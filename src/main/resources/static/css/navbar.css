@@ -1,4 +1,4 @@
-* {
+.navbar *, .navbar a{
     text-decoration: none;
 }
 
@@ -16,21 +16,23 @@
     justify-content: space-between;
 }
 
-li{
+.navbar li{
     list-style: none;
     display: inline-block;
 }
 
-li a {
+.navbar li a {
     color:black;
     font-size: 16px;
     font-weight: bold;
     margin-right: 25px;
+    cursor: pointer;
 }
 .search-container {
     flex-grow: 0.5;
     display: flex;
     justify-content: center;
+    cursor: pointer;
 }
 
 .search-container form {
@@ -56,23 +58,26 @@ li a {
     color: #666 !important;
     cursor: pointer;
     border: none;
+
 }
 
 
 .nav-buttons a {
     background-color: black;
-    color: white;
+    color: white !important;
     padding: 8px 18px;
     border-radius: 8px;
     font-size: 14px;
     margin-left: 10px;
     transition: 0.3s;
+    display: inline-block;
+    cursor: pointer;
 }
 
 .nav-buttons a:hover {
     background-color: #333;
 }
-button{
+.navbar button{
     background-color:black;
     margin-left: 10px;
     border-radius: 10px;
@@ -80,8 +85,12 @@ button{
     width: 90px;
 }
 
-button a{
+.navbar button a{
     color: white;
     font-weight:bold;
 }
 
+.navbar .nav-buttons a:hover {
+    background-color: #333;
+    color: gold;
+}
