@@ -1,4 +1,32 @@
+* {
+    text-decoration: none;
+}
 
+.navbar{
+    background-color:white;
+    font-family: 'Poppins', sans-serif;
+    padding-right: 15px;
+    padding-left: 15px;
+    border: 2px solid purple;
+}
+
+.navdiv{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+li{
+    list-style: none;
+    display: inline-block;
+}
+
+li a {
+    color:black;
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 25px;
+}
 .search-container {
     flex-grow: 0.5;
     display: flex;
@@ -23,9 +51,9 @@
 }
 
 .search-btn {
-    background: none;
-    width: auto;
-    color: #666;
+    background: none !important;
+    width: auto !important;
+    color: #666 !important;
     cursor: pointer;
     border: none;
 }
@@ -44,3 +72,16 @@
 .nav-buttons a:hover {
     background-color: #333;
 }
+button{
+    background-color:black;
+    margin-left: 10px;
+    border-radius: 10px;
+    padding: 10px;
+    width: 90px;
+}
+
+button a{
+    color: white;
+    font-weight:bold;
+}
+

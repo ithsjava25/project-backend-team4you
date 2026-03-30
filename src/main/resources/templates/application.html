@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Ansök</title>
@@ -7,6 +9,7 @@
     <link th:href="@{/css/application.css}" rel="stylesheet">
 </head>
 <body>
+<section layout:fragment="content">
 <div class="container">
     <h1 class="visually-hidden">Ansökningar</h1>
     <div class="second-container">
