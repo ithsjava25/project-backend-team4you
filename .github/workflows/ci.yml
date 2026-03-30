@@ -37,7 +37,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      # Required when project is checked out on Windows to prevent crash
+      # Ensure Maven wrapper is executable (Git may not preserve permissions)
       - name: Make mvnw executable
         run: chmod +x mvnw
 
