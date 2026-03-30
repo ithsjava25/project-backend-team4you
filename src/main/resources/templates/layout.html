@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" lang="">
+<head>
+    <meta charset="UTF-8">
+    <title>Ärendehantering</title>
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+<header th:replace="~{fragments/navbar :: header}"></header>
+
+<div class="main-wrapper" style="display: flex;">
+    <aside th:replace="~{fragments/side-navbar :: aside}"></aside>
+
+    <main layout:fragment="content" class="container">
+    </main>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"> <head>
+    <title>Boka tid</title>
+</head>
+<body>
+
+<section layout:fragment="content">
+    <main class="card">
+        <h2><i class="fa-regular fa-calendar"></i> Boka tid</h2>
+
+        <section class="section-booking">
+            <a th:href="@{/link}" target="_blank">Ärende</a>
+            <h2>Boka tid till ditt medborgarskapsärende</h2>
+            <p>Välj det här alternativet om du har blivit ombedd att boka tid för personlig inställelse</p>
+        </section>
+
+        <section class="section-calling">
+            <h2>Sök uppmaning till bokning</h2>
+            <p>Har du fått ett brev med en uppmaning att boka en tid? <a href="#">Sök</a></p>
+        </section>
+    </main>
+</section>
+
+</body>
+</html>
