@@ -88,7 +88,10 @@ public class WebAuthnCredential implements CredentialRecord {
     public Set<AuthenticatorTransport> getTransports() {
         if (transports == null || transports.isEmpty()) return Collections.emptySet();
         return Arrays.stream(transports.split(","))
-                .map(AuthenticatorTransport::valueOf)
+                .map(v -> Arrays.stream(AuthenticatorTransport.values())
+                        .filter(t -> t.getValue().equals(v))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalArgumentException("Unknown transport: " + v)))
                 .collect(Collectors.toSet());
     }
 
@@ -105,7 +108,7 @@ public class WebAuthnCredential implements CredentialRecord {
     // Standard Getters for remaining interface methods
     @Override
     public long getSignatureCount() {
-        return signatureCount;
+        return signatureCount != null ? signatureCount : 0L;
     }
 
     public void setSignatureCount(long count) {
@@ -114,7 +117,7 @@ public class WebAuthnCredential implements CredentialRecord {
 
     @Override
     public boolean isUvInitialized() {
-        return uvInitialized;
+        return uvInitialized != null && uvInitialized;
     }
 
     public void setUvInitialized(boolean uv) {
@@ -123,7 +126,7 @@ public class WebAuthnCredential implements CredentialRecord {
 
     @Override
     public boolean isBackupEligible() {
-        return backupEligible;
+        return backupEligible != null && backupEligible;
     }
 
     public void setBackupEligible(boolean be) {
@@ -132,7 +135,7 @@ public class WebAuthnCredential implements CredentialRecord {
 
     @Override
     public boolean isBackupState() {
-        return backupState;
+        return backupState != null && backupState;
     }
 
     public void setBackupState(boolean bs) {

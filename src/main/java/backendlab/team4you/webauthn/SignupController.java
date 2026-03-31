@@ -2,6 +2,7 @@ package backendlab.team4you.webauthn;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.SecureRandom;
 import java.util.List;
@@ -40,6 +42,15 @@ public class SignupController {
     @PostMapping("/signup")
     @ResponseBody
     public void signup(@RequestBody SignupRequest req, HttpServletRequest request, HttpServletResponse response) {
+
+        if (req.username == null || req.username.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is required");
+        }
+
+        if (users.findByUsername(req.username) != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+        }
+
         byte[] idBytes = new byte[32];
         random.nextBytes(idBytes);
 
