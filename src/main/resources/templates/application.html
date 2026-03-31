@@ -1,58 +1,36 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}" lang="en">
+<!--      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"-->
+<!--      layout:decorate="~{layout}">-->
 <head>
-    <meta charset="UTF-8">
-    <title>Ansök</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>Ansökningar</title>
     <link th:href="@{/css/application.css}" rel="stylesheet">
 </head>
 <body>
-<section layout:fragment="content">
-<div class="container">
-    <h1 class="visually-hidden">Ansökningar</h1>
-    <div class="second-container">
-        <div class="apply-container"><h2 >
-            <i >
 
-            </i>Ansök</h2><div>
-            <ul class="list-unstyled blockList"><li>
-                <a>
-                    <div class="third-container"><div ><div class=><div>
-                        <div class="forth-container">
-                            <i>
-                            </i>
-                            <div>
-                                <h3>Du vill ansöka</h3>Du vill ansöka eller få mer information om hur det går till.</div></div>
-                    </div>
-                    </div>
-                    </div>
-                    </div>
-                </a>
-            </li>
+<!--<section layout:fragment="content">-->
+    <div class="container">
+        <h1 class="visually-hidden">Ansökningar</h1>
+
+        <div class="apply-container">
+            <h2><i class="fa-solid fa-file-pen"></i> Ansök</h2>
+            <ul class="list-unstyled">
                 <li>
-                    <a class="a-extend" title="Du vill förlänga" href="extend.html" target="_blank">
-                        <div class="decision-container">
-                            <div data-testid="ansok-extend" class="card-body">
-                                <div class="div-align-items"><div>
-                                    <div class="d-flex align-items-center">
-                                        <i></i>
-                                        <div >
-                                            <h3>Du vill förlänga</h3>
-                                            Du har ett tillstånd och vill ansöka om att förlänga det.</div>
-                                    </div>
-                                </div>
-                                </div></div>
-                        </div>
-                    </a></li></ul> </div>
+                    <div class="forth-container">
+                        <h3>Du vill ansöka</h3>
+                        <p>Du vill ansöka eller få mer information om hur det går till.</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="decision-container">
+                        <h3>Du vill förlänga</h3>
+                        <p>Du har ett tillstånd och vill ansöka om att förlänga det.</p>
+                    </div>
+                </li>
+            </ul>
         </div>
     </div>
-
-</div>
-<div>
-    <div>
-
+</section>
 
 </body>
 </html>

@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}"> <head>
+<html xmlns:th="http://www.thymeleaf.org">
+      <head>
+<!--      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"-->
+<!--      layout:decorate="~{layout}"> <head>-->
+          <link th:href="@{/css/booking.css}" rel="stylesheet">
     <title>Boka tid</title>
 </head>
 <body>
 
-<section layout:fragment="content">
+<!--<section layout:fragment="content">-->
+<section class="container">
     <main class="card">
         <h2><i class="fa-regular fa-calendar"></i> Boka tid</h2>
 

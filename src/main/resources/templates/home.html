@@ -3,9 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
-    <link th:href="@{/css/home.css}" rel="stylesheet">
+    <link th:href="@{/css/navbar.css}" rel="stylesheet">
+    <link th:href="@{/css/side-navbar.css}" rel="stylesheet">
 </head>
 <body>
+<div th:replace="~{navbar :: header}"></div>
+<div th:replace="~{side-navbar :: aside}"></div>
+<main>
+
+
+
+</main>
+
 
 
 </body>
