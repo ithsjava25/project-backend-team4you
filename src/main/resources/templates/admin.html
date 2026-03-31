@@ -2,15 +2,56 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin</title>
+    <title>Title</title>
+    <link th:href="@{/css/side-navbar.css}" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link th:href="@{/css/navbar.css}">
 </head>
 <body>
-<nav>
-    <header class="header">
-        <a th:href="@{/admin}">Admin Dashboard</a>
+<aside th:fragment="aside">
+    <div class="container">
+        <div class="head">
+            <a th:href="@{/}">Admin Dashboard</a>
+        </div>
+        <ol class="side-nav">
+            <li class="home">
+                <a th:href="@{/static}">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Hantera användare</span>
+                </a>
+            </li>
+            <li class="application">
+                <a th:href="@{/application}">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <span>Hantera ansökningar</span>
+                </a>
+            </li>
+            <li class="booking">
+                <a th:href="@{/booking}">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>Hantera bokade tidare</span>
+                </a>
+            </li>
+            <li class="profile">
+                <a th:href="@{/profile}">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Hantera profiler</span>
+                </a>
+            </li>
+            <li class="profile">
+                <a th:href="@{/profile}">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Systemlogg</span>
+                </a>
+            </li>
+            <li class="profile">
+                <a th:href="@{/profile}">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Logga ut</span>
+                </a>
+            </li>
 
-    </header>
-</nav>
-
+        </ol>
+    </div>
+</aside>
 </body>
 </html>

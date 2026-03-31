@@ -2,7 +2,11 @@ package backendlab.team4you.user;
 
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 public class UserController {
@@ -21,7 +25,11 @@ public class UserController {
     }
 
     @GetMapping("/application")
-    public String application(){
+    public String application(Model model){
+        List<String> application = Arrays.asList("Ärende #1 - Pågående", "Ärende #15 - Väntar på beslut");
+        model.addAttribute("application", application);
+        model.addAttribute("userName", "Test user");
+
         return "application";
     }
 

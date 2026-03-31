@@ -1,20 +1,20 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-      <head>
-<!--      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"-->
-<!--      layout:decorate="~{layout}"> <head>-->
-          <link th:href="@{/css/booking.css}" rel="stylesheet">
-    <title>Boka tid</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+    <head>
+    <title>Ansökningar</title>
+    <link th:href="@{/css/booking.css}" rel="stylesheet">
+    </head>
 <body>
 
-<!--<section layout:fragment="content">-->
-<section class="container">
+<section layout:fragment="content">
+
     <main class="card">
         <h2><i class="fa-regular fa-calendar"></i> Boka tid</h2>
 
         <section class="section-booking">
-            <a th:href="@{/link}" target="_blank">Ärende</a>
+            <a th:href="@{/link}" >Ärende</a>
             <h2>Boka tid till ditt medborgarskapsärende</h2>
             <p>Välj det här alternativet om du har blivit ombedd att boka tid för personlig inställelse</p>
         </section>
