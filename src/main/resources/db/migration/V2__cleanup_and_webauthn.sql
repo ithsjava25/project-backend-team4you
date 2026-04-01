@@ -7,7 +7,7 @@ CREATE TABLE app_user (
 );
 
 CREATE TABLE user_credentials (
-                                  credential_id VARCHAR(512) PRIMARY KEY,
+                                  credential_id VARCHAR(1365) PRIMARY KEY,
                                   user_entity_user_id VARCHAR(255) NOT NULL,
                                   public_key BYTEA NOT NULL,
                                   attestation_object BYTEA,
