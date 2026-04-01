@@ -1,4 +1,4 @@
-package backendlab.team4you.webauthn;
+package backendlab.team4you.user;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
