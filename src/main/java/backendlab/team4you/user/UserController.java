@@ -42,4 +42,8 @@ public class UserController {
     public String admin(){
         return "admin";
     }
+    @GetMapping("/contact")
+    public String contact(){
+        return "contact";
+    }
 }
