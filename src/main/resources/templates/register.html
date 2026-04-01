@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Logga in - Ärendehantering</title>
+    <link rel="stylesheet" th:href="@{/css/register.css}">
+</head>
+<body>
+    <div class="signup-box">
+        <h1>Register</h1>
+        <form th:action="@{/register}" method="post">
+            <label>First name</label>
+            <label>
+                <input type="text" name="first name" required>
+            </label>
+            <label>Last name</label>
+            <label>
+                <input type="text" name="last name" required>
+            </label>
+            <label>Email</label>
+            <label>
+                <input type="text" name="Email" required>
+            </label>
+            <label>Password</label>
+            <label>
+                <input type="password" name="password" required>
+            </label>
+            <label>Confirm password</label>
+            <label>
+                <input type="password" name="confirm password" required>
+            </label>
+            <input type="submit" value="Submit">
+        </form>
+        <p>Already have an account? <a th:href="@{/login}">Log in</a></p>
+        <p>Return to <a th:href="@{/}">Home</a></p>
+    </div>
+
+
+</body>
+</html>
