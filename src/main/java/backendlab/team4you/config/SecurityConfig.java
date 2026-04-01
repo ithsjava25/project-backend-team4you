@@ -54,8 +54,9 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService(){
         return username -> User.builder()
                 .username(username)
-                .password("{noop}") //no password needed, only passkey but idk if i have to change this for something?
+                .password("{noop}!LOCKED!") // Non-empty impossible-to-match password
                 .roles("USER")
+                .accountLocked(true) // Prevent password-based login
                 .build();
     }
 }
