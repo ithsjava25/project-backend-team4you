@@ -1,6 +1,6 @@
-create table app_user (
-                          id bigserial primary key,
-                          email varchar(255) not null unique,
-                          password_hash varchar(255) not null,
-                          created_at timestamp not null default current_timestamp
-);
+-- create table app_user (
+--                           id bigserial primary key,
+--                           email varchar(255) not null unique,
+--                           password_hash varchar(255) not null,
+--                           created_at timestamp not null default current_timestamp
+-- );
