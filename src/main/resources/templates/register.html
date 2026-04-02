@@ -1,3 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" lang="">
+<head>
+    <meta charset="UTF-8">
+    <title>navbar</title>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
 <div class="signup-box" xmlns:th="http://www.w3.org/1999/xhtml">
     <h1>Registrera dig</h1>
     <form th:action="@{/register}" method="post">
@@ -27,3 +36,5 @@
         <p><a th:href="@{/}">Tillbaka till start</a></p>
     </div>
 </div>
+
+</html>

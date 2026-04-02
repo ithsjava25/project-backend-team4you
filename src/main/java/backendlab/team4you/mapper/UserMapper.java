@@ -1,8 +1,5 @@
 package backendlab.team4you.mapper;
 
-import backendlab.team4you.dto.UserDTO;
-import backendlab.team4you.user.UserEntity;
-
 public class UserMapper {
 
 
@@ -30,5 +27,11 @@ public class UserMapper {
 //        dto.setFullName(entity.getFirstName() + " " + entity.getLastName());
 //        return dto;
 //    }
+
+//    UserEntity user = new UserEntity();
+//user.setId(UUID.randomUUID().toString());
+//user.setName(dto.email()); // username = email
+//user.setDisplayName(dto.firstName() + " " + dto.lastName());
+//user.setPasswordHash(passwordEncoder.encode(dto.password()));
 }
 
