@@ -3,12 +3,13 @@ package backendlab.team4you.caserecord;
 import backendlab.team4you.registry.Registry;
 import jakarta.persistence.*;
 
+@Entity
 @Table(
         name = "case_number_sequence",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        name = "uk_case_number_sequence_docket_year",
-                        columnNames = {"docket_id", "year"}
+                        name = "uk_case_number_sequence_registry_year",
+                        columnNames = {"registry_id", "year"}
                 )
         }
 )
@@ -22,7 +23,7 @@ public class CaseNumberSequence {
     @JoinColumn(name = "registry_id", nullable = false)
     private Registry registry;
 
-    @Column(nullable = false)
+    @Column(name = "sequence_year",nullable = false)
     private Integer year;
 
     @Column(name = "last_value", nullable = false)
@@ -30,7 +31,7 @@ public class CaseNumberSequence {
 
     protected CaseNumberSequence() {}
 
-    public CaseNumberSequence(Registry registry, Integer year) {
+    public CaseNumberSequence(Registry registry, Integer year, Long lastValue) {
         this.registry = registry;
         this.year = year;
         this.lastValue = lastValue;
