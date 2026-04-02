@@ -19,17 +19,14 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         return http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(
                         authorizeHttp -> authorizeHttp
-                                // Public endpoints
-                                .requestMatchers( "/login", "/signup").permitAll()
+                                .requestMatchers("/login", "/signup", "/api/files/**").permitAll()
                                 .anyRequest().authenticated()
-
-                                // Add elevated permissions
-
                 )
-                .webAuthn( passkeys -> passkeys
-                        .rpId("localhost") //identity of the website
+                .webAuthn(passkeys -> passkeys
+                        .rpId("localhost")
                         .allowedOrigins("http://localhost:8080")
                         .rpName("Passkey team4you")
                 )
