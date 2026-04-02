@@ -23,7 +23,7 @@ public class CaseRecord {
     private String caseNumber;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "docket_id", nullable = false)
+    @JoinColumn(name = "registry_id", nullable = false)
     private Registry registry;
 
     @Column(nullable = false, length = 255)
