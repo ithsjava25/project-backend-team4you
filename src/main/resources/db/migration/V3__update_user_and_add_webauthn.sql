@@ -1,0 +1,9 @@
+ALTER TABLE app_user
+    ADD COLUMN IF NOT EXISTS email VARCHAR(255),
+    ADD COLUMN IF NOT EXISTS first_name VARCHAR(255),
+    ADD COLUMN IF NOT EXISTS last_name VARCHAR(255),
+    ADD COLUMN IF NOT EXISTS phone_number VARCHAR(50),
+    ADD COLUMN IF NOT EXISTS display_name VARCHAR(255);
+
+UPDATE app_user SET name = email WHERE name IS NULL;
+
