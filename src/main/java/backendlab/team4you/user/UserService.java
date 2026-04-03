@@ -2,7 +2,6 @@ package backendlab.team4you.user;
 
 import backendlab.team4you.dto.UserRegistrationDTO;
 import backendlab.team4you.repository.UserRepository;
-import lombok.extern.slf4j.Slf4j;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Slf4j
+
 @Service
 public class UserService {
 
