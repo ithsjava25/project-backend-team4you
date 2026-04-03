@@ -1,8 +1,11 @@
 package backendlab.team4you.user;
 
+import backendlab.team4you.dto.UserRegistrationDTO;
 import backendlab.team4you.repository.UserRepository;
-import groovy.util.logging.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -14,11 +17,13 @@ public class UserService {
 
 
     UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository){
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder){
 
 
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -40,7 +45,7 @@ public class UserService {
     @Transactional
     public void deleteById(String id){
         if(userRepository.findById(id).isEmpty()){
-            throw new RuntimeException("User not found"); // tills vi har globalexception
+            throw new RuntimeException("User not found");
         }
         userRepository.deleteById(id);
     }
@@ -49,5 +54,27 @@ public class UserService {
     }
 
 
+    public void registerUser(UserRegistrationDTO dto) {
 
+        if (userRepository.findByEmail(dto.email()).isPresent()) {
+            throw new RuntimeException("E-posten är redan tagen");
+        }
+
+        UserEntity user = new UserEntity();
+        user.setFirstName(dto.firstName());
+        user.setLastName(dto.lastName());
+        user.setEmail(dto.email());
+        user.setPhoneNumber(dto.phoneNumber());
+
+
+        String hashedPw = passwordEncoder.encode(dto.password());
+        user.setPasswordHash(hashedPw);
+
+
+        userRepository.save(user);
+    }
+
+    public UserEntity findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
 }

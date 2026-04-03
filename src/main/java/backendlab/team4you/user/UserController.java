@@ -1,6 +1,8 @@
 package backendlab.team4you.user;
 
 
+import backendlab.team4you.dto.ContactFormDTO;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -38,12 +40,26 @@ public class UserController {
         return "profile";
     }
 
-    @GetMapping("/admin")
+
+     @GetMapping("/admin")
+     @PreAuthorize("hasRole('ADMIN')")
     public String admin(){
         return "admin";
     }
+
     @GetMapping("/contact")
-    public String contact(){
+    public String showContactPage(Model model) {
+
+        model.addAttribute("contactForm", new ContactFormDTO("", "", "", "", ""));
         return "contact";
+    }
+
+    @PostMapping("/contact/send")
+    public String handleContactSubmit(@ModelAttribute("contactForm") ContactFormDTO form) {
+
+        System.out.println("Meddelande från: " + form.email());
+
+
+        return "redirect:/contact?success";
     }
 }
