@@ -3,12 +3,20 @@
 <head>
     <title>Add New Book</title>
     <link th:href="@{/css/contact.css}" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
 </head>
 <body>
 <div class="contact-wrapper"> <h1>Contact Us</h1>
 
-    <form th:action="@{/contact/send}" th:object="${contactForm}" method="post">
+    <form   hx-post="/contact/send"
+            hx-trigger="click"
+            hx-target="#contact-form"
+            hx-swap="outerHTML"
+            th:action="@{/contact/send}" th:object="${contactForm}" method="post">
         <div class="container">
+            <div th:fragment="message">
+                <p>Tack! Meddelandet är skickat 🎉</p>
+            </div>
             <div>
                 <label class="form-label">First Name </label>
                 <input type="text" class="form-control" th:field="*{firstName}" placeholder="Name" required>
@@ -30,7 +38,8 @@
                 <textarea class="form-control" th:field="*{message}" placeholder="How can we help?" required></textarea>
             </div>
             <div>
-                <button type="submit" class="submit-btn">Send Message</button>
+                <button
+                        type="submit" class="submit-btn">Send Message</button>
             </div>
         </div>
     </form>

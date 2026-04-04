@@ -5,6 +5,7 @@
     <head>
     <title>Ansökningar</title>
     <link th:href="@{/css/booking.css}" rel="stylesheet">
+        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     </head>
 <body>
 
@@ -14,15 +15,33 @@
         <h2><i class="fa-regular fa-calendar"></i> Boka tid </h2>
 
         <section class="section-booking">
-            <a th:href="@{/link}" target="_blank" rel="noopener noreferrer">Ärende</a>
+            <a
+                    hx-get="/booking/application"
+                    hx-target="#content-area"
+                    hx-swap="innerHTML"
+                    th:href="@{/booking/application}"
+                    class="btn-highlight"
+            >
+                Ärende
+            </a>
+
             <h2>Boka tid till ditt medborgarskapsärende</h2>
             <p>Välj det här alternativet om du har blivit ombedd att boka tid för personlig inställelse</p>
         </section>
-
         <section class="section-calling">
-            <h2>Sök uppmaning till bokning</h2>
-            <p>Har du fått ett brev med en uppmaning att boka en tid? <a th:href="@{/booking/search}">Sök</a></p>
+            <a
+                    hx-get="/booking/search"
+                    hx-target="#content-area"
+                    hx-swap="innerHTML"
+                    th:href="@{/booking/search}"
+            >
+                <h2>Sök uppmaning till bokning</h2>
+                <p>Har du fått ett brev med en uppmaning att boka en tid? Sök</p>
+            </a>
         </section>
+        <div th:fragment="content">
+            <h2>Bokning</h2>
+        </div>
     </main>
 </section>
 

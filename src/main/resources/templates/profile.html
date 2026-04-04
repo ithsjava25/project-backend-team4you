@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>navbar</title>
     <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <header th:fragment="header">
@@ -27,7 +28,16 @@
             </div>
 
             <ul class="nav-links">
-                <li><a th:href="@{/applications}">Mina Ansökningar</a></li>
+                <li>
+                    <a
+                            hx-get="/profile"
+                            hx-target="#content-area"
+                            hx-swap="innerHTML"
+                            th:href="@{/profile}"
+                    >
+                        Min profil
+                    </a>
+                </li>
                 <li><a th:href="@{/new}">Ny Ansökan</a></li>
                 <li><a th:href="@{/bookings}">Bokade</a></li>
                 <li><a th:href="@{/profile}" class="btn-highlight">Profil</a></li>
