@@ -1,4 +1,4 @@
-package backendlab.team4you.dto;
+package backendlab.team4you.contact;
 
 public record ContactFormDTO(
         String firstName,

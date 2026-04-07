@@ -38,9 +38,27 @@
                         Min profil
                     </a>
                 </li>
-                <li><a th:href="@{/new}">Ny Ansökan</a></li>
-                <li><a th:href="@{/bookings}">Bokade</a></li>
-                <li><a th:href="@{/profile}" class="btn-highlight">Profil</a></li>
+                <li>
+                    <a
+                            hx-get="/application"
+                            hx-target="#content-area"
+                            hx-swap="innerHTML"
+                            th:href="@{/application}"
+                    >
+                        Ny Ansökan
+                    </a>
+                </li>
+                <li>
+                    <a
+                            hx-get="/bookings"
+                            hx-target="#content-area"
+                            hx-swap="innerHTML"
+                            th:href="@{/bookings}"
+                    >
+                        Bokade
+                    </a>
+                </li>
+                <li><a th:href="@{/}" class="btn-highlight">Hem</a></li>
             </ul>
         </div>
 

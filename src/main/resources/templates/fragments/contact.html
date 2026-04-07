@@ -8,11 +8,14 @@
 <body>
 <div class="contact-wrapper"> <h1>Contact Us</h1>
 
-    <form   hx-post="/contact/send"
-            hx-trigger="click"
-            hx-target="#contact-form"
-            hx-swap="outerHTML"
-            th:action="@{/contact/send}" th:object="${contactForm}" method="post">
+    <form hx-post="/contact/send"
+          hx-target="#contact-section"
+          hx-swap="outerHTML"
+          th:object="${contactForm}">
+
+        <input type="text" th:field="*{firstName}">
+
+        <button type="submit">Skicka meddelande</button>
         <div class="container">
             <div th:fragment="message">
                 <p>Tack! Meddelandet är skickat 🎉</p>
@@ -28,6 +31,7 @@
             <div>
                 <label class="form-label">Email</label>
                 <input type="email" class="form-control" th:field="*{email}" placeholder="Email" required>
+
             </div>
             <div>
                 <label class="form-label">Phone number</label>

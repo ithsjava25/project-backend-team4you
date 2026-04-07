@@ -12,10 +12,15 @@
 <header th:replace="~{fragments/navbar :: header}"></header>
 
 <div class="main-wrapper" style="display: flex;">
+
     <aside th:replace="~{fragments/side-navbar :: aside}"></aside>
 
-    <main layout:fragment="content" class="container">
+    <main class="container">
+        <div id="content-area">
+
+        </div>
     </main>
+
 </div>
 
 </body>

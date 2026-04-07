@@ -1,6 +1,7 @@
-package backendlab.team4you.webauthn;
+package backendlab.team4you.controller;
 
 import backendlab.team4you.dto.UserRegistrationDTO;
+import backendlab.team4you.exceptions.DuplicateEmailException;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
 import org.springframework.stereotype.Controller;
@@ -39,10 +40,13 @@ public class RegistrationController {
 
         try {
             userService.registerUser(registrationDto);
-        } catch (RuntimeException e) {
-            model.addAttribute("error", "E-postadressen är redan registrerad!");
-            return "register";
-        }
+         } catch (DuplicateEmailException e) {
+        model.addAttribute("error", "E-postadressen är redan registrerad!");
+        return "register";
+               } catch (Exception e) {
+                   model.addAttribute("error", "Ett oväntat fel uppstod. Försök igen.");
+                    return "register";
+    }
 
         return "redirect:/login?registered";
     }
@@ -67,7 +71,14 @@ public class RegistrationController {
         String email = principal.getName();
         UserEntity user = userService.findByEmail(email);
 
+        if (user == null) {
+
+            return "redirect:/login?error=user_not_found";
+        }
+
         model.addAttribute("fullName", user.getFirstName() + " " + user.getLastName());
         return "welcome";
+
+
     }
 }

@@ -5,5 +5,9 @@ ALTER TABLE app_user
     ADD COLUMN IF NOT EXISTS phone_number VARCHAR(50),
     ADD COLUMN IF NOT EXISTS display_name VARCHAR(255);
 
-UPDATE app_user SET name = email WHERE name IS NULL;
+    UPDATE app_user SET email = name WHERE email IS NULL;
+
+    ALTER TABLE app_user ALTER COLUMN email SET NOT NULL;
+
+    ALTER TABLE app_user ADD CONSTRAINT uk_app_user_email UNIQUE (email);
 

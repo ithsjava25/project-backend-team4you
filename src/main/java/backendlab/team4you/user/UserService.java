@@ -1,6 +1,8 @@
 package backendlab.team4you.user;
 
 import backendlab.team4you.dto.UserRegistrationDTO;
+import backendlab.team4you.exceptions.DuplicateEmailException;
+import backendlab.team4you.exceptions.UserNotFoundException;
 import backendlab.team4you.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.User;
@@ -44,7 +46,7 @@ public class UserService {
     @Transactional
     public void deleteById(String id){
         if(userRepository.findById(id).isEmpty()){
-            throw new RuntimeException("User not found");
+            throw new DuplicateEmailException("E-posten är redan taken");
         }
         userRepository.deleteById(id);
     }
@@ -75,5 +77,14 @@ public class UserService {
 
     public UserEntity findByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
+    }
+
+    @Transactional
+    public void deleteUser(String id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException("User not found with id: " + id);
+        }
+
+        userRepository.deleteById(id);
     }
 }

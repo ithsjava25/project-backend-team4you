@@ -18,4 +18,10 @@ public class GlobalExceptionHandler {
 
         return "error";
     }
+    @ExceptionHandler(DuplicateEmailException.class)
+    @ResponseStatus(HttpStatus.CONFLICT) //
+    public String handleDuplicateEmail(DuplicateEmailException ex, Model model) {
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "error";
+    }
 }

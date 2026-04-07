@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="sv" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link th:href="@{/css/side-navbar.css}" rel="stylesheet">
+    <link th:href="@{/css/navbar.css}" rel="stylesheet">
+</head>
+<body>
+<div class="dashboard-layout">
+
+    <aside class="sidebar">
+        <div class="head">
+            <a th:href="@{/}">Team4You Admin</a>
+        </div>
+
+        <nav>
+            <ul class="side-nav">
+                <li>
+                    <a hx-get="/admin/users" hx-target="#content-area">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Användaröversikt</span>
+                    </a>
+                </li>
+                <li>
+                    <a hx-get="/admin/applications" hx-target="#content-area">
+                        <i class="fa-solid fa-file-invoice"></i>
+                        <span>Ansökningar</span>
+                    </a>
+                </li>
+                <li>
+                    <a hx-get="/admin/bookings" hx-target="#content-area">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <span>Bokningar</span>
+                    </a>
+                </li>
+                <li>
+                    <a hx-get="/admin/logs" hx-target="#content-area">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                        <span>Systemlogg</span>
+                    </a>
+                </li>
+
+                <li class="logout-item">
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="btn-logout">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span>Logga ut</span>
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main id="content-area">
+        <div class="welcome-message">
+            <h2>Välkommen till Dashboarden</h2>
+            <p>Välj en kategori i menyn för att hantera systemet.</p>
+        </div>
+    </main>
+
+</div>
+</body>
+</html>
