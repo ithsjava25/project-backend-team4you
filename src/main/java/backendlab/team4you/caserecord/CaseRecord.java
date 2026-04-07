@@ -5,6 +5,7 @@ import backendlab.team4you.webauthn.UserEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(
@@ -19,7 +20,7 @@ public class CaseRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "case_number", nullable = false, unique = true, length = 50)
+    @Column(name = "case_number", nullable = false, unique = true, length = 50, updatable = false)
     private String caseNumber;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -71,12 +72,15 @@ public class CaseRecord {
             String confidentialityLevel,
             LocalDateTime openedAt
     ) {
-        this.registry = registry;
+        this.registry = Objects.requireNonNull(registry, "registry is required");
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("title is required");
+        }
         this.title = title;
         this.description = description;
         this.status = status;
-        this.owner = owner;
-        this.assignedUser = assignedUser;
+        this.owner = Objects.requireNonNull(owner, "owner is required");
+        this.assignedUser = Objects.requireNonNull(assignedUser, "assignedUser is required");
         this.confidentialityLevel = confidentialityLevel;
         this.openedAt = openedAt;
     }
@@ -84,6 +88,9 @@ public class CaseRecord {
     @PrePersist
     void onCreate() {
         LocalDateTime now = LocalDateTime.now();
+        if (this.caseNumber == null || this.caseNumber.isBlank()) {
+            throw new IllegalStateException("caseNumber must be set before persisting");
+        }
         this.createdAt = now;
         if (this.openedAt == null) {
             this.openedAt = now;
@@ -106,6 +113,16 @@ public class CaseRecord {
     }
 
     public String getCaseNumber() {
+
+        if (this.caseNumber != null) {
+            throw new IllegalStateException("caseNumber is immutable once set");
+        }
+        if (caseNumber == null || caseNumber.isBlank()) {
+            throw new IllegalArgumentException("caseNumber is required");
+        }
+        if (caseNumber.length() > 50) {
+            throw new IllegalArgumentException("caseNumber length must be <= 50");
+        }
         return caseNumber;
     }
 
