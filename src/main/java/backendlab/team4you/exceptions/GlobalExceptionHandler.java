@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND) // 404
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public String notFoundException(UserNotFoundException ex, Model model) {
 
         model.addAttribute("errorMessage", ex.getMessage());
@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
         return "error";
     }
     @ExceptionHandler(DuplicateEmailException.class)
-    @ResponseStatus(HttpStatus.CONFLICT) //
+    @ResponseStatus(HttpStatus.CONFLICT)
     public String handleDuplicateEmail(DuplicateEmailException ex, Model model) {
         model.addAttribute("errorMessage", ex.getMessage());
         return "error";
