@@ -1,0 +1,30 @@
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.card {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+
+.section-booking, .section-calling {
+    margin-top: 20px;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.section-calling {
+    border: 1px solid purple;
+}
+
+.section-booking {
+    border: 1px solid purple;
+}
+
+{}

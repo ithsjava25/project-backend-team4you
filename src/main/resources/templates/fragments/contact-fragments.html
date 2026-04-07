@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="contact-form" id="contact-section">
+    <form hx-post="/contact/send" hx-target="#contact-section" hx-swap="outerHTML">
+        <input type="text" th:field="*{firstName}">
+        <p th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="error"></p>
+
+        <button type="submit">Skicka</button>
+    </form>
+</div>
+
+<div th:fragment="success-message" id="contact-section">
+    <div class="alert alert-success">
+        <h3>Tack! Meddelandet är skickat 🎉</h3>
+        <p>Vi hör av oss så snart vi kan.</p>
+    </div>
+</div>
+</body>
+</html>
