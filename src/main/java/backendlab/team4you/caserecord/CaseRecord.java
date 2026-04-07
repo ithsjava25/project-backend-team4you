@@ -35,11 +35,11 @@ public class CaseRecord {
     @Column(nullable = false, length = 50)
     private String status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_user_id", nullable = false)
     private UserEntity owner;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_user_id", nullable = false)
     private UserEntity assignedUser;
 
