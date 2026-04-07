@@ -1,0 +1,47 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+    font-family: Poppins, sans-serif;
+}
+
+.container{
+    width:250px;
+    height: 100%;
+    position:absolute;
+    background: #f3f3f3;
+    z-index: 1;
+    transition: 0.5s;
+}
+
+.home{
+    padding: 10px;
+}
+
+.application{
+    padding: 10px;
+}
+
+.profile{
+    padding: 10px;
+}
+.contact{
+    padding: 10px;
+}
+.logout{
+    padding: 10px;
+}
+
+.booking{
+    padding: 10px;
+}
+
+li:hover{
+    color: #6017a8;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+{}

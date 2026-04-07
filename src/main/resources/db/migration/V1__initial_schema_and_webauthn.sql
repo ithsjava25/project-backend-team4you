@@ -4,6 +4,7 @@ CREATE TABLE app_user (
                           display_name VARCHAR(255),
                           password_hash VARCHAR(255), -- NULL permitido para Passkeys
                           created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+
 );
 
 CREATE TABLE user_credentials (

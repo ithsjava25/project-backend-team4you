@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+<head>
+    <title>Ansökningar</title>
+    <link th:href="@{/css/application.css}" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+<main>
+<section layout:fragment="content">
+    <div class="container">
+        <h1 class="visually-hidden"> </h1>
+
+        <div class="apply-container">
+            <h2><i class="fa-solid fa-file-pen"></i> Ansök</h2>
+            <ul class="list-unstyled">
+                <li>
+                    <div class="forth-container">
+                        <h3>Du vill ansöka</h3>
+                        <p>Du vill ansöka eller få mer information om hur det går till.</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="decision-container">
+                        <h3>Du vill förlänga</h3>
+                        <p>Du har ett tillstånd och vill ansöka om att förlänga det.</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+
+<!--    <div id="content-area"-->
+<!--         th:replace="fragments/application :: content">-->
+<!--    </div>-->
+</main>
+</body>
+</html>

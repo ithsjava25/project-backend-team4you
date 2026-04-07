@@ -1,0 +1,51 @@
+name: CI Pipeline
+
+# Triggers on push and pull requests
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: team4you
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      # Checks out the repository code
+      - uses: actions/checkout@v6.0.2
+
+      # Sets up Java25 and caches Maven dependencies
+      - uses: actions/setup-java@v5.2.0
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+
+      # Ensure Maven wrapper is executable (Git may not preserve permissions)
+      - name: Make mvnw executable
+        run: chmod +x mvnw
+
+      # Builds the project and runs all tests
+      - name: Build and test
+        run: ./mvnw verify
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/team4you
+          DB_USERNAME: postgres
+          DB_PASSWORD: postgres
+          SPRING_DOCKER_COMPOSE_ENABLED: false

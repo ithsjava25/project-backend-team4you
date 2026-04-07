@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Document</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+    <h1>Logga in</h1>
+    <form th:action="@{/login}" method="post">
+    <label for="email">E-post</label>
+    <input type="email" id="email" name="username" required autofocus>
+
+    <label for="password">Lösenord</label>
+    <input type="password" id="password" name="password" required>
+
+    <input type="submit" value="Logga in" class="submit-btn">
+    </form>
+    <p>Inget konto? <a th:href="@{/register}">Registrera dig här</a></p>
+    <form hx-post="/register">
+        <input id="title" name="title" type="text"
+               hx-post="/validate"
+               hx-trigger="change"
+               hx-sync="closest form:abort">
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
