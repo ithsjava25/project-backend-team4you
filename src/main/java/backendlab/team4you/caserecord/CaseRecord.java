@@ -113,6 +113,16 @@ public class CaseRecord {
     }
 
     public String getCaseNumber() {
+
+        if (this.caseNumber != null) {
+            throw new IllegalStateException("caseNumber is immutable once set");
+        }
+        if (caseNumber == null || caseNumber.isBlank()) {
+            throw new IllegalArgumentException("caseNumber is required");
+        }
+        if (caseNumber.length() > 50) {
+            throw new IllegalArgumentException("caseNumber length must be <= 50");
+        }
         return caseNumber;
     }
 
