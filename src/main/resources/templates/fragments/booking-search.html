@@ -1,0 +1,7 @@
+<div th:fragment="content">
+    <h2>Bokningssök</h2>
+
+    <ul>
+        <li th:each="booking : ${bookings}" th:text="${booking}"></li>
+    </ul>
+</div>
