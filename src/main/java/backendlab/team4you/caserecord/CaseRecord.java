@@ -1,7 +1,7 @@
 package backendlab.team4you.caserecord;
 
 import backendlab.team4you.registry.Registry;
-import backendlab.team4you.webauthn.UserEntity;
+import backendlab.team4you.user.UserEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
