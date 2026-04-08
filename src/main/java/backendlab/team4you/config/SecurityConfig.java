@@ -12,6 +12,10 @@ import org.springframework.security.web.webauthn.management.JdbcPublicKeyCredent
 import org.springframework.security.web.webauthn.management.JdbcUserCredentialRepository;
 import org.springframework.security.web.webauthn.management.PublicKeyCredentialUserEntityRepository;
 import org.springframework.security.web.webauthn.management.UserCredentialRepository;
+import backendlab.team4you.user.UserEntity;
+import backendlab.team4you.user.UserService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.User;
 
 @Configuration
 public class SecurityConfig {
@@ -62,13 +66,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(BCryptPasswordEncoder encoder){
+    public UserDetailsService userDetailsService(BCryptPasswordEncoder encoder, UserService userService){
         return username -> {
             UserEntity user = userService.findByEmail(username);
             if (user == null) {
                 throw new UsernameNotFoundException("User not found: " + username);
             }
             String role = username.equals("admin@team4you.com") ? "ADMIN" : "USER";
+
             return User.builder()
                     .username(user.getEmail())
                     .password(user.getPasswordHash())

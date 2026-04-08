@@ -1,5 +1,6 @@
 package backendlab.team4you.config;
 
+import backendlab.team4you.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Lazy;
@@ -15,22 +16,23 @@ import java.io.IOException;
 public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final UserCredentialRepository userCredentialRepository;
-    private final PublicKeyCredentialUserEntityRepository userEntityRepository;
+    private final UserService userService;
 
     public CustomAuthenticationSuccessHandler(@Lazy UserCredentialRepository userCredentialRepository,
-                                              @Lazy PublicKeyCredentialUserEntityRepository userEntityRepository) {
+                                              @Lazy UserService userService){
         this.userCredentialRepository = userCredentialRepository;
-        this.userEntityRepository = userEntityRepository;
+        this.userService = userService;
     }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+                                        Authentication authentication
+                                        ) throws IOException {
 
         String username = authentication.getName();
 
-        var userEntity = userEntityRepository.findByEmail(username);
+        var userEntity = userService.findByEmail(username);
 
         if (userEntity != null){
             var credentials = userCredentialRepository.findByUserId(userEntity.getId());
