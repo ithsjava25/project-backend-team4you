@@ -26,6 +26,9 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "role")
+    private String role = "USER";
+
     @Column(name = "phone_number")
     private String phoneNumber;
 
@@ -110,5 +113,13 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
