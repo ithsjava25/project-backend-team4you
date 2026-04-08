@@ -2,7 +2,7 @@ package backendlab.team4you.caserecord;
 
 import backendlab.team4you.registry.Registry;
 import backendlab.team4you.user.UserEntity;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -42,21 +42,28 @@ public class CaseRecordService {
                 openedAt
         );
 
-        String nextCaseNumber = allocateNextCaseNumber(registry, LocalDateTime.now().getYear());
+        String nextCaseNumber = allocateNextCaseNumber(registry);
         caseRecord.setCaseNumber(nextCaseNumber);
 
         return caseRecordRepository.save(caseRecord);
     }
 
-    private String allocateNextCaseNumber(Registry registry, int year) {
+    private String allocateNextCaseNumber(Registry registry) {
+        int year = LocalDateTime.now().getYear();
+
         CaseNumberSequence sequence = caseNumberSequenceRepository
-                .findByRegistryAndYear(registry, year)
+                .findWithLockByRegistryAndYear(registry, year)
                 .orElseGet(() -> new CaseNumberSequence(registry, year, 0L));
 
         long nextValue = sequence.getLastValue() + 1;
         sequence.setLastValue(nextValue);
         caseNumberSequenceRepository.save(sequence);
 
-        return registry.getCode() + "-" + year + "-" + nextValue;
+        return buildCaseNumber(registry, year, nextValue);
+    }
+
+    private String buildCaseNumber(Registry registry, int year, long sequence) {
+        String shortYear = String.format("%02d", year % 100);
+        return registry.getCode() + shortYear + "-" + sequence;
     }
 }

@@ -2,6 +2,8 @@ package backendlab.team4you.caserecord;
 
 import backendlab.team4you.registry.Registry;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 
@@ -29,6 +31,8 @@ public class CaseNumberSequence {
     private Integer year;
 
     @Column(name = "last_value", nullable = false)
+    @NotNull
+    @Min(0)
     private Long lastValue;
 
     protected CaseNumberSequence() {}
@@ -36,7 +40,7 @@ public class CaseNumberSequence {
     public CaseNumberSequence(Registry registry, Integer year, Long lastValue) {
         this.registry = Objects.requireNonNull(registry, "registry is required");
         this.year = Objects.requireNonNull(year, "year is required");
-        this.lastValue = Objects.requireNonNull(lastValue, "lastValue is required");
+        setLastValue(lastValue);
     }
 
     public Long getId() {
@@ -56,6 +60,12 @@ public class CaseNumberSequence {
     }
 
     public void setLastValue(Long lastValue) {
+        if (lastValue == null) {
+            throw new IllegalArgumentException("lastValue is required");
+        }
+        if (lastValue < 0) {
+            throw new IllegalArgumentException("lastValue must be >= 0");
+        }
         this.lastValue = lastValue;
     }
 }
