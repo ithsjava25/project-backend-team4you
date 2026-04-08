@@ -76,7 +76,7 @@ public class RegistrationController {
             return "redirect:/login?error=user_not_found";
         }
 
-        model.addAttribute("fullName", user.getFirstName() + user.getLastName());
+        model.addAttribute("fullName", user.getFirstName() + " " + user.getLastName());
         return "welcome";
 
 
