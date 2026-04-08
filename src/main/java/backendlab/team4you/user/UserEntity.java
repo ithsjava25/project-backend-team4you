@@ -4,24 +4,23 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.security.web.webauthn.api.PublicKeyCredentialUserEntity;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "app_user")
+@Table(name = "user_entities")
 public class UserEntity implements PublicKeyCredentialUserEntity {
 
     @Id
-    @Column(name = "id", length = 255)
+    @Column(name = "id")
     private String id;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "name", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "first_name")
+    @Column(name = "display_name")
     private String firstName;
 
     @Column(name = "last_name")
@@ -39,10 +38,10 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     public UserEntity() {
     }
 
-    public UserEntity(Bytes id, String name, String displayName) {
-        this.id = id != null ? id.toBase64UrlString() : null;
-
-        this.createdAt = LocalDateTime.now();
+    public UserEntity(Bytes id, String email, String firstName) {
+        this.id = id != null ? id.toString() : null;
+        this.email = email;
+        this.firstName = firstName;
     }
 
     @Override
@@ -56,14 +55,12 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
 
     @Override
     public String getName() {
-        return email;
+        return this.email;
     }
-
-
 
     @Override
     public String getDisplayName() {
-        return this.firstName + " " + this.lastName;
+        return (this.firstName != null ? this.firstName : "") + " " + (this.lastName != null ? this.lastName : "");
     }
     
 
