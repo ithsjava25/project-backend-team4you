@@ -35,6 +35,16 @@ public class SignupController {
         this.users = users;
     }
 
+    @GetMapping("/webauthn-check")
+    public String showWebAuthnCheck(){
+        return "webauthn-check";
+    }
+
+    @GetMapping("/dashboard")
+    public String dashboard() {
+        return "dashboard";
+    }
+
     @GetMapping("/signup")
     String signup(org.springframework.security.web.csrf.CsrfToken token, Model model) {
         model.addAttribute("csrfToken", token.getToken());
@@ -97,4 +107,6 @@ public class SignupController {
             this.displayName = displayName;
         }
     }
+
+
 }
