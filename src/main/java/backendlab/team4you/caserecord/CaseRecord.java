@@ -20,7 +20,7 @@ public class CaseRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "case_number", nullable = false, unique = true, length = 50, updatable = false)
+    @Column(name = "case_number", nullable = false, length = 50, updatable = false)
     private String caseNumber;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -50,7 +50,7 @@ public class CaseRecord {
     @Column(name = "opened_at", nullable = false)
     private LocalDateTime openedAt;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
@@ -76,12 +76,16 @@ public class CaseRecord {
         if (title == null || title.isBlank()) {
             throw new IllegalArgumentException("title is required");
         }
-        this.title = title;
+        this.title = title.trim();
         this.description = description;
-        this.status = status;
+        this.status = (status == null || status.isBlank()) ? "OPEN" : status.trim();
         this.owner = Objects.requireNonNull(owner, "owner is required");
         this.assignedUser = Objects.requireNonNull(assignedUser, "assignedUser is required");
-        this.confidentialityLevel = confidentialityLevel;
+        this.confidentialityLevel =
+                (confidentialityLevel == null || confidentialityLevel.isBlank())
+                        ? "OPEN"
+                        : confidentialityLevel.trim();
+
         this.openedAt = openedAt;
     }
 
@@ -94,12 +98,6 @@ public class CaseRecord {
         this.createdAt = now;
         if (this.openedAt == null) {
             this.openedAt = now;
-        }
-        if (this.status == null) {
-            this.status = "OPEN";
-        }
-        if (this.confidentialityLevel == null) {
-            this.confidentialityLevel = "OPEN";
         }
     }
 
