@@ -39,7 +39,7 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     }
 
     public UserEntity(Bytes id, String email, String firstName) {
-        this.id = id != null ? id.toString() : null;
+        this.id = id != null ? id.toBase64UrlString() : null;
         this.email = email;
         this.firstName = firstName;
     }
