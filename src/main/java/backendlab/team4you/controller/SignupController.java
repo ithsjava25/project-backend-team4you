@@ -59,7 +59,7 @@ public class SignupController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is required");
         }
 
-        if (users.findByUsername(req.username) != null) {
+        if (users.findByEmail(req.username) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
         }
 

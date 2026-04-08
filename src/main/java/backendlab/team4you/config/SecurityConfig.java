@@ -64,13 +64,14 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(BCryptPasswordEncoder encoder){
         return username -> {
+            UserEntity user = userService.findByEmail(username);
+            if (user == null) {
+                throw new UsernameNotFoundException("User not found: " + username);
+            }
             String role = username.equals("admin@team4you.com") ? "ADMIN" : "USER";
-
-            String passwordHash = encoder.encode("123456");
-
             return User.builder()
-                    .username(username)
-                    .password(passwordHash)
+                    .username(user.getEmail())
+                    .password(user.getPasswordHash())
                     .roles(role)
                     .accountLocked(false)
                     .build();
