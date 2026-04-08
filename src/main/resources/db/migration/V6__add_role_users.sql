@@ -1,0 +1,2 @@
+ALTER TABLE user_entities
+    ADD COLUMN role VARCHAR(20) DEFAULT 'USER';
