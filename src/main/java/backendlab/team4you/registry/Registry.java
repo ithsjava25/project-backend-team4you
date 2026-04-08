@@ -17,7 +17,7 @@ public class Registry {
     private String name;
 
     @Column(nullable = false, unique = true, length = 2)
-    @Pattern(regexp = "[A-Z]{2}")
+    @Pattern(regexp = "[A-Z]{2}", message = "code must be exactly 2 uppercase letters")
     private String code;
 
     @Column(name = "created_at", nullable = false, updatable = false, insertable = false)
@@ -27,6 +27,9 @@ public class Registry {
 
     public Registry(String name, String code) {
         this.name = name;
+        if (!code.matches("[A-Z]{2}")) {
+            throw new IllegalArgumentException("code must be exactly 2 uppercase letters");
+        }
         this.code = code;
     }
 
