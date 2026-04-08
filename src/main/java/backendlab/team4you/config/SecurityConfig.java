@@ -17,20 +17,22 @@ import org.springframework.security.web.webauthn.management.UserCredentialReposi
 public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                            CustomAuthenticationSuccessHandler successHandler) throws Exception {
 
         return http
                 .authorizeHttpRequests(
                         authorizeHttp -> authorizeHttp
                                 // Public endpoints
                                 .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-                                .requestMatchers( "/","/login", "login/webauthn", "/signup", "/error").permitAll()
+                                .requestMatchers( "/","/login", "/login/webauthn", "/signup", "/error").permitAll()
                                 .requestMatchers("/webauthn/authenticate/**").permitAll()
 
-                                .requestMatchers("/profile", "/logout").authenticated()
+//                                .requestMatchers("/profile", "/logout").authenticated()
+                                .requestMatchers("/webauthn-check").authenticated()
 
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .requestMatchers("/dashboard/**", "/profile/**").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers("/dashboard", "/profile/**").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers("/add-passkey").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers("/webauthn/register/**").hasAnyRole("USER", "ADMIN")
 
@@ -43,7 +45,8 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/dashboard", true))
+                        .successHandler(successHandler))
+
                 .logout(logout -> logout.logoutSuccessUrl("/").permitAll())
                 .build();
     }
@@ -59,15 +62,17 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(){
+    public UserDetailsService userDetailsService(BCryptPasswordEncoder encoder){
         return username -> {
             String role = username.equals("admin@team4you.com") ? "ADMIN" : "USER";
 
+            String passwordHash = encoder.encode("123456");
+
             return User.builder()
                     .username(username)
-                    .password("{noop}!LOCKED!") // Non-empty impossible-to-match password
+                    .password(passwordHash)
                     .roles(role)
-                    .accountLocked(true) // Prevent password-based login
+                    .accountLocked(false)
                     .build();
         };
     }
