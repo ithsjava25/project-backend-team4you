@@ -3,6 +3,8 @@ package backendlab.team4you.caserecord;
 import backendlab.team4you.registry.Registry;
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(
         name = "case_number_sequence",
@@ -32,9 +34,9 @@ public class CaseNumberSequence {
     protected CaseNumberSequence() {}
 
     public CaseNumberSequence(Registry registry, Integer year, Long lastValue) {
-        this.registry = registry;
-        this.year = year;
-        this.lastValue = lastValue;
+        this.registry = Objects.requireNonNull(registry, "registry is required");
+        this.year = Objects.requireNonNull(year, "year is required");
+        this.lastValue = Objects.requireNonNull(lastValue, "lastValue is required");
     }
 
     public Long getId() {
