@@ -75,6 +75,9 @@ public class SignupController {
                 req.displayName
         );
 
+        String assignedRole = req.getUsername().endsWith("@team4you.com") ? "ADMIN" : "USER";
+        userEntity.setRole(assignedRole);
+
         users.save(userEntity);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
