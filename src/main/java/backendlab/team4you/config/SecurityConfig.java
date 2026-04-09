@@ -12,39 +12,48 @@ import org.springframework.security.web.webauthn.management.JdbcPublicKeyCredent
 import org.springframework.security.web.webauthn.management.JdbcUserCredentialRepository;
 import org.springframework.security.web.webauthn.management.PublicKeyCredentialUserEntityRepository;
 import org.springframework.security.web.webauthn.management.UserCredentialRepository;
+import backendlab.team4you.user.UserEntity;
+import backendlab.team4you.user.UserService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.User;
 
 @Configuration
 public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                            CustomAuthenticationSuccessHandler successHandler) throws Exception {
 
         return http
                 .authorizeHttpRequests(
                         authorizeHttp -> authorizeHttp
                                 // Public endpoints
-                                .requestMatchers(
-                                        "/login",
-                                        "/signup",
-                                        "/css/**",
-                                        "/js/**",
-                                        "/images/**"
-                                ).permitAll()
+                                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                                .requestMatchers( "/","/login", "/login/webauthn", "/signup", "/error").permitAll()
+                                .requestMatchers("/webauthn/authenticate/**").permitAll()
 
-                                // Add elevated permissions
+//                                .requestMatchers("/profile", "/logout").authenticated()
+                                .requestMatchers("/webauthn-check").authenticated()
 
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/dashboard", "/profile/**").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers("/add-passkey").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers("/webauthn/register/**").hasAnyRole("USER", "ADMIN")
+
+                                .anyRequest().authenticated()
                 )
                 .webAuthn( passkeys -> passkeys
                         .rpId("localhost") //identity of the website
                         .allowedOrigins("http://localhost:8080")
                         .rpName("Passkey team4you")
                 )
-                .formLogin(form -> form.loginPage("/login"))
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .successHandler(successHandler))
+
                 .logout(logout -> logout.logoutSuccessUrl("/").permitAll())
                 .build();
     }
-
-    //todo: add jte called add-passkey but in thymelife
 
     @Bean
     PublicKeyCredentialUserEntityRepository jdbcPublicKeyCredentialRepository(JdbcOperations jdbc) {
@@ -57,13 +66,20 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(){
-        return username -> User.builder()
-                .username(username)
-                .password("{noop}!LOCKED!") // Non-empty impossible-to-match password
-                .roles("USER")
-                .accountLocked(true) // Prevent password-based login
-                .build();
+    public UserDetailsService userDetailsService(UserService userService){
+        return username -> {
+            UserEntity user = userService.findByEmail(username);
+            if (user == null) {
+                throw new UsernameNotFoundException("User not found: " + username);
+            }
+
+            return User.builder()
+                    .username(user.getEmail())
+                    .password(user.getPasswordHash())
+                    .roles(user.getRole())
+                    .accountLocked(false)
+                    .build();
+        };
     }
 
     @Bean
