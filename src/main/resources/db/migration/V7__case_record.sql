@@ -20,10 +20,10 @@ ALTER TABLE case_record
     ADD CONSTRAINT uk_case_record_case_number UNIQUE (case_number);
 
 ALTER TABLE case_record
-    ADD CONSTRAINT FK_CASE_RECORD_ON_ASSIGNED_USER FOREIGN KEY (assigned_user_id) REFERENCES app_user (id);
+    ADD CONSTRAINT FK_CASE_RECORD_ON_ASSIGNED_USER FOREIGN KEY (assigned_user_id) REFERENCES user_entities (id);
 
 ALTER TABLE case_record
-    ADD CONSTRAINT FK_CASE_RECORD_ON_OWNER_USER FOREIGN KEY (owner_user_id) REFERENCES app_user (id);
+    ADD CONSTRAINT FK_CASE_RECORD_ON_OWNER_USER FOREIGN KEY (owner_user_id) REFERENCES user_entities (id);
 
 ALTER TABLE case_record
     ADD CONSTRAINT FK_CASE_RECORD_ON_REGISTRY FOREIGN KEY (registry_id) REFERENCES registry (id);
