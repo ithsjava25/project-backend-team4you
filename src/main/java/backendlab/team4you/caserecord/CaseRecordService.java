@@ -33,13 +33,13 @@ public class CaseRecordService {
 
     public CaseRecordResponseDto createCaseRecord(CaseRecordRequestDto requestDto) {
         Registry registry = registryRepository.findById(requestDto.registryId())
-                .orElseThrow(() -> new RegistryNotFoundException(requestDto.registryId()));
+                .orElseThrow(() -> new RegistryNotFoundException("registry not found: " + requestDto.registryId()));
 
         UserEntity owner = userRepository.findById(requestDto.ownerUserId())
-                .orElseThrow(() -> new UserNotFoundException(requestDto.ownerUserId()));
+                .orElseThrow(() -> new UserNotFoundException("user not found: " + requestDto.ownerUserId()));
 
         UserEntity assignedUser = userRepository.findById(requestDto.assignedUserId())
-                .orElseThrow(() -> new IllegalArgumentException("assigned user not found: " + requestDto.assignedUserId()));
+                .orElseThrow(() -> new UserNotFoundException("user not found: " + requestDto.assignedUserId()));
 
         CaseRecord caseRecord = new CaseRecord(
                 registry,
