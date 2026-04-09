@@ -93,3 +93,13 @@ h2{
     font-size: 17px;
     cursor: pointer;
 }
+
+.passkey-button{
+
+    color:green;
+    background:white;
+    border:1px soild purple;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    padding:15px;
+}
