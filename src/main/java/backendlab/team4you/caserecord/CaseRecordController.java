@@ -12,6 +12,7 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/api/case-records")
+
 public class CaseRecordController {
     private final CaseRecordService caseRecordService;
 
@@ -22,15 +23,12 @@ public class CaseRecordController {
     @PostMapping
     public ResponseEntity<CaseRecordResponseDto> createCaseRecord(
             @Valid @RequestBody CaseRecordRequestDto requestDto) {
-
         CaseRecordResponseDto responseDto = caseRecordService.createCaseRecord(requestDto);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(responseDto.id())
                 .toUri();
-
         return ResponseEntity.created(location).body(responseDto);
     }
 }
