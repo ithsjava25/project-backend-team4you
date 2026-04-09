@@ -7,10 +7,12 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.net.URI;
 
 @Configuration
+@ConditionalOnProperty(name = "aws.access-key")
 public class S3Config {
 
     @Value("${aws.access-key}")
