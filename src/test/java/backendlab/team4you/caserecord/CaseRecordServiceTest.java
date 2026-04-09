@@ -13,6 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.web.webauthn.api.Bytes;
 
 import java.time.LocalDateTime;
@@ -129,5 +130,106 @@ class CaseRecordServiceTest {
         assertThatThrownBy(() -> caseRecordService.createCaseRecord(requestDto))
                 .isInstanceOf(UserNotFoundException.class)
                 .hasMessage("user not found: missing-owner");
+    }
+
+    @Test
+    @DisplayName("should retry sequence creation when first insert collides and then succeed")
+    void shouldRetrySequenceCreationWhenFirstInsertCollidesAndThenSucceed() {
+        Registry registry = new Registry("Kommunstyrelsen", "KS");
+
+        UserEntity owner = new UserEntity(Bytes.random(), "owner@example.com", "Owner");
+        UserEntity assignedUser = new UserEntity(Bytes.random(), "assigned@example.com", "Assigned");
+
+        CaseRecordRequestDto requestDto = new CaseRecordRequestDto(
+                1L,
+                "test case",
+                "test description",
+                "OPEN",
+                owner.getIdAsString(),
+                assignedUser.getIdAsString(),
+                "OPEN",
+                LocalDateTime.of(2026, 4, 9, 10, 0)
+        );
+
+        CaseNumberSequence existingSequenceAfterRetry = new CaseNumberSequence(registry, 2026, 0L);
+
+        when(registryRepository.findById(1L)).thenReturn(Optional.of(registry));
+        when(userRepository.findById(owner.getIdAsString())).thenReturn(Optional.of(owner));
+        when(userRepository.findById(assignedUser.getIdAsString())).thenReturn(Optional.of(assignedUser));
+
+        when(caseNumberSequenceRepository.findWithLockByRegistryAndYear(any(), any()))
+                .thenReturn(Optional.empty())
+                .thenReturn(Optional.of(existingSequenceAfterRetry));
+
+        when(caseNumberSequenceRepository.saveAndFlush(any(CaseNumberSequence.class)))
+                .thenThrow(new DataIntegrityViolationException("duplicate key"));
+
+        when(caseNumberSequenceRepository.save(any(CaseNumberSequence.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        when(caseRecordRepository.save(any(CaseRecord.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        CaseRecordResponseDto response = caseRecordService.createCaseRecord(requestDto);
+
+        assertThat(response.caseNumber()).isEqualTo("KS26-1");
+        assertThat(response.registryCode()).isEqualTo("KS");
+
+        verify(caseNumberSequenceRepository, times(2))
+                .findWithLockByRegistryAndYear(any(), any());
+
+        verify(caseNumberSequenceRepository, times(1))
+                .saveAndFlush(any(CaseNumberSequence.class));
+
+        assertThat(existingSequenceAfterRetry.getLastValue()).isEqualTo(1L);
+
+        ArgumentCaptor<CaseRecord> caseRecordCaptor = ArgumentCaptor.forClass(CaseRecord.class);
+        verify(caseRecordRepository).save(caseRecordCaptor.capture());
+
+        assertThat(caseRecordCaptor.getValue().getCaseNumber()).isEqualTo("KS26-1");
+    }
+
+    @Test
+    @DisplayName("should throw IllegalStateException after max retry attempts when sequence creation keeps failing")
+    void shouldThrowIllegalStateExceptionAfterMaxRetryAttempts() {
+        Registry registry = new Registry("Kommunstyrelsen", "KS");
+
+        UserEntity owner = new UserEntity(Bytes.random(), "owner@example.com", "Owner");
+        UserEntity assignedUser = new UserEntity(Bytes.random(), "assigned@example.com", "Assigned");
+
+        CaseRecordRequestDto requestDto = new CaseRecordRequestDto(
+                1L,
+                "test case",
+                "test description",
+                "OPEN",
+                owner.getIdAsString(),
+                assignedUser.getIdAsString(),
+                "OPEN",
+                LocalDateTime.of(2026, 4, 9, 10, 0)
+        );
+
+        when(registryRepository.findById(1L)).thenReturn(Optional.of(registry));
+        when(userRepository.findById(owner.getIdAsString())).thenReturn(Optional.of(owner));
+        when(userRepository.findById(assignedUser.getIdAsString())).thenReturn(Optional.of(assignedUser));
+
+        when(caseNumberSequenceRepository.findWithLockByRegistryAndYear(any(), any()))
+                .thenReturn(Optional.empty());
+
+        when(caseNumberSequenceRepository.saveAndFlush(any(CaseNumberSequence.class)))
+                .thenThrow(new DataIntegrityViolationException("duplicate key"));
+
+        org.assertj.core.api.Assertions.assertThatThrownBy(() ->
+                        caseRecordService.createCaseRecord(requestDto)
+                )
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("failed to allocate case number after 3 attempts");
+
+        verify(caseNumberSequenceRepository, times(3))
+                .findWithLockByRegistryAndYear(any(), any());
+
+        verify(caseNumberSequenceRepository, times(3))
+                .saveAndFlush(any(CaseNumberSequence.class));
+
+        verify(caseRecordRepository, never()).save(any(CaseRecord.class));
     }
 }
