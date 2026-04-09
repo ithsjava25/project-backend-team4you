@@ -20,10 +20,10 @@ public record CaseRecordRequestDto(
     @Size(max = 50, message = "status must be at most 50 characters")
     String status,
 
-    @NotNull(message = "ownerUserId is required")
+    @NotBlank(message = "ownerUserId is required")
     String ownerUserId,
 
-    @NotNull(message = "assignedUserId is required")
+    @NotBlank(message = "assignedUserId is required")
     String assignedUserId,
 
     @Size(max = 50, message = "confidentiality level must be at most 50 characters")
