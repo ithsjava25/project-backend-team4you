@@ -75,6 +75,10 @@ public class SignupController {
                 req.displayName
         );
 
+        userEntity.setEmail(req.email);
+        userEntity.setFirstName(req.firstName);
+        userEntity.setLastName(req.lastName);
+
         String assignedRole = req.getUsername().endsWith("@team4you.com") ? "ADMIN" : "USER";
         userEntity.setRole(assignedRole);
 
@@ -93,6 +97,9 @@ public class SignupController {
     public static class SignupRequest {
         private String username;
         private String displayName;
+        private String email;
+        private String firstName;
+        private String lastName;
 
         public SignupRequest() {
         }
@@ -111,6 +118,30 @@ public class SignupController {
 
         public void setDisplayName(String displayName) {
             this.displayName = displayName;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public void setFirstName(String firstName) {
+            this.firstName = firstName;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+
+        public void setLastName(String lastName) {
+            this.lastName = lastName;
         }
     }
 
