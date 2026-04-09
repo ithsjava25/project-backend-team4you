@@ -7,13 +7,15 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+
 
 import java.io.InputStream;
 
 // Tells Spring to manage this class as a service bean
 @Service
+@ConditionalOnProperty(name = "aws.access-key")
 public class S3Service {
-
     private final S3Client s3Client;
 
     @Value("${aws.bucket-name}")
