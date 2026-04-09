@@ -68,8 +68,8 @@ public class RegistrationController {
     public String welcome(Model model, Principal principal) {
         if (principal == null) return "redirect:/login"; // Säkerhetskoll
 
-        String email = principal.getName();
-        UserEntity user = userService.findByEmail(email);
+        String name = principal.getName();
+        UserEntity user = userService.findByName(name);
 
         if (user == null) {
 

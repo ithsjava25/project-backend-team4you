@@ -79,6 +79,10 @@ public class UserService {
         return userRepository.findByEmail(email).orElse(null);
     }
 
+    public UserEntity findByName(String name){
+        return userRepository.findByName(name).orElse(null);
+    }
+
     @Transactional
     public void deleteUser(String id) {
         if (!userRepository.existsById(id)) {
