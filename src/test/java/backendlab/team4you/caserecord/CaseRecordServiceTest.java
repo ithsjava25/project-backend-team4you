@@ -43,7 +43,7 @@ class CaseRecordServiceTest {
     @Test
     @DisplayName("should create case record with next case number when all referenced entities exist")
     void shouldCreateCaseRecordWithNextCaseNumber() {
-        Registry registry = new Registry("kommunstyrelsen", "KS");
+        Registry registry = new Registry("Kommunstyrelsen", "KS");
 
         UserEntity owner = new UserEntity(Bytes.random(), "owner@example.com", "Owner");
         UserEntity assignedUser = new UserEntity(Bytes.random(), "assigned@example.com", "Assigned");
@@ -110,7 +110,7 @@ class CaseRecordServiceTest {
     @Test
     @DisplayName("should throw UserNotFoundException when owner does not exist")
     void shouldThrowWhenOwnerDoesNotExist() {
-        Registry registry = new Registry("kommunstyrelsen", "KS");
+        Registry registry = new Registry("Kommunstyrelsen", "KS");
 
         CaseRecordRequestDto requestDto = new CaseRecordRequestDto(
                 1L,
