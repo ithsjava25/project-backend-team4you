@@ -1,5 +1,7 @@
 package backendlab.team4you.caserecord;
 
+import backendlab.team4you.exceptions.RegistryNotFoundException;
+import backendlab.team4you.exceptions.UserNotFoundException;
 import backendlab.team4you.registry.Registry;
 import backendlab.team4you.registry.RegistryRepository;
 import backendlab.team4you.repository.UserRepository;
@@ -31,10 +33,10 @@ public class CaseRecordService {
 
     public CaseRecordResponseDto createCaseRecord(CaseRecordRequestDto requestDto) {
         Registry registry = registryRepository.findById(requestDto.registryId())
-                .orElseThrow(() -> new IllegalArgumentException("registry not found: " + requestDto.registryId()));
+                .orElseThrow(() -> new RegistryNotFoundException(requestDto.registryId()));
 
         UserEntity owner = userRepository.findById(requestDto.ownerUserId())
-                .orElseThrow(() -> new IllegalArgumentException("owner not found: " + requestDto.ownerUserId()));
+                .orElseThrow(() -> new UserNotFoundException(requestDto.ownerUserId()));
 
         UserEntity assignedUser = userRepository.findById(requestDto.assignedUserId())
                 .orElseThrow(() -> new IllegalArgumentException("assigned user not found: " + requestDto.assignedUserId()));
