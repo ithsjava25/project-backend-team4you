@@ -59,6 +59,10 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
         return email;
     }
 
+    public String getUserId() {
+        return id;
+    }
+
 
 
     @Override

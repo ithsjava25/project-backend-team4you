@@ -1,6 +1,8 @@
 package backendlab.team4you.caserecord;
 
 import backendlab.team4you.registry.Registry;
+import backendlab.team4you.registry.RegistryRepository;
+import backendlab.team4you.repository.UserRepository;
 import backendlab.team4you.user.UserEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
@@ -12,40 +14,48 @@ import java.time.LocalDateTime;
 public class CaseRecordService {
     private final CaseRecordRepository caseRecordRepository;
     private final CaseNumberSequenceRepository caseNumberSequenceRepository;
+    private final RegistryRepository registryRepository;
+    private final UserRepository userRepository;
 
     public CaseRecordService(
             CaseRecordRepository caseRecordRepository,
-            CaseNumberSequenceRepository caseNumberSequenceRepository
+            CaseNumberSequenceRepository caseNumberSequenceRepository,
+            RegistryRepository registryRepository,
+            UserRepository userRepository
     ) {
         this.caseRecordRepository = caseRecordRepository;
         this.caseNumberSequenceRepository = caseNumberSequenceRepository;
+        this.registryRepository = registryRepository;
+        this.userRepository = userRepository;
     }
 
-    public CaseRecord createCaseRecord(
-            Registry registry,
-            String title,
-            String description,
-            String status,
-            UserEntity owner,
-            UserEntity assignedUser,
-            String confidentialityLevel,
-            LocalDateTime openedAt
-    ) {
+    public CaseRecordResponseDto createCaseRecord(CaseRecordRequestDto requestDto) {
+        Registry registry = registryRepository.findById(requestDto.registryId())
+                .orElseThrow(() -> new IllegalArgumentException("registry not found: " + requestDto.registryId()));
+
+        UserEntity owner = userRepository.findById(requestDto.ownerUserId())
+                .orElseThrow(() -> new IllegalArgumentException("owner not found: " + requestDto.ownerUserId()));
+
+        UserEntity assignedUser = userRepository.findById(requestDto.assignedUserId())
+                .orElseThrow(() -> new IllegalArgumentException("assigned user not found: " + requestDto.assignedUserId()));
+
         CaseRecord caseRecord = new CaseRecord(
                 registry,
-                title,
-                description,
-                status,
+                requestDto.title(),
+                requestDto.description(),
+                requestDto.status(),
                 owner,
                 assignedUser,
-                confidentialityLevel,
-                openedAt
+                requestDto.confidentialityLevel(),
+                requestDto.openedAt()
         );
 
         String nextCaseNumber = allocateNextCaseNumber(registry);
         caseRecord.setCaseNumber(nextCaseNumber);
 
-        return caseRecordRepository.save(caseRecord);
+        CaseRecord savedCaseRecord = caseRecordRepository.save(caseRecord);
+
+        return toResponseDto(savedCaseRecord);
     }
 
     private String allocateNextCaseNumber(Registry registry) {
@@ -65,5 +75,23 @@ public class CaseRecordService {
     private String buildCaseNumber(Registry registry, int year, long sequence) {
         String shortYear = String.format("%02d", year % 100);
         return registry.getCode() + shortYear + "-" + sequence;
+    }
+    private CaseRecordResponseDto toResponseDto(CaseRecord caseRecord) {
+        return new CaseRecordResponseDto(
+                caseRecord.getId(),
+                caseRecord.getCaseNumber(),
+                caseRecord.getRegistry().getId(),
+                caseRecord.getRegistry().getCode(),
+                caseRecord.getTitle(),
+                caseRecord.getDescription(),
+                caseRecord.getStatus(),
+                caseRecord.getOwner().getUserId(),
+                caseRecord.getAssignedUser().getUserId(),
+                caseRecord.getConfidentialityLevel(),
+                caseRecord.getOpenedAt(),
+                caseRecord.getCreatedAt(),
+                caseRecord.getUpdatedAt(),
+                caseRecord.getClosedAt()
+        );
     }
 }

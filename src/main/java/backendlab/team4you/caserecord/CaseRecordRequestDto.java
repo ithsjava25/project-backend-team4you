@@ -6,25 +6,29 @@ import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
-public class CaseRecordRequestDto {
+public record CaseRecordRequestDto(
 
     @NotNull(message = "registryId is required")
-    Long registryId;
+    Long registryId,
 
     @NotBlank(message = "title is required")
     @Size(max = 255, message = "title must be at most 255 characters")
-    String title;
+    String title,
 
-    String description;
+    String description,
+
+    @Size(max = 50, message = "status must be at most 50 characters")
+    String status,
 
     @NotNull(message = "ownerUserId is required")
-    Long ownerUserId;
+    String ownerUserId,
 
     @NotNull(message = "assignedUserId is required")
-    Long assignedUserId;
+    String assignedUserId,
 
     @Size(max = 50, message = "confidentiality level must be at most 50 characters")
-    String confidentialityLevel;
+    String confidentialityLevel,
 
-    LocalDateTime openedAt;
+    LocalDateTime openedAt
+){
 }
