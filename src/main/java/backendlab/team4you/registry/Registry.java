@@ -27,7 +27,7 @@ public class Registry {
 
     public Registry(String name, String code) {
         this.name = name;
-        if (!code.matches("[A-Z]{2}")) {
+        if (code == null || !code.matches("[A-Z]{2}")) {
             throw new IllegalArgumentException("code must be exactly 2 uppercase letters");
         }
         this.code = code;
