@@ -67,16 +67,7 @@ public class CaseRecordService {
 
         for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
-                CaseNumberSequence sequence = caseNumberSequenceRepository
-                        .findWithLockByRegistryAndYear(registry, year)
-                        .orElseGet(() -> createSequence(registry, year));
-
-                long nextValue = sequence.getLastValue() + 1;
-                sequence.setLastValue(nextValue);
-                caseNumberSequenceRepository.save(sequence);
-
-                return buildCaseNumber(registry, year, nextValue);
-
+                return tryAllocateNextCaseNumber(registry, year);
             } catch (DataIntegrityViolationException exception) {
                 if (attempt == maxAttempts) {
                     throw new IllegalStateException(
@@ -95,9 +86,18 @@ public class CaseRecordService {
         );
     }
 
-    private CaseNumberSequence createSequence(Registry registry, int year) {
-        CaseNumberSequence newSequence = new CaseNumberSequence(registry, year, 0L);
-        return caseNumberSequenceRepository.save(newSequence);
+    private String tryAllocateNextCaseNumber(Registry registry, int year) {
+        CaseNumberSequence sequence = caseNumberSequenceRepository
+                .findWithLockByRegistryAndYear(registry, year)
+                .orElseGet(() -> caseNumberSequenceRepository.saveAndFlush(
+                        new CaseNumberSequence(registry, year, 0L)
+                ));
+
+        long nextValue = sequence.getLastValue() + 1;
+        sequence.setLastValue(nextValue);
+        caseNumberSequenceRepository.save(sequence);
+
+        return buildCaseNumber(registry, year, nextValue);
     }
 
     private String buildCaseNumber(Registry registry, int year, long sequence) {
