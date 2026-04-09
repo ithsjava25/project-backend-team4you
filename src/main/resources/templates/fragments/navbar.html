@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" lang="">
+<head>
+    <meta charset="UTF-8">
+    <title>navbar</title>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<header th:fragment="header">
+
+    <nav class="navbar">
+        <div class="navdiv">
+            <div class="logo">
+                <a th:href="@{/static}">Hem</a>
+            </div>
+
+            <div class="search-container">
+                <form th:action="@{/search}" method="get">
+                    <label>
+                        <input type="text" name="query" placeholder="Sök ärende eller info...">
+                    </label>
+                    <button type="submit" class="search-btn">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </form>
+            </div>
+
+            <ul class="nav-links">
+                <li><a th:href="@{/static}" class="nav-menu">Home</a></li>
+                <li><a th:href="@{/about}" class="nav-menu">About</a></li>
+                <li class="nav-buttons">
+                    <a th:href="@{/login}" class="btn-login">Sign in</a>
+                    <a th:href="@{/register}" class="btn-register">Register</a>
+                </li>
+            </ul>
+        </div>
+
+    </nav>
+
+</header>
+</html>

@@ -1,5 +1,8 @@
-package backendlab.team4you.webauthn;
+package backendlab.team4you.controller;
 
+import backendlab.team4you.user.UserEntity;
+import backendlab.team4you.user.UserService;
+import backendlab.team4you.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
@@ -28,9 +31,21 @@ public class SignupController {
 
     private final PublicKeyCredentialUserEntityRepository users;
     private final SecureRandom random = new SecureRandom();
+    private final UserService userService;
 
-    public SignupController(PublicKeyCredentialUserEntityRepository users) {
+    public SignupController(PublicKeyCredentialUserEntityRepository users,
+                            UserService userService) {
         this.users = users;
+        this.userService = userService;
+    }
+
+    @GetMapping("/webauthn-check")
+    public String showWebAuthnCheck(){
+        return "webauthn-check";
+    }
+    @GetMapping("/dashboard")
+    public String dashboard() {
+        return "dashboard";
     }
 
     @GetMapping("/signup")
@@ -47,7 +62,7 @@ public class SignupController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is required");
         }
 
-        if (users.findByUsername(req.username) != null) {
+        if (userService.findByEmail(req.username) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
         }
 
@@ -59,6 +74,9 @@ public class SignupController {
                 req.username,
                 req.displayName
         );
+
+        String assignedRole = req.getUsername().endsWith("@team4you.com") ? "ADMIN" : "USER";
+        userEntity.setRole(assignedRole);
 
         users.save(userEntity);
 
@@ -95,4 +113,6 @@ public class SignupController {
             this.displayName = displayName;
         }
     }
+
+
 }
