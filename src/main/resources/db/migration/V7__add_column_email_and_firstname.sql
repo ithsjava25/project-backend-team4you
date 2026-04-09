@@ -1,0 +1,3 @@
+ALTER TABLE user_entities
+    ADD COLUMN IF NOT EXISTS email VARCHAR(255),
+    ADD COLUMN IF NOT EXISTS first_name VARCHAR(255);

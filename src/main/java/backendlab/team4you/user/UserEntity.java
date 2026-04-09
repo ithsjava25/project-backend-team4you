@@ -21,7 +21,7 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @Column(name = "displayName")
+    @Column(name = "display_name")
     private String displayName;
 
     @Column(name = "email")
