@@ -6,6 +6,7 @@ import backendlab.team4you.registry.Registry;
 import backendlab.team4you.registry.RegistryRepository;
 import backendlab.team4you.user.UserRepository;
 import backendlab.team4you.user.UserEntity;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -62,16 +63,41 @@ public class CaseRecordService {
 
     private String allocateNextCaseNumber(Registry registry) {
         int year = LocalDateTime.now().getYear();
+        int maxAttempts = 3;
 
-        CaseNumberSequence sequence = caseNumberSequenceRepository
-                .findWithLockByRegistryAndYear(registry, year)
-                .orElseGet(() -> new CaseNumberSequence(registry, year, 0L));
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                CaseNumberSequence sequence = caseNumberSequenceRepository
+                        .findWithLockByRegistryAndYear(registry, year)
+                        .orElseGet(() -> createSequence(registry, year));
 
-        long nextValue = sequence.getLastValue() + 1;
-        sequence.setLastValue(nextValue);
-        caseNumberSequenceRepository.save(sequence);
+                long nextValue = sequence.getLastValue() + 1;
+                sequence.setLastValue(nextValue);
+                caseNumberSequenceRepository.save(sequence);
 
-        return buildCaseNumber(registry, year, nextValue);
+                return buildCaseNumber(registry, year, nextValue);
+
+            } catch (DataIntegrityViolationException exception) {
+                if (attempt == maxAttempts) {
+                    throw new IllegalStateException(
+                            "failed to allocate case number after " + maxAttempts +
+                                    " attempts for registry " + registry.getId() +
+                                    " and year " + year,
+                            exception
+                    );
+                }
+            }
+        }
+
+        throw new IllegalStateException(
+                "unreachable state while allocating case number for registry " +
+                        registry.getId() + " and year " + year
+        );
+    }
+
+    private CaseNumberSequence createSequence(Registry registry, int year) {
+        CaseNumberSequence newSequence = new CaseNumberSequence(registry, year, 0L);
+        return caseNumberSequenceRepository.save(newSequence);
     }
 
     private String buildCaseNumber(Registry registry, int year, long sequence) {
