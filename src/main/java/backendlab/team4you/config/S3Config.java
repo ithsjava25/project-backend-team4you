@@ -8,11 +8,11 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
-// Makes Spring read this class on startup
+import java.net.URI;
+
 @Configuration
 public class S3Config {
 
-    // Reads from application.properties → environment variable
     @Value("${aws.access-key}")
     private String accessKey;
 
@@ -22,13 +22,17 @@ public class S3Config {
     @Value("${aws.region}")
     private String region;
 
-    // Spring creates and manages this S3Client, inject it anywhere you need it
+    @Value("${aws.endpoint-url}")
+    private String endpointUrl;
+
     @Bean
     public S3Client s3Client() {
         AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
         return S3Client.builder()
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                .endpointOverride(URI.create(endpointUrl)) // Points to LocalStack instead of real AWS
+                .forcePathStyle(true) // Required for LocalStack
                 .build();
     }
 }
