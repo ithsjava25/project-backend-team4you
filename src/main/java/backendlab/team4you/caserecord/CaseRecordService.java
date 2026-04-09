@@ -4,7 +4,7 @@ import backendlab.team4you.exceptions.RegistryNotFoundException;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import backendlab.team4you.registry.Registry;
 import backendlab.team4you.registry.RegistryRepository;
-import backendlab.team4you.repository.UserRepository;
+import backendlab.team4you.user.UserRepository;
 import backendlab.team4you.user.UserEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
