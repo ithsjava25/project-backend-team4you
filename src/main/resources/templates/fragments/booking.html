@@ -42,6 +42,22 @@
         <div th:fragment="content">
             <h2>Bokning</h2>
         </div>
+
+        <div th:fragment="content">
+            <h2>Mina bokningar</h2>
+
+            <div id="booking-list">
+                <div th:replace="fragments/booking-items :: list"></div>
+            </div>
+
+            <button
+                    hx-get="/bookings?page=1"
+                    hx-target="#booking-list"
+                    hx-swap="beforeend"
+            >
+                Visa fler
+            </button>
+        </div>
     </main>
 </section>
 

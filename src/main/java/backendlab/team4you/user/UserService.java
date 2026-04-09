@@ -3,13 +3,13 @@ package backendlab.team4you.user;
 import backendlab.team4you.dto.UserRegistrationDTO;
 import backendlab.team4you.exceptions.DuplicateEmailException;
 import backendlab.team4you.exceptions.UserNotFoundException;
-import backendlab.team4you.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 
+import java.security.Principal;
 import java.util.List;
 
 
@@ -17,10 +17,12 @@ import java.util.List;
 public class UserService {
 
 
+
     UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder){
+
 
 
         this.userRepository = userRepository;
@@ -82,9 +84,25 @@ public class UserService {
     @Transactional
     public void deleteUser(String id) {
         if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException("User not found with id: " + id);
+            throw new UserNotFoundException("User not found");
         }
 
         userRepository.deleteById(id);
     }
+
+    @Transactional
+    public String deleteByEmail(String email) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "User not found with email: " + email
+                ));
+
+        userRepository.delete(user);
+
+        return email;
+    }
+
+
+
+
 }

@@ -1,9 +1,6 @@
 package backendlab.team4you.user;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.security.web.webauthn.api.PublicKeyCredentialUserEntity;
 
@@ -17,7 +14,7 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     @Column(name = "id")
     private String id;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "display_name")
@@ -26,8 +23,8 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "role")
-    private String role = "USER";
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -65,7 +62,7 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     public String getDisplayName() {
         return (this.firstName != null ? this.firstName : "") + " " + (this.lastName != null ? this.lastName : "");
     }
-    
+
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -116,10 +113,12 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     }
 
     public String getRole() {
-        return role;
+
+        return role.name();
     }
 
     public void setRole(String role) {
-        this.role = role;
+
+        this.role = UserRole.valueOf(role);
     }
 }

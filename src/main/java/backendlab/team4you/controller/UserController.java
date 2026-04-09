@@ -1,12 +1,26 @@
 package backendlab.team4you.controller;
 
 
+import backendlab.team4you.exceptions.UserNotFoundException;
+import backendlab.team4you.user.UserEntity;
+import backendlab.team4you.user.UserRepository;
+import backendlab.team4you.user.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @Controller
 public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+
+    }
 
 
 
@@ -25,6 +39,19 @@ public class UserController {
     public String admin(){
         return "admin";
     }
+
+
+    @DeleteMapping("/account")
+    public String deleteAccount(Principal principal) {
+
+        String email = principal.getName();
+        userService.deleteByEmail(email);
+
+        return "fragments/account-deleted :: content";
+    }
+
+
+
 
 
 }

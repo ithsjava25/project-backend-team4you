@@ -7,7 +7,7 @@
 </head>
 <body>
 <div class="contact-wrapper"> <h1>Contact Us</h1>
-
+    <div th:replace="fragments/form-errors :: errors"></div>
     <form hx-post="/contact/send"
           hx-target="#contact-section"
           hx-swap="outerHTML"

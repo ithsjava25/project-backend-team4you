@@ -4,12 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <title>navbar</title>
-    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/register.css}">
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <div class="signup-box" xmlns:th="http://www.w3.org/1999/xhtml">
     <h1>Registrera dig</h1>
+
+    <div th:replace="fragments/form-errors :: errors"></div>
+    <div th:replace="fragments/success-message :: success"></div>
+
     <form th:action="@{/register}" method="post">
         <label for="firstName">Förnamn </label>
         <input type="text" id="firstName" name="firstName" required>
@@ -36,6 +40,7 @@
         <p>Har du redan ett konto? <a th:href="@{/login}">Logga in</a></p>
         <p><a th:href="@{/}">Tillbaka till start</a></p>
     </div>
+
 </div>
 
 </html>
