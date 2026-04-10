@@ -68,7 +68,9 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST ,"Username already exists");
         }
 
-        if (userRepository.findByEmail(dto.email()).isPresent()) {
+        String cleanEmail = dto.email() != null ? dto.email().trim() : null;
+
+        if (cleanEmail != null && userRepository.findByEmail(cleanEmail).isPresent()) {
             throw new DuplicateEmailException("E-posten är redan tagen");
         }
 
@@ -76,7 +78,7 @@ public class UserService {
         user.setName(dto.name().trim());
         user.setFirstName(dto.firstName());
         user.setLastName(dto.lastName());
-        user.setEmail(dto.email());
+        user.setEmail(cleanEmail);
         user.setPhoneNumber(dto.phoneNumber());
 
 
