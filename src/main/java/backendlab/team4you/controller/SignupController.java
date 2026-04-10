@@ -2,10 +2,8 @@ package backendlab.team4you.controller;
 
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
-import backendlab.team4you.user.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,7 +11,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.security.web.webauthn.management.PublicKeyCredentialUserEntityRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,16 +18,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.security.SecureRandom;
 import java.util.List;
 
 @Controller
 public class SignupController {
 
     private final PublicKeyCredentialUserEntityRepository users;
-    private final SecureRandom random = new SecureRandom();
     private final UserService userService;
 
     public SignupController(PublicKeyCredentialUserEntityRepository users,

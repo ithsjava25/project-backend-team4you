@@ -22,6 +22,7 @@ public class UserService {
     UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private static final String ADMIN_EMAIL = "admin@team4you.com";
+    private final SecureRandom random = new SecureRandom();
 
     public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder){
 
@@ -96,7 +97,7 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "E-posten är redan tagen");
 
         byte[] idBytes = new byte[32];
-        new SecureRandom().nextBytes(idBytes);
+        random.nextBytes(idBytes);
 
         UserEntity userEntity = new UserEntity(
                 new Bytes(idBytes),
