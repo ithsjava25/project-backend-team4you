@@ -55,12 +55,19 @@ public class UserService {
 
     public void registerUser(UserRegistrationDTO dto) {
 
+        if (dto.name() == null || dto.name().isBlank()) {
+            throw new IllegalArgumentException("Username is required");
+        }
+        if (userRepository.findByName(dto.name().trim()).isPresent()) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+
         if (userRepository.findByEmail(dto.email()).isPresent()) {
             throw new DuplicateEmailException("E-posten är redan tagen");
         }
 
         UserEntity user = new UserEntity();
-        user.setName(dto.name());
+        user.setName(dto.name().trim());
         user.setFirstName(dto.firstName());
         user.setLastName(dto.lastName());
         user.setEmail(dto.email());
