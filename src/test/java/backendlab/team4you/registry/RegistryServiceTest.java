@@ -20,7 +20,7 @@ public class RegistryServiceTest {
     @Mock
     private RegistryRepository registryRepository;
 
-    @Mock
+    @InjectMocks
     private RegistryService registryService;
 
     @Test
