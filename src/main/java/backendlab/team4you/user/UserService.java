@@ -89,11 +89,18 @@ public class UserService {
 
     public UserEntity registerWebAuthnUser(String username, String displayName, String email, String firstName, String lastName){
 
+        if (username == null || username.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is required");
+        }
+        if (email == null || email.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required");
+        }
         String cleanName = username.trim();
+        String cleanEmail = email.trim();
 
         if(userRepository.findByName(cleanName).isPresent())
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Användarnamnet är redan taget");
-        if(userRepository.findByEmail(email).isPresent())
+        if(userRepository.findByEmail(cleanEmail).isPresent())
             throw new ResponseStatusException(HttpStatus.CONFLICT, "E-posten är redan tagen");
 
         byte[] idBytes = new byte[32];
@@ -109,7 +116,8 @@ public class UserService {
         userEntity.setFirstName(firstName);
         userEntity.setLastName(lastName);
 
-        String assignedRole = email.equalsIgnoreCase(ADMIN_EMAIL) ? "ADMIN" : "USER";
+        //Every user that register themselves will automatically get the role USER assigned
+        String assignedRole = "USER";
         userEntity.setRole(assignedRole);
 
         return userRepository.save(userEntity);
