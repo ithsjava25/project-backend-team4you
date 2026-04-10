@@ -26,11 +26,14 @@ public class Registry {
     protected Registry() {}
 
     public Registry(String name, String code) {
-        this.name = name;
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("name is required");
+        }
+        this.name = name.trim();
         if (code == null || !code.matches("[A-Z]{2}")) {
             throw new IllegalArgumentException("code must be exactly 2 uppercase letters");
         }
-        this.code = code;
+        this.code = code.trim();
     }
 
     public Long getId() {
