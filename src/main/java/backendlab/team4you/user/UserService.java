@@ -4,10 +4,14 @@ import backendlab.team4you.dto.UserRegistrationDTO;
 import backendlab.team4you.exceptions.DuplicateEmailException;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 
+import java.security.SecureRandom;
 import java.util.List;
 
 
@@ -17,6 +21,7 @@ public class UserService {
 
     UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private static final String ADMIN_EMAIL = "admin@team4you.com";
 
     public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder){
 
@@ -79,6 +84,35 @@ public class UserService {
 
 
         userRepository.save(user);
+    }
+
+    public UserEntity registerWebAuthnUser(String username, String displayName, String email, String firstName, String lastName){
+
+        String cleanName = username.trim();
+
+        if(userRepository.findByName(cleanName).isPresent())
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Användarnamnet är redan taget");
+        if(userRepository.findByEmail(email).isPresent())
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "E-posten är redan tagen");
+
+        byte[] idBytes = new byte[32];
+        new SecureRandom().nextBytes(idBytes);
+
+        UserEntity userEntity = new UserEntity(
+                new Bytes(idBytes),
+                cleanName,
+                displayName
+        );
+
+        userEntity.setEmail(email);
+        userEntity.setFirstName(firstName);
+        userEntity.setLastName(lastName);
+
+        String assignedRole = email.equalsIgnoreCase(ADMIN_EMAIL) ? "ADMIN" : "USER";
+        userEntity.setRole(assignedRole);
+
+        return userRepository.save(userEntity);
+
     }
 
     public UserEntity findByEmail(String email) {

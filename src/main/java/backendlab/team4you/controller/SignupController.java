@@ -32,7 +32,6 @@ public class SignupController {
     private final PublicKeyCredentialUserEntityRepository users;
     private final SecureRandom random = new SecureRandom();
     private final UserService userService;
-    private static final String ADMIN_EMAIL = "admin@team4you.com";
 
     public SignupController(PublicKeyCredentialUserEntityRepository users,
                             UserService userService) {
@@ -59,34 +58,16 @@ public class SignupController {
     @ResponseBody
     public void signup(@RequestBody SignupRequest req, HttpServletRequest request, HttpServletResponse response) {
 
-        if (req.username == null || req.username.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is required");
-        }
-
-        if (userService.findByEmail(req.username) != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
-        }
-
-        byte[] idBytes = new byte[32];
-        random.nextBytes(idBytes);
-
-        UserEntity userEntity = new UserEntity(
-                new Bytes(idBytes),
-                req.username,
-                req.displayName
+        UserEntity userEntity = userService.registerWebAuthnUser(
+                req.getUsername(),
+                req.getDisplayName(),
+                req.getEmail(),
+                req.getFirstName(),
+                req.getLastName()
         );
 
-        userEntity.setEmail(req.email);
-        userEntity.setFirstName(req.firstName);
-        userEntity.setLastName(req.lastName);
-
-        String assignedRole = req.getEmail().equalsIgnoreCase(ADMIN_EMAIL) ? "ADMIN" : "USER";
-        userEntity.setRole(assignedRole);
-
-        users.save(userEntity);
-
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                userEntity.getName(), null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                userEntity.getName(), null, List.of(new SimpleGrantedAuthority("ROLE_" + userEntity.getRole())));
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(auth);
