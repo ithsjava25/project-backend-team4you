@@ -110,4 +110,26 @@ public class ApiExceptionHandler {
                 .status(status)
                 .body(body);
     }
+
+    @ExceptionHandler(DuplicateRegistryNameException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicateRegistryName(DuplicateRegistryNameException exception) {
+        log.warn("Duplicate registry name: {}", exception.getMessage());
+
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
+                "conflict",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(DuplicateRegistryCodeException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicateRegistryCode(DuplicateRegistryCodeException exception) {
+        log.warn("Duplicate registry code: {}", exception.getMessage());
+
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
+                "conflict",
+                exception.getMessage()
+        );
+    }
 }
