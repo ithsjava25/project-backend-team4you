@@ -32,6 +32,7 @@ public class SignupController {
     private final PublicKeyCredentialUserEntityRepository users;
     private final SecureRandom random = new SecureRandom();
     private final UserService userService;
+    private static final String ADMIN_EMAIL = "admin@team4you.com";
 
     public SignupController(PublicKeyCredentialUserEntityRepository users,
                             UserService userService) {
@@ -79,7 +80,7 @@ public class SignupController {
         userEntity.setFirstName(req.firstName);
         userEntity.setLastName(req.lastName);
 
-        String assignedRole = req.getEmail().endsWith("@team4you.com") ? "ADMIN" : "USER";
+        String assignedRole = req.getEmail().equalsIgnoreCase(ADMIN_EMAIL) ? "ADMIN" : "USER";
         userEntity.setRole(assignedRole);
 
         users.save(userEntity);
