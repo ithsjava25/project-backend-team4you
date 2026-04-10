@@ -6,6 +6,7 @@ import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserRepository;
 import backendlab.team4you.user.UserService;
 import jakarta.transaction.Transactional;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +51,21 @@ public class UserController {
         return "fragments/account-deleted :: content";
     }
 
+    @GetMapping("/user/{id}")
+    public ResponseEntity<UserEntity> getUserById(@PathVariable String id) {
+        UserEntity user = userService.findById(id);
 
+        if (user == null) {
+            throw new UserNotFoundException("Not found");
+        }
+
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/user/update/{id}")
+    public String redirectToEdit(@PathVariable String id) {
+        return "redirect:/user/edit/" + id;
+    }
 
 
 

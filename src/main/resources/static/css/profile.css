@@ -61,57 +61,8 @@
 
 }
 
-
-.nav-buttons a {
+button{
+    color:white;
+    border-radius:20px;
     background-color: black;
-    color: white !important;
-    padding: 8px 18px;
-    border-radius: 8px;
-    font-size: 14px;
-    margin-left: 10px;
-    transition: 0.3s;
-    display: inline-block;
-    cursor: pointer;
 }
-
-.nav-buttons a:hover {
-    background-color: #333;
-}
-.navbar button{
-    background-color:black;
-    margin-left: 10px;
-    border-radius: 10px;
-    padding: 10px;
-    width: 90px;
-}
-
-.navbar button a{
-    color: white;
-    font-weight:bold;
-}
-
-.navbar .nav-buttons a:hover {
-    background-color: #333;
-    color: gold;
-}
-
-.profile-btn {
-    padding: 8px 16px;
-    border-radius: 20px;
-    border: 1px solid #ddd;
-    background-color: #f8fafc;
-    color: #333;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 500;
-    transition: all 0.2s;
-}
-
-.profile-btn:hover {
-    background-color: #f1f5f9;
-    border-color: #38bdf8;
-    color: #38bdf8;
-}
-{}

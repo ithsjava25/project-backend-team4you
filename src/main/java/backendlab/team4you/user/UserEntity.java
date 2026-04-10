@@ -44,10 +44,6 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
         this.firstName = firstName;
     }
 
-    @Override
-    public Bytes getId() {
-        return id != null ? Bytes.fromBase64(id) : null;
-    }
 
     public void setId(Bytes id) {
         this.id = id != null ? id.toBase64UrlString() : null;
@@ -56,6 +52,11 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     @Override
     public String getName() {
         return this.email;
+    }
+
+    @Override
+    public Bytes getId() {
+        return id != null ? Bytes.fromBase64(id) : null;
     }
 
     @Override
@@ -121,4 +122,7 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
 
         this.role = UserRole.valueOf(role);
     }
+
+
+
 }

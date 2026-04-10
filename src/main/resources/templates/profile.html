@@ -13,7 +13,8 @@
     <nav class="navbar">
         <div class="navdiv">
             <div class="logo">
-                <a th:href="@{/static}">Profil </a>
+                <a th:href="@{/static}">Profil
+                    <i class="fa-solid fa-user"></i> </a>
             </div>
 
             <div class="search-container">
@@ -36,6 +37,7 @@
                             th:href="@{/profile}"
                     >
                         Min profil
+
                     </a>
                 </li>
                 <li>
@@ -58,20 +60,22 @@
                         Bokade
                     </a>
                 </li>
-                <li><a th:href="@{/}" class="btn-highlight">Hem</a></li>
+                <li>
+                    <a th:href="@{/}" class="btn-highlight">Hem
+                        <i class="fa fa-home" aria-hidden="true"></i></a>
+                </li>
             </ul>
         </div>
-
-        <button
-                hx-delete="/account"
-                hx-confirm="Är du säker på att du vill ta bort ditt konto?"
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-        >
-            Ta bort mitt konto
-        </button>
-
     </nav>
 
+    <button
+            hx-delete="/account"
+            hx-confirm="Är du säker på att du vill ta bort ditt konto?"
+            hx-target="#content-area"
+            hx-swap="innerHTML"
+    >
+        Ta bort mitt konto
+        <i class="fa-solid fa-trash"></i>
+    </button>
 </header>
 </html>
