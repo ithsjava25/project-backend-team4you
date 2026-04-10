@@ -58,10 +58,11 @@ public class UserService {
     public void registerUser(UserRegistrationDTO dto) {
 
         if (userRepository.findByEmail(dto.email()).isPresent()) {
-            throw new RuntimeException("E-posten är redan tagen");
+            throw new DuplicateEmailException("E-posten är redan tagen");
         }
 
         UserEntity user = new UserEntity();
+        user.setName(dto.name());
         user.setFirstName(dto.firstName());
         user.setLastName(dto.lastName());
         user.setEmail(dto.email());

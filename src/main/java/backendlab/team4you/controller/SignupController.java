@@ -79,13 +79,13 @@ public class SignupController {
         userEntity.setFirstName(req.firstName);
         userEntity.setLastName(req.lastName);
 
-        String assignedRole = req.getUsername().endsWith("@team4you.com") ? "ADMIN" : "USER";
+        String assignedRole = req.getEmail().endsWith("@team4you.com") ? "ADMIN" : "USER";
         userEntity.setRole(assignedRole);
 
         users.save(userEntity);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                userEntity.getName(), null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                userEntity.getEmail(), null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(auth);
