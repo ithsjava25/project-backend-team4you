@@ -4,6 +4,7 @@ import backendlab.team4you.dto.UserRegistrationDTO;
 import backendlab.team4you.exceptions.DuplicateEmailException;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.webauthn.api.Bytes;
@@ -21,7 +22,6 @@ public class UserService {
 
     UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private static final String ADMIN_EMAIL = "admin@team4you.com";
     private final SecureRandom random = new SecureRandom();
 
     public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder){
@@ -62,10 +62,10 @@ public class UserService {
     public void registerUser(UserRegistrationDTO dto) {
 
         if (dto.name() == null || dto.name().isBlank()) {
-            throw new IllegalArgumentException("Username is required");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Username is required");
         }
         if (userRepository.findByName(dto.name().trim()).isPresent()) {
-            throw new IllegalArgumentException("Username already exists");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST ,"Username already exists");
         }
 
         if (userRepository.findByEmail(dto.email()).isPresent()) {
@@ -112,7 +112,7 @@ public class UserService {
                 displayName
         );
 
-        userEntity.setEmail(email);
+        userEntity.setEmail(cleanEmail);
         userEntity.setFirstName(firstName);
         userEntity.setLastName(lastName);
 
@@ -120,8 +120,11 @@ public class UserService {
         String assignedRole = "USER";
         userEntity.setRole(assignedRole);
 
-        return userRepository.save(userEntity);
-
+        try {
+            return userRepository.save(userEntity);
+        } catch (DataIntegrityViolationException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username or email already taken");
+        }
     }
 
     public UserEntity findByEmail(String email) {
