@@ -30,8 +30,8 @@ public class Team4youApplication {
 				);
 
 				devUser.setPasswordHash(encoder.encode("123456"));
-				devUser.setRole("ADMIN");
-				devUser.setEmail("dev@team4you.com");
+				devUser.setRole("USER");
+				devUser.setEmail("dev@gmail.com");
 
 				repository.save(devUser);
 			}
