@@ -1,6 +1,6 @@
 package backendlab.team4you;
 
-import backendlab.team4you.repository.UserRepository;
+import backendlab.team4you.user.UserRepository;
 import backendlab.team4you.user.UserEntity;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
