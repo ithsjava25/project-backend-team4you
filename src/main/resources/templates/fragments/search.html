@@ -1,16 +1,7 @@
-<form
-        hx-get="/search"
-        hx-target="#content-area"
-        hx-swap="innerHTML"
->
+<section layout:fragment="content" xmlns:layout="">
 
-    <input
-            type="text"
-            name="searchTerm"
-            placeholder="Search..."
-            hx-trigger="keyup changed delay:300ms"
-    >
+    <h2>Sökresultat</h2>
 
-    <button type="submit">Search</button>
+    <div th:each="user : ${users}" th:text="${user.email}"></div>
 
-</form>
+</section>

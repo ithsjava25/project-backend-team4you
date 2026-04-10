@@ -1,35 +1,81 @@
-body{
-    height:100vh;
+.navbar *, .navbar a{
+    text-decoration: none;
+}
+
+.navbar{
+    background-color:white;
+    font-family: Poppins, sans-serif;
+    padding-right: 15px;
+    padding-left: 15px;
+    border: 2px solid purple;
+}
+
+.navbar button{
+
+}
+
+.navdiv{
     display: flex;
-    margin: 0;
-    padding: 0;
-    font-family: sans-serif;
-
-    background-size: cover;
-    justify-content: center;
     align-items: center;
-
+    justify-content: space-between;
 }
 
-.container{
+.navbar li{
+    list-style: none;
+    display: inline-block;
+}
 
-    padding: 40px;
-    border: 1px solid black;
+.navbar li a {
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 25px;
+    cursor: pointer;
+}
+.search-container {
+    flex-grow: 0.5;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.search-container form {
+    display: flex;
+    background: #f0f2f5;
+    border-radius: 20px;
+    padding: 5px 15px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.search-container input {
+    border: none;
     background: transparent;
-    border-radius: 0px;
-    text-align: center;
-    backdrop-filter: blur(20px);
+    padding: 8px;
+    width: 100%;
+    outline: none;
 }
-.header{
 
-    text-align: center;
-    margin-bottom: 25px;
+.search-btn {
+    background: none !important;
+    width: auto !important;
+    color: #666 !important;
+    cursor: pointer;
+    border: none;
 
-    font-size: 1rem;
-    text-transform: uppercase;
+}
+
+.nav-buttons a:hover {
+    background-color: #333;
+}
+
+
+.navbar button a{
     color: white;
+    font-weight:bold;
 }
 
-p{
-    color:black;
+.navbar .nav-buttons a:hover {
+    background-color: #333;
+    color: gold;
 }
+

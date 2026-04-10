@@ -4,6 +4,7 @@ import backendlab.team4you.dto.UserRegistrationDTO;
 import backendlab.team4you.exceptions.DuplicateEmailException;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import jakarta.transaction.Transactional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -104,6 +105,10 @@ public class UserService {
     }
 
 
+    public String search(String searchTerm) {
 
 
+        return searchTerm;
+
+    }
 }

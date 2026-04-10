@@ -1,3 +1,4 @@
+
 <header th:fragment="header">
     <nav class="navbar">
         <div class="navdiv">
@@ -6,10 +7,22 @@
                 <a th:href="@{/}">Hem</a>
             </div>
 
+            <div id="content-area"></div>
+
             <div class="search-container">
-                <form th:action="@{/search}" method="get">
-                    <input type="text" name="query" placeholder="Sök ärende eller info...">
-                    <button type="submit" class="search-btn">
+                <form
+                        hx-get="/search"
+                        hx-target="#content-area"
+                        hx-swap="innerHTML"
+                >
+                    <input
+                            type="text"
+                            name="searchTerm"
+                            placeholder="Sök..."
+                            hx-trigger="keyup changed delay:300ms"
+                    >
+
+                    <button type="submit">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </button>
                 </form>

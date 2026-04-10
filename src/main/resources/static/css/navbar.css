@@ -10,6 +10,10 @@
     border: 2px solid purple;
 }
 
+.navbar button{
+
+}
+
 .navdiv{
     display: flex;
     align-items: center;
@@ -22,7 +26,6 @@
 }
 
 .navbar li a {
-    color:black;
     font-size: 16px;
     font-weight: bold;
     margin-right: 25px;
@@ -62,28 +65,12 @@
 }
 
 
-.nav-buttons a {
-    background-color: black;
-    color: white !important;
-    padding: 8px 18px;
-    border-radius: 8px;
-    font-size: 14px;
-    margin-left: 10px;
-    transition: 0.3s;
-    display: inline-block;
-    cursor: pointer;
-}
+
 
 .nav-buttons a:hover {
     background-color: #333;
 }
-.navbar button{
-    background-color:black;
-    margin-left: 10px;
-    border-radius: 10px;
-    padding: 10px;
-    width: 90px;
-}
+
 
 .navbar button a{
     color: white;
@@ -94,4 +81,4 @@
     background-color: #333;
     color: gold;
 }
-{}
+

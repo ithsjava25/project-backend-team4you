@@ -1,0 +1,28 @@
+*{ margin:0;
+    padding:0;
+    box-sizing: border-box;
+    font-family: Poppins, sans-serif;
+} li, ul, span
+  {
+      list-style-type: none;
+      text-decoration: none;
+      padding:10px;
+  } nav{
+        width:250px;
+        background-color:
+                #333; height:100vh; color:white;
+    }
+.btn-logout
+{
+    border-radius:20px;
+    cursor:pointer;
+    font-size:16px }
+
+.dashboard-wrapper {
+    display: flex;
+}
+
+#content-area {
+    flex: 1;
+    padding: 20px;
+}
