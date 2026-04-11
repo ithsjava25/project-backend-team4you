@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}">
+<html xmlns:th="http://www.thymeleaf.org">
+<!--      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"-->
+<!--      layout:decorate="~{layout}">-->
     <head>
     <title>Ansökningar</title>
     <link th:href="@{/css/booking.css}" rel="stylesheet">
@@ -9,7 +9,8 @@
     </head>
 <body>
 
-<section layout:fragment="content">
+<!--<section layout:fragment="content">-->
+<section>
 
     <main class="card">
         <h2><i class="fa-regular fa-calendar"></i> Boka tid </h2>
@@ -39,7 +40,7 @@
                 <p>Har du fått ett brev med en uppmaning att boka en tid? Sök</p>
             </a>
         </section>
-        <div th:fragment="content">
+        <div>
             <h2>Bokning</h2>
         </div>
 
@@ -57,7 +58,16 @@
             >
                 Visa fler
             </button>
+            <button
+                    th:attr="hx-post=@{/booking/cancel(id=${booking.id})}"
+                    hx-confirm="Är du säker?"
+                    hx-target="closest tr"
+                    hx-swap="outerHTML"
+            >
+                Avboka
+            </button>
         </div>
+
     </main>
 </section>
 

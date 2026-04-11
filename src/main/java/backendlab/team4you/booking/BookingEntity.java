@@ -25,7 +25,7 @@ public class BookingEntity {
     
 
     @Enumerated(EnumType.STRING)
-    private BookingStatus status;
+    private BookingEnum status;
 
     public BookingEntity() {}
 
@@ -80,11 +80,11 @@ public class BookingEntity {
         this.createdAt = createdAt;
     }
 
-    public BookingStatus getStatus() {
+    public BookingEnum getStatus() {
         return status;
     }
 
-    public void setStatus(BookingStatus status) {
+    public void setStatus(BookingEnum status) {
         this.status = status;
     }
 

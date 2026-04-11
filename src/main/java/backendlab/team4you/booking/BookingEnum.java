@@ -1,6 +1,6 @@
 package backendlab.team4you.booking;
 
-public enum BookingStatus {
+public enum BookingEnum {
 
     PENDING,
     CONFIRMED,

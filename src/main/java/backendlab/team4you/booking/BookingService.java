@@ -2,6 +2,7 @@ package backendlab.team4you.booking;
 
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BookingService {
@@ -10,5 +11,14 @@ public class BookingService {
 
     public BookingService(BookingRepository bookingRepository) {
         this.bookingRepository = bookingRepository;
+    }
+
+
+    @Transactional
+    public void cancelBooking(String id) {
+        BookingEntity booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        booking.setStatus(BookingEnum.CANCELLED);
     }
 }

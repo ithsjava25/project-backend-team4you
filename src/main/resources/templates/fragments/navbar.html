@@ -1,5 +1,4 @@
-
-<header th:fragment="header">
+<header th:fragment="header" xmlns:sec="http://www.w3.org/1999/xhtml">
     <nav class="navbar">
         <div class="navdiv">
 
@@ -29,12 +28,22 @@
             </div>
 
             <ul class="nav-links">
-                <li><a th:href="@{/}" class="nav-menu">Home</a></li>
+                <li class="nav-buttons"><a th:href="@{/}" class="nav-menu">Home</a></li>
                 <li><a th:href="@{/contact}" class="nav-menu">Contact</a></li>
-                <li class="nav-buttons">
-                    <a th:href="@{/login}" class="btn-login">Sign in</a>
+                <li sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/login}">Logga in</a>
+                </li>
+                <li>
                     <a th:href="@{/register}" class="btn-register">Register</a>
                 </li>
+                <li class="nav-buttons"><a th:href="@{/admin}" class="nav-menu">Admin</a>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <form th:action="@{/logout}" method="post">
+                        <button>Logga ut</button>
+                    </form>
+                </li>
+
             </ul>
 
         </div>

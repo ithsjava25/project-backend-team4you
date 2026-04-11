@@ -12,6 +12,12 @@ import java.util.List;
 @Controller
 public class BookingController {
 
+    private final BookingService bookingService;
+
+    public BookingController(BookingService bookingService) {
+        this.bookingService = bookingService;
+    }
+
 
     @GetMapping("/booking/application")
     public String bookingApplication() {
@@ -63,7 +69,14 @@ public class BookingController {
     }
 
     @PostMapping("/booking/cancel")
-    public String cancelBooking() {
+    public String cancelBooking(
+            @RequestParam String id,
+            Model model
+    ) {
+
+        bookingService.cancelBooking(id);
+
+        model.addAttribute("message", "Bokningen har avbokats");
 
         return "fragments/booking-cancelled :: content";
     }

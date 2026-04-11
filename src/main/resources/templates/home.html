@@ -1,22 +1,23 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<!--      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"-->
-<!--      layout:decorate="~{layout}">-->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<html xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
+layout:decorate="~{layout}">
+
 
 <head>
     <title>Home</title>
-<!--    <link rel="stylesheet" th:href="@{/css/layout.css}">-->
-        <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link  th:href="@{/css/layout.css}">
 </head>
 
 <header th:replace="~{fragments/navbar :: header}"></header>
 <body>
 
-<!--<section layout:fragment="content">-->
+<section layout:fragment="content">
 
     <h1>Välkommen!</h1>
+
     <p>Detta är startsidan</p>
+
 </section>
 
 </body>
