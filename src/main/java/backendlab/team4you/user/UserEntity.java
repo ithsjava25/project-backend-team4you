@@ -32,9 +32,7 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
 
     @Column(name = "display_name")
     private String displayName;
-
-    @Column(name = "email")
-    private String email;
+    
 
     @Column(name = "first_name")
     private String firstName;
@@ -89,9 +87,7 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     }
 
 
-    public @Nullable String getDisplayName() {
-        return displayName;
-    }
+
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
@@ -159,7 +155,5 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
 
 }
 
-    public String getIdAsString() {
-        return this.id;
-    }
-}
+
+
