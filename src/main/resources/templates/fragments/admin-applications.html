@@ -1,0 +1,22 @@
+<div th:fragment="content">
+
+    <h2>Ansökningar</h2>
+
+    <ul>
+        <li th:each="application : ${applications}">
+
+            <span th:text="${application}"></span>
+
+            <button
+                    th:attr="hx-post=@{/admin/applications(id=${application})}"
+                    hx-target="closest li"
+                    hx-swap="outerHTML"
+                    hx-confirm="Är du säker?"
+            >
+                Ta bort
+            </button>
+
+        </li>
+    </ul>
+
+</div>

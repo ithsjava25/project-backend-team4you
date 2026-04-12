@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin</title>
+
+<!--    <link rel="stylesheet" th:href="@{/css/base.css}">-->
+<!--    <link rel="stylesheet" th:href="@{/css/layout.css}">-->
+<!--    <link rel="stylesheet" th:href="@{/css/side-navbar.css}">-->
+<!--    <link rel="stylesheet" th:href="@{/css/admin.css}">-->
+<!--    <link rel="stylesheet" th:href="@{/css/admin-layout.css}">-->
+    <link rel="stylesheet" th:href="@{/css/sidenav.css}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+
+<div class="main-wrapper">
+
+    <aside
+            th:replace="~{fragments/admin-sidenav :: aside}">
+            sec:authorize="isAuthenticated()">
+    </aside>
+
+    <main class="container">
+        <div layout:fragment="content"></div>
+    </main>
+
+
+
+</div>
+
+</body>
+</html>
