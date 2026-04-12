@@ -152,6 +152,10 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
         this.role = UserRole.valueOf(role);
     }
 
+     public String getIdAsString() {
+        return this.id;
+    }
+
 
 }
 
