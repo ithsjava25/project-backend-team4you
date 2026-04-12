@@ -21,4 +21,12 @@ public class BookingService {
 
         booking.setStatus(BookingEnum.CANCELLED);
     }
+
+    @Transactional
+    public void delete(String id) {
+        BookingEntity booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        bookingRepository.deleteById(id);
+    }
 }

@@ -35,11 +35,7 @@ public class UserController {
 
 
 
-     @GetMapping("/admin")
-     @PreAuthorize("hasRole('ADMIN')")
-    public String admin(){
-        return "admin";
-    }
+
 
 
     @DeleteMapping("/account")

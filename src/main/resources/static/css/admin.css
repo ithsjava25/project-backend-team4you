@@ -9,7 +9,6 @@
     width:250px;
     height: 100%;
     position:absolute;
-    background: #f3f3f3;
     z-index: 1;
     transition: 0.5s;
 }

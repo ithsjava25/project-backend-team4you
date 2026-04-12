@@ -1,0 +1,52 @@
+<aside th:fragment="aside" class="sidebar">
+
+    <div class="container">
+
+        <div class="head">
+            <a th:href="@{/admin}">Admin Dashboard</a>
+        </div>
+
+        <ul class="sidebar-links">
+
+            <li>
+                <a th:href="@{/admin/users}" hx-get="/admin/users" hx-target="#content-area">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Hantera användare</span>
+                </a>
+            </li>
+
+            <li>
+                <a th:href="@{/admin/applications}" hx-get="/admin/applications" hx-target="#content-area">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <span>Hantera ansökningar</span>
+                </a>
+            </li>
+
+            <li>
+                <a th:href="@{/admin/bookings}" hx-get="/admin/bookings" hx-target="#content-area">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>Bokningar</span>
+                </a>
+            </li>
+
+            <li>
+                <a th:href="@{/admin/logs}" hx-get="/admin/logs" hx-target="#content-area">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                    <span>Systemlogg</span>
+                </a>
+            </li>
+
+            <li>
+                <form th:action="@{/logout}" method="post">
+                    <button class="submit" type="submit">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Logga ut</span>
+                    </button>
+                </form>
+            </li>
+
+        </ul>
+
+    </div>
+
+</aside>

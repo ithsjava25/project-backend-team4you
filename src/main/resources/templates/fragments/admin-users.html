@@ -1,0 +1,20 @@
+<div th:fragment="content">
+
+    <h2>Användare</h2>
+
+    <ul>
+        <li th:each="user : ${users}">
+            <span th:text="${user}"></span>
+
+            <button
+                th:attr="hx-post=@{/admin/users(id=${user})}"
+                hx-target="closest li"
+                hx-swap="outerHTML"
+                hx-confirm="Är du säker?"
+            >
+                Ta bort
+            </button>
+        </li>
+    </ul>
+
+</div>
