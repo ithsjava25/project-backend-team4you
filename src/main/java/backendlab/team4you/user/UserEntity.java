@@ -32,7 +32,7 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
 
     @Column(name = "display_name")
     private String displayName;
-
+    
 
     @Column(name = "first_name")
     private String firstName;
@@ -151,7 +151,8 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
 
         this.role = UserRole.valueOf(role);
     }
-    public String getIdAsString() {
+
+     public String getIdAsString() {
         return this.id;
     }
 

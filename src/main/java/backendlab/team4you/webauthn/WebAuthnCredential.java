@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 public class WebAuthnCredential implements CredentialRecord {
 
     @Id
-    @Column(name = "id", length = 512)
+    @Column(name = "credential_id", length = 512)
     private String credentialId;
 
-    @Column(name = "user_entity_id", length = 255)
+    @Column(name = "user_entity_user_id", length = 255)
     private String userEntityUserId;
 
     @Column(name = "public_key", columnDefinition = "bytea")

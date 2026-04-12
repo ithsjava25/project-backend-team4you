@@ -8,9 +8,16 @@
     <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 <body>
+
 <div th:replace="fragments/form-errors :: errors"></div>
 <div th:replace="fragments/success-message :: success"></div>
 <form th:action="@{/login}" method="post">
+
+    <h1>Logga in</h1>
+    <form th:action="@{/login}" method="post">
+    <label for="username">Användarnamn</label>
+    <input type="text" id="username" name="username" required autofocus>
+
 
 
     <div class="form-container">
