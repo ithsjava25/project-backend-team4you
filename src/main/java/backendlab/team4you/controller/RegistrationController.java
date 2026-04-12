@@ -25,7 +25,7 @@ public class RegistrationController {
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
 
-        model.addAttribute("user", new UserRegistrationDTO("", "", "", "", "", ""));
+        model.addAttribute("user", new UserRegistrationDTO("","", "", "", "", "", ""));
         return "register";
     }
 
@@ -68,8 +68,8 @@ public class RegistrationController {
     public String welcome(Model model, Principal principal) {
         if (principal == null) return "redirect:/login";
 
-        String email = principal.getName();
-        UserEntity user = userService.findByEmail(email);
+        String name = principal.getName();
+        UserEntity user = userService.findByName(name);
 
         if (user == null) {
 

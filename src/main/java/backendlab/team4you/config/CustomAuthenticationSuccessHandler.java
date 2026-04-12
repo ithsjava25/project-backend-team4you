@@ -32,7 +32,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String username = authentication.getName();
 
-        var userEntity = userService.findByEmail(username);
+        var userEntity = userService.findByName(username);
 
         if (userEntity != null){
             var credentials = userCredentialRepository.findByUserId(userEntity.getId());

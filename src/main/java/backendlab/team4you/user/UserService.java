@@ -4,13 +4,26 @@ import backendlab.team4you.dto.UserRegistrationDTO;
 import backendlab.team4you.exceptions.DuplicateEmailException;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import jakarta.transaction.Transactional;
+
 import org.jspecify.annotations.Nullable;
+
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.stereotype.Service;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 
 
 import java.security.Principal;
+
+import org.springframework.web.server.ResponseStatusException;
+
+
+import java.security.SecureRandom;
+
 import java.util.List;
 
 
@@ -21,6 +34,7 @@ public class UserService {
 
     UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final SecureRandom random = new SecureRandom();
 
     public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder){
 
@@ -61,14 +75,24 @@ public class UserService {
 
     public void registerUser(UserRegistrationDTO dto) {
 
-        if (userRepository.findByEmail(dto.email()).isPresent()) {
-            throw new RuntimeException("E-posten är redan tagen");
+        if (dto.name() == null || dto.name().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Username is required");
+        }
+        if (userRepository.findByName(dto.name().trim()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST ,"Username already exists");
+        }
+
+        String cleanEmail = dto.email() != null ? dto.email().trim() : null;
+
+        if (cleanEmail != null && userRepository.findByEmail(cleanEmail).isPresent()) {
+            throw new DuplicateEmailException("E-posten är redan tagen");
         }
 
         UserEntity user = new UserEntity();
+        user.setName(dto.name().trim());
         user.setFirstName(dto.firstName());
         user.setLastName(dto.lastName());
-        user.setEmail(dto.email());
+        user.setEmail(cleanEmail);
         user.setPhoneNumber(dto.phoneNumber());
 
 
@@ -79,8 +103,52 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public UserEntity registerWebAuthnUser(String username, String displayName, String email, String firstName, String lastName){
+
+        if (username == null || username.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is required");
+        }
+        if (email == null || email.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is required");
+        }
+        String cleanName = username.trim();
+        String cleanEmail = email.trim();
+
+        if(userRepository.findByName(cleanName).isPresent())
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Användarnamnet är redan taget");
+        if(userRepository.findByEmail(cleanEmail).isPresent())
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "E-posten är redan tagen");
+
+        byte[] idBytes = new byte[32];
+        random.nextBytes(idBytes);
+
+        UserEntity userEntity = new UserEntity(
+                new Bytes(idBytes),
+                cleanName,
+                displayName
+        );
+
+        userEntity.setEmail(cleanEmail);
+        userEntity.setFirstName(firstName);
+        userEntity.setLastName(lastName);
+
+        //Every user that register themselves will automatically get the role USER assigned
+        String assignedRole = "USER";
+        userEntity.setRole(assignedRole);
+
+        try {
+            return userRepository.save(userEntity);
+        } catch (DataIntegrityViolationException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username or email already taken");
+        }
+    }
+
     public UserEntity findByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
+    }
+
+    public UserEntity findByName(String name){
+        return userRepository.findByName(name.trim()).orElse(null);
     }
 
     @Transactional

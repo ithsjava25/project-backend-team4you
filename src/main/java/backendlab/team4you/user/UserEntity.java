@@ -1,6 +1,14 @@
 package backendlab.team4you.user;
 
+
 import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.security.web.webauthn.api.PublicKeyCredentialUserEntity;
 
@@ -14,10 +22,21 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     @Column(name = "id")
     private String id;
 
+
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @Column(name = "name", nullable = false, unique = true)
+    private String name;
+
+
     @Column(name = "display_name")
+    private String displayName;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "first_name")
     private String firstName;
 
     @Column(name = "last_name")
@@ -38,10 +57,10 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     public UserEntity() {
     }
 
-    public UserEntity(Bytes id, String email, String firstName) {
+    public UserEntity(Bytes id, String name, String displayName) {
         this.id = id != null ? id.toBase64UrlString() : null;
-        this.email = email;
-        this.firstName = firstName;
+        this.name = name;
+        this.displayName = displayName;
     }
 
 
@@ -51,10 +70,15 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
 
     @Override
     public String getName() {
-        return this.email;
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
+
     public Bytes getId() {
         return id != null ? Bytes.fromBase64(id) : null;
     }
@@ -62,6 +86,15 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     @Override
     public String getDisplayName() {
         return (this.firstName != null ? this.firstName : "") + " " + (this.lastName != null ? this.lastName : "");
+    }
+
+
+    public @Nullable String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
 
@@ -124,5 +157,9 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     }
 
 
+}
 
+    public String getIdAsString() {
+        return this.id;
+    }
 }
