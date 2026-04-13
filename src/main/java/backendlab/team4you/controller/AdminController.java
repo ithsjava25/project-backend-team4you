@@ -50,17 +50,7 @@ public class AdminController {
     }
 
 
-    @GetMapping("/admin/users")
-    public String adminLogs(Model model){
-        List<String> users = List.of(
-                "User johndoe",
-                "User janedoe",
-                "User anna"
-        );
 
-        model.addAttribute("users", users);
-        return "fragments/admin-users.html :: content";
-    }
 
     @PostMapping("/admin/users")
     public String deleteUser(@RequestParam String id, Model model){

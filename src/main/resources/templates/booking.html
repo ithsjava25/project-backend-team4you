@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<!--      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"-->
-<!--      layout:decorate="~{layout}">-->
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
     <head>
     <title>Ansökningar</title>
     <link th:href="@{/css/booking.css}" rel="stylesheet">
@@ -9,66 +9,51 @@
     </head>
 <body>
 
-<!--<section layout:fragment="content">-->
-<section>
+<section layout:fragment="content" class="card">
 
-    <main class="card">
-        <h2><i class="fa-regular fa-calendar"></i> Boka tid </h2>
+    <h2><i class="fa-regular fa-calendar"></i> Boka tid</h2>
 
-        <section class="section-booking">
-            <a
-                    hx-get="/booking/application"
-                    hx-target="#content-area"
-                    hx-swap="innerHTML"
-                    th:href="@{/booking/application}"
-                    class="btn-highlight"
-            >
-                Ärende
-            </a>
+    <section class="section-booking">
+        <a
+                hx-get="/booking/application"
+                hx-target="#content-area"
+                hx-swap="innerHTML"
+                th:href="@{/booking/application}"
+                class="btn-highlight"
+        >
+            Ärende
+        </a>
 
-            <h2>Boka tid till ditt medborgarskapsärende</h2>
-            <p>Välj det här alternativet om du har blivit ombedd att boka tid för personlig inställelse</p>
-        </section>
-        <section class="section-calling">
-            <a
-                    hx-get="/booking/search"
-                    hx-target="#content-area"
-                    hx-swap="innerHTML"
-                    th:href="@{/booking/search}"
-            >
-                <h2>Sök uppmaning till bokning</h2>
-                <p>Har du fått ett brev med en uppmaning att boka en tid? Sök</p>
-            </a>
-        </section>
-        <div>
-            <h2>Bokning</h2>
-        </div>
+        <h2>Boka tid till ditt medborgarskapsärende</h2>
+        <p>Välj detta alternativ om du blivit ombedd att boka tid</p>
+    </section>
 
-        <div th:fragment="content">
-            <h2>Mina bokningar</h2>
+    <section class="section-calling">
+        <a
+                hx-get="/booking/search"
+                hx-target="#content-area"
+                hx-swap="innerHTML"
+                th:href="@{/booking/search}"
+        >
+            <h2>Sök uppmaning till bokning</h2>
+            <p>Har du fått ett brev? Sök här</p>
+        </a>
+    </section>
 
-            <div id="booking-list">
-                <div th:replace="fragments/booking-items :: list"></div>
-            </div>
+    <h2>Mina bokningar</h2>
 
-            <button
-                    hx-get="/bookings?page=1"
-                    hx-target="#booking-list"
-                    hx-swap="beforeend"
-            >
-                Visa fler
-            </button>
-            <button
-                    th:attr="hx-post=@{/booking/cancel(id=${booking.id})}"
-                    hx-confirm="Är du säker?"
-                    hx-target="closest tr"
-                    hx-swap="outerHTML"
-            >
-                Avboka
-            </button>
-        </div>
+    <div id="booking-list">
+        <div th:replace="fragments/booking-list :: list"></div>
+    </div>
 
-    </main>
+    <button
+            hx-get="/bookings?page=1"
+            hx-target="#booking-list"
+            hx-swap="beforeend"
+    >
+        Visa fler
+    </button>
+
 </section>
 
 </body>

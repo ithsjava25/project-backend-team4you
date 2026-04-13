@@ -1,55 +1,56 @@
 <!doctype html>
-<html lang="en">
+<html lang="sv"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Document</title>
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <title>Logga in</title>
     <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
+
+<section layout:fragment="content">
+
 <body>
 
-<div th:replace="fragments/form-errors :: errors"></div>
-<div th:replace="fragments/success-message :: success"></div>
-<form th:action="@{/login}" method="post">
 
-    <h1>Logga in</h1>
-    <form th:action="@{/login}" method="post">
-    <label for="username">Användarnamn</label>
-    <input type="text" id="username" name="username" required autofocus>
+    <div class="login-wrapper">
 
-
+    <div th:replace="fragments/form-errors :: errors"></div>
+    <div th:replace="fragments/success-message :: success"></div>
 
     <div class="form-container">
-        <section class="form-header">
-            <h2>Logga in</h2>
-        </section>
-        <section class="input-container">
-            <label class="input-container">
-                <input type="text" placeholder="username" required>
-            </label>
-            <label>
-                <input type="password" placeholder="password" required>
-            </label>
 
-            <section>
-                <button class="submit" type="submit">Logga in</button>
-            </section>
-            <section class="signup">
-                Har du inget konto?<a th:href="@{/register}"> Registrera</a>
-            </section>
-        </section>
+        <h2>Logga in</h2>
+
+        <form th:action="@{/login}" method="post">
+
+            <label for="username">Användarnamn</label>
+            <input type="text" id="username" name="username" required autofocus>
+
+            <label for="password">Lösenord</label>
+            <input type="password" id="password" name="password" required>
+
+            <button class="login-submit" type="submit">Logga in</button>
+
+        </form>
+
+        <p>
+            Har du inget konto?
+            <a th:href="@{/register}">Registrera</a>
+        </p>
 
         <button class="passkey-button"
                 type="button"
                 hx-get="/login/webauthn"
                 hx-target="#content-area"
-                hx-swap="innerHTML"
-                th:href="@{/login/webauthn}">
+                hx-swap="innerHTML">
             Logga in med passkeys
         </button>
 
     </div>
-</form>
+    </div>
+</section>
+
 </body>
 </html>

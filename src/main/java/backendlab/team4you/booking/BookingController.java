@@ -80,4 +80,9 @@ public class BookingController {
 
         return "fragments/booking-cancelled :: content";
     }
+
+    @GetMapping("/booking")
+    public String bookingPage() {
+        return "booking";
+    }
 }

@@ -1,7 +1,23 @@
+:root {
+    --color-bg: #161a2d;
+    --color-surface: #1f2544;
+    --color-primary: #6017a8;
+    --color-accent: #00d4ff;
+    --color-text: #ffffff;
+    --color-muted: #a0a0b0;
+    --color-success: #28a745;
+}
+
 .alert-success {
     background: #d4edda;
     color: #155724;
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 10px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }

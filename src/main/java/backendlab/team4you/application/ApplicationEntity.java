@@ -2,8 +2,10 @@ package backendlab.team4you.application;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "application_entity")
 public class ApplicationEntity {
     @Id
     private Long id;

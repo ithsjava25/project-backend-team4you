@@ -1,105 +1,52 @@
-body{
-    height:100vh;
-    display: flex;
-    margin: 0;
-    padding: 0;
-    font-family: sans-serif;
 
-    background-size: cover;
-    justify-content: center;
-    align-items: center;
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --color-bg: #161a2d;
+    --color-surface: #1f2544;
+    --color-primary: #6017a8;
+    --color-accent: #00d4ff;
+    --color-text: #ffffff;
+    --color-muted: #a0a0b0;
+    --color-success: #28a745;
 }
 
-h2{
-    color:black;
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background: #f5f6fa
 }
 
 .form-container {
-    max-width:320px;
-    width: 100%;
-    padding: 40px;
-    box-shadow: 0 0 10px black;
-    background: transparent;
-    border-radius: 30px;
-    text-align: center;
-    backdrop-filter: blur(20px);
-}
-
-.form-header {
-    text-align: center;
-    margin-bottom: 25px;
-
-    font-size: 1rem;
-    text-transform: uppercase;
+    background: #161a2d;
     color: white;
-}
-.input-container {
-    position: relative;
-    margin-bottom: 20px;
-}
-
-.input-container input {
-    padding:15px 20px ;
-    width: 275px;
-    border-radius: 30px;
-    border: 0px solid white;
-    box-shadow: 0 0 5px black;
-    margin-bottom: 20px;
-    background: transparent;
-    font-size: 1rem;
-    outline: none;
-    color: black;
-}
-
-
-.forgot-password a {
-    text-decoration: none;
-    color: rgb(255, 255, 255);
-    font-size: 14px;
-}
-.forgot-password a:hover {
-    text-decoration: underline;
-}
-
-.forgot-password a {
-    text-decoration: none;
-    color: rgb(255, 255, 255);
-    font-size: 14px;
-}
-.forgot-password a:hover {
-    text-decoration: underline;
-}
-.submit {
-    width: 100%;
-    padding: 15px;
+    padding: 40px;
     border-radius: 20px;
-    border: 1px solid purple;
+    width: 320px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
 
+.form-container h2 {
     margin-bottom: 20px;
-    font-family: sans-serif;
-    font-weight: 100;
-    background: white;
-    cursor: pointer;
-    color:green;
-
-
 }
-.submit:hover {
-    box-shadow: 0 0 9px rgba(255, 255, 255, 0.662);
+
+.form-container label {
+    display: block;
+    margin-bottom: 5px;
+    text-align: left;
 }
-.signup {
-    text-align: center;
-    font-size: 17px;
-    cursor: pointer;
+
+.login-submit{
+    color:white;
+    border:none;
+    background: #161a2d;
 }
 
 .passkey-button{
-
-    color:green;
-    background:white;
-    border: 1px solid purple;
-    border-radius: 20px;
-    margin-bottom: 20px;
-    padding:15px;
+    color:white;
+    border:none;
+    background: #161a2d;
 }

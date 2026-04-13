@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-    xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
-layout:decorate="~{layout}">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 
+      layout:decorate="~{layout}">
 
 <head>
     <title>Home</title>
-<!--    <link  th:href="@{/css/layout.css}">-->
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
 </head>
 
-<header th:replace="~{fragments/navbar :: header}"></header>
 <body>
 
 <section layout:fragment="content">

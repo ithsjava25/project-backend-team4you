@@ -1,47 +1,52 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing: border-box;
-    font-family: Poppins, sans-serif;
-}
 
-.container{
-    width:250px;
+
+aside{
+    background: #161a2d;
+    width: 350px;
     height: 100%;
-    position:absolute;
+    border: 1px solid purple;
+    transition: all 0.5s ease;
+    align-items: center;
+    gap: 0 20px;
+    padding: 15px 20px;
+    color:white
+
+}
+
+
+li{
+    list-style: none;
+    margin:10px;
+    padding:10px;
+}
+
+
+
+.submit {
+    width: 50%;
+    padding: 10px;
+    border-radius:20px;
+    border: 1px solid purple;
+    margin-bottom: 20px;
+    font-family: sans-serif;
+    font-weight: 100;
+    background: white;
+    cursor: pointer;
+    color:green;
+
+}
+
+.side-navbar-container {
+    width: 250px;
+    min-height: 100vh;
     background: #f3f3f3;
-    z-index: 1;
-    transition: 0.5s;
 }
 
-.home{
+.side-navbar-container li {
     padding: 10px;
 }
 
-.application{
-    padding: 10px;
-}
-
-.profile{
-    padding: 10px;
-}
-.contact{
-    padding: 10px;
-}
-.logout{
-    padding: 10px;
-}
-
-.booking{
-    padding: 10px;
-}
-
-li:hover{
+.side-navbar-container li:hover {
     color: #6017a8;
-    text-decoration: none;
-    font-size: 1.2rem;
-    font-weight: 500;
     cursor: pointer;
 }
-{}
-

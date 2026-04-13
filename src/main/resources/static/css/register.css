@@ -1,33 +1,36 @@
-body{
-    background: #344a72;
-    font-family: 'Poppins', sans-serif;
+:root {
+    --color-bg: #161a2d;
+    --color-surface: #1f2544;
+    --color-primary: #6017a8;
+    --color-accent: #00d4ff;
+    --color-text: #ffffff;
+    --color-muted: #a0a0b0;
+    --color-success: #28a745;
+
 }
 
-.signup-box{
-    width: 360px;
-    height: 620px;
-    margin: auto;
-    background-color: white;
-    border-radius: 3px;
+.register-h1{
+    color:white;
 }
 
-h1{
+.form-container{
+    width:360px;
+}
+
+.register-h1{
     text-align: center;
     padding-top: 15px;
 }
-h4{
-    text-align: center;
-}
-form{
+
+.register-form{
     width:300px;
     margin-left: 20px;
 }
 
 form label{
-    display:flex;
+    display:block;
     margin-top:20px;
     font-size: 18px;
-
 }
 
 form input{
@@ -42,7 +45,7 @@ form input{
 
 input[type="button"]{
     width: 320px;
-    height: 35px;
+    height: 10px;
     margin-top: 20px;
     border: none;
     background-color: #49c1a2;
@@ -50,49 +53,41 @@ input[type="button"]{
     font-size:18px;
 }
 
-p{
+.register-p{
     text-align: center;
     margin-top: 20px;
     font-size: 15px;
 }
 
-a{
+.register-a{
     color: #49c1a2;
 
+
 }
 
-.signup-box {
-    width: 380px;
-    min-height: 700px;
-    margin: 50px auto;
-    background-color: white;
-    border-radius: 8px;
-    padding-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
 
-form label {
-    display: block;
-    margin-top: 15px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
-}
 
-input[type="submit"] {
-    width: 100%;
-    height: 45px;
-    margin-top: 25px;
-    border: none;
-    background-color: #49c1a2;
-    color: white;
-    font-size: 18px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
+
+
+
 
 input[type="submit"]:hover {
     background-color: #3ba88c;
 }
-{}
+
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background: #f5f6fa
+}
+
+.form-container {
+    background: #161a2d;
+    color: white;
+    padding: 40px;
+    border-radius: 20px;
+    width: 380px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
