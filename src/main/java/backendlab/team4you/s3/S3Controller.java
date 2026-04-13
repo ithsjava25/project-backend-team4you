@@ -32,12 +32,13 @@ public class S3Controller {
     // GET /api/files/download/{key} — download a file
     @GetMapping("/download/{key}")
     public ResponseEntity<byte[]> downloadFile(@PathVariable String key) throws IOException {
-        InputStream stream = s3Service.downloadFile(key);
-        byte[] bytes = stream.readAllBytes();
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + key + "\"")
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(bytes);
+        try (InputStream stream = s3Service.downloadFile(key)) {
+            byte[] bytes = stream.readAllBytes();
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + key + "\"")
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(bytes);
+        }
     }
 
     // DELETE /api/files/delete/{key} — delete a file
