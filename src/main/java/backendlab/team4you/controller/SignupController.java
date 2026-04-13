@@ -2,10 +2,8 @@ package backendlab.team4you.controller;
 
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
-import backendlab.team4you.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,7 +11,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.security.web.webauthn.management.PublicKeyCredentialUserEntityRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,16 +18,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.security.SecureRandom;
 import java.util.List;
 
 @Controller
 public class SignupController {
 
     private final PublicKeyCredentialUserEntityRepository users;
-    private final SecureRandom random = new SecureRandom();
     private final UserService userService;
 
     public SignupController(PublicKeyCredentialUserEntityRepository users,
@@ -58,30 +52,16 @@ public class SignupController {
     @ResponseBody
     public void signup(@RequestBody SignupRequest req, HttpServletRequest request, HttpServletResponse response) {
 
-        if (req.username == null || req.username.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is required");
-        }
-
-        if (userService.findByEmail(req.username) != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
-        }
-
-        byte[] idBytes = new byte[32];
-        random.nextBytes(idBytes);
-
-        UserEntity userEntity = new UserEntity(
-                new Bytes(idBytes),
-                req.username,
-                req.displayName
+        UserEntity userEntity = userService.registerWebAuthnUser(
+                req.getUsername(),
+                req.getDisplayName(),
+                req.getEmail(),
+                req.getFirstName(),
+                req.getLastName()
         );
 
-        String assignedRole = req.getUsername().endsWith("@team4you.com") ? "ADMIN" : "USER";
-        userEntity.setRole(assignedRole);
-
-        users.save(userEntity);
-
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                userEntity.getName(), null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                userEntity.getName(), null, List.of(new SimpleGrantedAuthority("ROLE_" + userEntity.getRole())));
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(auth);
@@ -93,6 +73,9 @@ public class SignupController {
     public static class SignupRequest {
         private String username;
         private String displayName;
+        private String email;
+        private String firstName;
+        private String lastName;
 
         public SignupRequest() {
         }
@@ -111,6 +94,30 @@ public class SignupController {
 
         public void setDisplayName(String displayName) {
             this.displayName = displayName;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public void setFirstName(String firstName) {
+            this.firstName = firstName;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+
+        public void setLastName(String lastName) {
+            this.lastName = lastName;
         }
     }
 

@@ -71,13 +71,13 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(UserService userService){
         return username -> {
-            UserEntity user = userService.findByEmail(username);
+            UserEntity user = userService.findByName(username);
             if (user == null) {
                 throw new UsernameNotFoundException("User not found: " + username);
             }
 
             return User.builder()
-                    .username(user.getEmail())
+                    .username(user.getName())
                     .password(user.getPasswordHash())
                     .roles(user.getRole())
                     .accountLocked(false)
