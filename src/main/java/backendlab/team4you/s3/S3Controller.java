@@ -25,6 +25,9 @@ public class S3Controller {
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
         String key = file.getOriginalFilename();
+        if (key == null || key.isBlank()) {
+            return ResponseEntity.badRequest().body("Invalid filename");
+        }
         s3Service.uploadFile(key, file.getBytes(), file.getContentType());
         return ResponseEntity.ok("File uploaded: " + key);
     }

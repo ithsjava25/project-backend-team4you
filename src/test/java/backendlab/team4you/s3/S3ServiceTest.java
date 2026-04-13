@@ -9,6 +9,8 @@ import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -21,6 +23,11 @@ class S3ServiceTest {
 
     @InjectMocks
     S3Service s3Service;
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(s3Service, "bucketName", "team4you-files");
+    }
 
     @Test
     void uploadFile_shouldCallPutObject() {
