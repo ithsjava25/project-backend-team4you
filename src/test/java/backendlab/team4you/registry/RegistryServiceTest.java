@@ -9,6 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -74,6 +75,36 @@ public class RegistryServiceTest {
                 .hasMessage("registry code already exists: KS");
 
         verify(registryRepository, never()).save(any(Registry.class));
+    }
+
+    @Test
+    @DisplayName("should translate save race condition into DuplicateRegistryNameException")
+    void shouldTranslateSaveRaceConditionIntoDuplicateRegistryNameException() {
+        RegistryRequestDto requestDto = new RegistryRequestDto("Kommunstyrelsen", "KS");
+
+        when(registryRepository.existsByName("Kommunstyrelsen")).thenReturn(false, true);
+        when(registryRepository.existsByCode("KS")).thenReturn(false);
+        when(registryRepository.save(any(Registry.class)))
+                .thenThrow(new DataIntegrityViolationException("unique constraint violation"));
+
+        assertThatThrownBy(() -> registryService.createRegistry(requestDto))
+                .isInstanceOf(DuplicateRegistryNameException.class)
+                .hasMessage("registry name already exists: Kommunstyrelsen");
+    }
+
+    @Test
+    @DisplayName("should translate save race condition into DuplicateRegistryCodeException")
+    void shouldTranslateSaveRaceConditionIntoDuplicateRegistryCodeException() {
+        RegistryRequestDto requestDto = new RegistryRequestDto("Kommunstyrelsen", "KS");
+
+        when(registryRepository.existsByName("Kommunstyrelsen")).thenReturn(false);
+        when(registryRepository.existsByCode("KS")).thenReturn(false, true);
+        when(registryRepository.save(any(Registry.class)))
+                .thenThrow(new DataIntegrityViolationException("unique constraint violation"));
+
+        assertThatThrownBy(() -> registryService.createRegistry(requestDto))
+                .isInstanceOf(DuplicateRegistryCodeException.class)
+                .hasMessage("registry code already exists: KS");
     }
 
 }
