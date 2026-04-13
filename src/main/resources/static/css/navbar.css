@@ -81,3 +81,11 @@
     color: gold;
 }
 
+
+.navbar li form button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    font-weight: bold;
+}

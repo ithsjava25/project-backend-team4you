@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class BookingEntity {
 
     @Id
-    private String id;
+    private Long id;
 
     private String name;
 
@@ -32,11 +32,11 @@ public class BookingEntity {
 
 
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

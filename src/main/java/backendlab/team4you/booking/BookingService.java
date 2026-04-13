@@ -23,7 +23,7 @@ public class BookingService {
     }
 
     @Transactional
-    public void delete(String id) {
+    public void delete(Long id) {
         BookingEntity booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 

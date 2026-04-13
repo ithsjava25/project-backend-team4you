@@ -2,17 +2,22 @@ package backendlab.team4you.controller;
 
 import backendlab.team4you.booking.BookingService;
 import backendlab.team4you.service.LogService;
+import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
 import groovy.util.logging.Slf4j;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -58,9 +63,13 @@ public class AdminController {
     }
 
     @PostMapping("/admin/users")
-    public String deleteUser(@RequestParam String id){
+    public String deleteUser(@RequestParam String id, Model model){
+
         userService.deleteUser(id);
-        return "";
+
+        model.addAttribute("message", "Användare borttagen");
+
+        return "fragments/alert :: success";
     }
 
     @PostMapping("/admin/logs/delete")
@@ -94,6 +103,7 @@ public class AdminController {
     public String deleteApplication(@RequestParam String id){
 
 
+
         return "fragments/empty :: content";
     }
 
@@ -112,11 +122,27 @@ public class AdminController {
     }
 
     @PostMapping("/admin/bookings")
-    public String deleteBooking(@RequestParam String id){
+    public ResponseEntity<Void> deleteBooking(@RequestParam Long id){
+        try {
+            bookingService.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found", ex);
+        }
+    }
 
-       bookingService.delete(id);
+    @GetMapping("/admin/users")
+    public String getUsers(@RequestParam(defaultValue = "0") int page,
+                           Model model) {
 
-        return "fragments/empty :: content";
+        Page<UserEntity> users = userService.getUsers(page, 5);
+
+        model.addAttribute("users", users.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", users.getTotalPages());
+
+        return "fragments/admin-users :: content";
     }
 }
+
 

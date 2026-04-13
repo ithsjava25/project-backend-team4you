@@ -4,7 +4,7 @@
 
     <ul>
         <li th:each="user : ${users}">
-            <span th:text="${user}"></span>
+            <span th:text="${user.username}"></span>
 
             <button
                 th:attr="hx-post=@{/admin/users(id=${user})}"

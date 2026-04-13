@@ -5,10 +5,10 @@
     <ul>
         <li th:each="booking : ${bookings}">
 
-            <span th:text="${booking}"></span>
+            <span th:text="${booking.displayName}"></span>
 
             <button
-                    th:attr="hx-post=@{/admin/bookings(id=${booking})}"
+                    th:attr="hx-post=@{/admin/bookings(id=${booking.id})}"
                     hx-target="closest li"
                     hx-swap="outerHTML"
                     hx-confirm="Är du säker?"

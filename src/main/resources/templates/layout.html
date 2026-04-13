@@ -19,9 +19,13 @@
 
 <div class="main-wrapper">
 
+
+
     <div sec:authorize="isAuthenticated()">
         <aside th:replace="~{fragments/side-navbar :: aside}"></aside>
     </div>
+
+    <div id="alert-area"></div>
 
     <main class="container">
         <div id="content-area" layout:fragment="content">

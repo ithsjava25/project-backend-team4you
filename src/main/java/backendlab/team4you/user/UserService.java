@@ -8,6 +8,8 @@ import jakarta.transaction.Transactional;
 import org.jspecify.annotations.Nullable;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -178,5 +180,8 @@ public class UserService {
 
         return searchTerm;
 
+    }
+    public Page<UserEntity> getUsers(int page, int size) {
+        return userRepository.findAll(PageRequest.of(page, size));
     }
 }
