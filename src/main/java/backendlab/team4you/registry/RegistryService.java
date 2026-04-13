@@ -2,6 +2,7 @@ package backendlab.team4you.registry;
 
 import backendlab.team4you.exceptions.DuplicateRegistryCodeException;
 import backendlab.team4you.exceptions.DuplicateRegistryNameException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,27 +16,36 @@ public class RegistryService {
     }
 
     public RegistryResponseDto createRegistry(RegistryRequestDto requestDto) {
-        if (registryRepository.existsByName(requestDto.name().trim())) {
-            throw new DuplicateRegistryNameException("registry name already exists: " + requestDto.name().trim());
+        String trimmedName = requestDto.name().trim();
+        String trimmedCode = requestDto.code().trim();
+
+        if (registryRepository.existsByName(trimmedName)) {
+            throw new DuplicateRegistryNameException("registry name already exists: " + trimmedName);
         }
 
-        if (registryRepository.existsByCode(requestDto.code().trim())) {
-            throw new DuplicateRegistryCodeException("registry code already exists: " + requestDto.code().trim());
+        if (registryRepository.existsByCode(trimmedCode)) {
+            throw new DuplicateRegistryCodeException("registry code already exists: " + trimmedCode);
         }
 
-        Registry registry = new Registry(
-                requestDto.name().trim(),
-                requestDto.code().trim()
-        );
+        Registry registry = new Registry(trimmedName, trimmedCode);
 
-        Registry savedRegistry = registryRepository.save(registry);
+        try {
+            Registry savedRegistry = registryRepository.save(registry);
 
-        return new RegistryResponseDto(
-                savedRegistry.getId(),
-                savedRegistry.getName(),
-                savedRegistry.getCode()
-        );
+            return new RegistryResponseDto(
+                    savedRegistry.getId(),
+                    savedRegistry.getName(),
+                    savedRegistry.getCode()
+            );
+        } catch (DataIntegrityViolationException e) {
+            if (registryRepository.existsByName(trimmedName)) {
+                throw new DuplicateRegistryNameException("registry name already exists: " + trimmedName);
+            }
+
+            if (registryRepository.existsByCode(trimmedCode)) {
+                throw new DuplicateRegistryCodeException("registry code already exists: " + trimmedCode);
+            }
+            throw e;
+        }
     }
-
-
 }
