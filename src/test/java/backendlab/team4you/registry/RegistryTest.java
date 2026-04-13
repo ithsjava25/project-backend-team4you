@@ -18,10 +18,9 @@ public class RegistryTest {
     }
 
     @Test
-    @DisplayName("should trim name and code when creating registry")
+    @DisplayName("should trim name when creating registry")
     void shouldTrimNameWhenCreatingRegistry() {
         Registry registry = new Registry("  Kommunstyrelsen  ", "KS");
-
         assertThat(registry.getName()).isEqualTo("Kommunstyrelsen");
         assertThat(registry.getCode()).isEqualTo("KS");
     }

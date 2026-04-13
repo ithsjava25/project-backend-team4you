@@ -30,10 +30,14 @@ public class Registry {
             throw new IllegalArgumentException("name is required");
         }
         this.name = name.trim();
-        if (code == null || !code.matches("[A-Z]{2}")) {
+        if (code == null) {
             throw new IllegalArgumentException("code must be exactly 2 uppercase letters");
         }
-        this.code = code.trim();
+        String normalizedCode = code.trim();
+        if (!normalizedCode.matches("[A-Z]{2}")) {
+            throw new IllegalArgumentException("code must be exactly 2 uppercase letters");
+        }
+        this.code = normalizedCode;
     }
 
     public Long getId() {
