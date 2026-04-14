@@ -11,10 +11,8 @@
 
 <section layout:fragment="content">
 
-<body>
 
-
-    <div class="login-wrapper">
+    <div class="form-wrapper">
 
     <div th:replace="fragments/form-errors :: errors"></div>
     <div th:replace="fragments/success-message :: success"></div>
@@ -24,14 +22,15 @@
         <h2>Logga in</h2>
 
         <form th:action="@{/login}" method="post">
-
+            <div class="form-group">
             <label for="username">Användarnamn</label>
             <input type="text" id="username" name="username" required autofocus>
-
+            </div>
+            <div class="form-group">
             <label for="password">Lösenord</label>
             <input type="password" id="password" name="password" required>
-
-            <button class="login-submit" type="submit">Logga in</button>
+            </div>
+            <button class="btn-primary" type="submit">Logga in</button>
 
         </form>
 
@@ -50,6 +49,7 @@
 
     </div>
     </div>
+
 </section>
 
 </body>

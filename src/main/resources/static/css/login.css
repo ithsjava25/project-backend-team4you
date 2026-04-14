@@ -12,41 +12,20 @@
     --color-success: #28a745;
 }
 
-.login-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 80vh;
-    background: #f5f6fa
-}
 
-.form-container {
-    background: #161a2d;
-    color: white;
-    padding: 40px;
-    border-radius: 20px;
-    width: 320px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-}
 
-.form-container h2 {
-    margin-bottom: 20px;
-}
+/*.form-container h2 {*/
+/*    margin-bottom: 20px;*/
+/*}*/
 
-.form-container label {
-    display: block;
-    margin-bottom: 5px;
-    text-align: left;
-}
 
-.login-submit{
-    color:white;
-    border:none;
-    background: #161a2d;
-}
+
+/*.login-submit{*/
+/*    color:white;*/
+/*    border:none;*/
+/*    background: #161a2d;*/
+/*}*/
 
 .passkey-button{
-    color:white;
-    border:none;
-    background: #161a2d;
+    margin-top: 10px;
 }

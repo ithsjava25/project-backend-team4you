@@ -21,3 +21,22 @@
     padding: 0;
     box-sizing: border-box;
 }
+
+/*.page-center-wrapper {*/
+/*    display: flex;*/
+/*    justify-content: center;*/
+/*    align-items: center;*/
+/*    min-height: calc(100vh - 70px);*/
+/*    background-color: var(--color-bg);*/
+/*    padding: 20px;*/
+/*}*/
+
+/*.form-card {*/
+/*    background-color: var(--color-surface);*/
+/*    color: var(--color-text);*/
+/*    padding: 40px;*/
+/*    border-radius: 20px;*/
+/*    width: 100%;*/
+/*    max-width: 450px;*/
+/*    box-shadow: 0 10px 30px rgba(0,0,0,0.4);*/
+/*}*/
