@@ -92,6 +92,12 @@
             <artifactId>htmx-spring-boot</artifactId>
             <version>5.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.webauthn4j</groupId>
+            <artifactId>webauthn4j-core</artifactId>
+            <version>0.30.2.RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
 
