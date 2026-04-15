@@ -25,12 +25,15 @@ public class SecurityConfig {
                                             CustomAuthenticationSuccessHandler successHandler) throws Exception {
 
         return http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(
                         authorizeHttp -> authorizeHttp
                                 // Public endpoints
                                 .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                                 .requestMatchers( "/","/login", "/login/webauthn", "/signup", "/error").permitAll()
                                 .requestMatchers("/webauthn/authenticate/**").permitAll()
+                                .requestMatchers("/api/files/**").permitAll()
+
 
 //                                .requestMatchers("/profile", "/logout").authenticated()
                                 .requestMatchers("/webauthn-check").authenticated()
