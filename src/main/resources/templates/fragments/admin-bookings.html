@@ -6,6 +6,7 @@
         <li th:each="booking : ${bookings}">
 
             <span th:text="${booking.displayName}"></span>
+            <div id="alert-area"></div>
 
             <button
                     th:attr="hx-post=@{/admin/bookings(id=${booking.id})}"

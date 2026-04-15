@@ -29,14 +29,21 @@
 
             <ul class="nav-links">
                 <li class="nav-buttons"><a th:href="@{/}" class="nav-menu">Home</a></li>
-                <li><a th:href="@{/contact}" class="nav-menu">Contact</a></li>
+
+                <li>
+                    <a th:href="@{/contact}" class="nav-menu">Contact
+                    </a>
+                </li>
+
                 <li sec:authorize="!isAuthenticated()">
                     <a th:href="@{/login}">Logga in</a>
                 </li>
-                <li>
+
+                <li sec:authorize="isAnonymous()">
                     <a th:href="@{/register}" class="btn-register">Register</a>
                 </li>
-                <li class="nav-buttons"><a th:href="@{/admin}" class="nav-menu">Admin</a>
+                <li sec:authorize="hasRole('ADMIN')" class="nav-buttons">
+                    <a th:href="@{/admin}" class="nav-menu">Admin</a>
                 </li>
                 <li sec:authorize="isAuthenticated()">
                     <form th:action="@{/logout}" method="post">

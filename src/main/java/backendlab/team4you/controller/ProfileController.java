@@ -11,11 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class ProfileController {
 
     @GetMapping("/profile")
-    public String profile(Model model,
-                          @AuthenticationPrincipal UserDetails userDetails) {
-
-        model.addAttribute("username", userDetails.getUsername());
-
+    public String profile() {
         return "profile";
     }
 

@@ -4,74 +4,21 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-
-
-
 <head>
     <title>Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/components/form.css}">
+
+
 </head>
 
 <body>
 
-<div class="dashboard-wrapper">
-
-    <aside class="sidebar">
-
-        <nav>
-            <ul class="side-nav">
-                <li>
-                    <a class="a-dashboard" hx-get="/dashboard/home" hx-target="#content-area" th:href="@{/dashboard/home}">
-                        <i class="fa-solid fa-house"></i>
-                        <span>Dashboard Hem</span>
-                    </a>
-                </li>
-
-                <li sec:authorize="hasRole('ADMIN')">
-                    <a class="a-dashboard" hx-get="/admin/users" hx-target="#content-area" th:href="@{/admin/users}">
-                        <i class="fa-solid fa-users-gear"></i>
-                        <span>Användaröversikt</span>
-                    </a>
-                </li>
-                <li sec:authorize="hasRole('ADMIN')">
-                    <a class="a-dashboard" hx-get="/admin/logs" hx-target="#content-area" th:href="@{/admin/logs}">
-                        <i class="fa-solid fa-clipboard-list"></i>
-                        <span>Systemlogg</span>
-                    </a>
-                </li>
-
-                <li sec:authorize="hasRole('USER')">
-                    <a class="a-dashboard" hx-get="/user/profile" hx-target="#content-area" th:href="@{/user/profile}">
-                        <i class="fa-solid fa-user"></i>
-                        <span>Min Profil</span>
-                    </a>
-                </li>
-                <li sec:authorize="hasRole('USER')">
-                    <a  class="a-dashboard" hx-get="/user/my-bookings" hx-target="#content-area" th:href="@{/user/my-bookings}">
-                        <i class="fa-solid fa-calendar-check"></i>
-                        <span>Mina Bokningar</span>
-                    </a>
-                </li>
-
-                <li class="logout-item" sec:authorize="isAuthenticated()" >
-                    <form th:action="@{/logout}" method="post">
-                        <button type="submit" class="btn-primary">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                            <span>Logga ut</span>
-                        </button>
-                    </form>
-                </li>
-            </ul>
-        </nav>
-    </aside>
+<aside th:replace="~{fragments/admin-sidenav :: aside}"></aside>
 
 
-    <main id="content-area" layout:fragment="content">
-    </main>
-
-</div>
 
 </body>
 </html>

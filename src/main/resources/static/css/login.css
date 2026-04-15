@@ -28,4 +28,7 @@
 
 .passkey-button{
     margin-top: 10px;
+    color:white;
+    border-radius: 30px;
+    width: 100%;
 }

@@ -1,6 +1,8 @@
 <div th:fragment="content">
     <h2>Systemlogg</h2>
 
+    <div id="alert-area"></div>
+
     <ul>
         <li th:each="log : ${logs}" th:text="${log}"></li>
     </ul>

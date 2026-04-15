@@ -2,7 +2,7 @@
 <html lang="sv"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout}" xmlns:sec="http://www.w3.org/1999/xhtml">
+      layout:decorate="~{layout}" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8">
@@ -10,7 +10,7 @@
 
 </head>
 
-
+<body>
     <section layout:fragment="content">
 
     <h1>Min profil</h1>
@@ -22,7 +22,7 @@
         <hr>
 
         <div class="danger-zone">
-            <h3>Farliga åtgärder</h3>
+
 
             <button
                     hx-delete="/account"
@@ -31,7 +31,7 @@
                     hx-swap="innerHTML"
                     class="btn-danger"
             >
-                Ta bort mitt konto
+                Ta bort konto
             </button>
         </div>
 
@@ -41,5 +41,5 @@
 
 
 </section>
-
+</body>
 </html>

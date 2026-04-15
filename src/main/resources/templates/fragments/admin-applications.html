@@ -6,6 +6,7 @@
         <li th:each="application : ${applications}">
 
             <span th:text="${application}"></span>
+            <div id="alert-area"></div>
 
             <button
                     th:attr="hx-post=@{/admin/applications(id=${application})}"
