@@ -23,15 +23,27 @@ public class Team4youApplication {
 		return args -> {
 			if (repository.count() == 0) {
 
-				UserEntity devUser = new UserEntity(
+				UserEntity devAdmin = new UserEntity(
 						Bytes.fromBase64("01"),
 						"dev",           // name (username)
 						"Developer"      // displayName
 				);
 
-				devUser.setPasswordHash(encoder.encode("123456"));
+				devAdmin.setPasswordHash(encoder.encode("123456"));
+				devAdmin.setRole("ADMIN");
+				devAdmin.setEmail("devadmin@gmail.com");
+
+				repository.save(devAdmin);
+
+				UserEntity devUser = new UserEntity(
+						Bytes.fromBase64("02"),
+						"user",           // name (username)
+						"Developer"      // displayName
+				);
+
+				devUser.setPasswordHash(encoder.encode("1234"));
 				devUser.setRole("USER");
-				devUser.setEmail("dev@gmail.com");
+				devUser.setEmail("devuser@gmail.com");
 
 				repository.save(devUser);
 			}

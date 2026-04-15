@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.security.web.webauthn.management.PublicKeyCredentialUserEntityRepository;
 import org.springframework.security.web.webauthn.management.UserCredentialRepository;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +41,16 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 return;
             }
         }
-        getRedirectStrategy().sendRedirect(request, response, "/dashboard");
+
+        var authorities = authentication.getAuthorities();
+
+        boolean isAdmin = authorities.stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (isAdmin)
+            getRedirectStrategy().sendRedirect(request, response, "/dashboard");
+        else {
+            getRedirectStrategy().sendRedirect(request, response, "/home");
+        }
     }
 }

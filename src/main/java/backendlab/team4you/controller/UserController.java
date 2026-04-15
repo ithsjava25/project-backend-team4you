@@ -12,7 +12,12 @@ public class UserController {
 
     @GetMapping("/")
     public String homepage(){
-        return "home";
+        return "login";
+    }
+
+    @GetMapping("/home")
+    public String userHome() {
+        return "index";
     }
 
 
