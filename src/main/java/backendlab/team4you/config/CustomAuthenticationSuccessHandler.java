@@ -38,7 +38,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             var credentials = userCredentialRepository.findByUserId(userEntity.getId());
 
             if (!credentials.isEmpty()){
-                getRedirectStrategy().sendRedirect(request, response, "/webauthn-check");
+                getRedirectStrategy().sendRedirect(request, response, "/login/webauthn/");
                 return;
             }
         }

@@ -33,10 +33,11 @@ public class SignupController {
         this.userService = userService;
     }
 
-    @GetMapping("/webauthn-check")
-    public String showWebAuthnCheck(){
-        return "webauthn-check";
+    @GetMapping("/login/webauthn/")
+    public String webauthnCheck() {
+        return "check";
     }
+
     @GetMapping("/dashboard")
     public String dashboard() {
         return "dashboard";

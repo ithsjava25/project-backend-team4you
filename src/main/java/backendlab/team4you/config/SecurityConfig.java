@@ -15,7 +15,7 @@ import org.springframework.security.web.webauthn.management.UserCredentialReposi
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.config.annotation.web.configurers.WebAuthnConfigurer;
 
 @Configuration
 public class SecurityConfig {
@@ -28,12 +28,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         authorizeHttp -> authorizeHttp
                                 // Public endpoints
-                                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
+                                .requestMatchers("/static/css/**", "/js/**", "/images/**").permitAll()
                                 .requestMatchers( "/","/login", "/login/webauthn", "/signup", "/error").permitAll()
                                 .requestMatchers("/webauthn/authenticate/**").permitAll()
-
-//                                .requestMatchers("/profile", "/logout").authenticated()
-                                .requestMatchers("/webauthn-check").authenticated()
 
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/dashboard", "/profile/**").hasAnyRole("USER", "ADMIN")
@@ -46,11 +43,12 @@ public class SecurityConfig {
                         .rpId("localhost") //identity of the website
                         .allowedOrigins("http://localhost:8080")
                         .rpName("Passkey team4you")
+
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .successHandler(successHandler))
-
+                        .successHandler(successHandler)
+                )
                 .logout(logout -> logout.logoutSuccessUrl("/").permitAll())
                 .build();
     }
