@@ -33,4 +33,33 @@ public class CaseFile {
 
     @Column(nullable = false)
     private LocalDateTime uploadedAt;
+
+    public String getS3Key() {
+        return s3Key;
+    }
+
+    public void setCaseRecord(CaseRecord caseRecord) {
+        this.caseRecord = caseRecord;
+    }
+
+    public void setOriginalFilename(String originalFilename) {
+        this.originalFileName = originalFilename;
+    }
+
+    public void setS3Key(String s3Key) {
+        this.s3Key = s3Key;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
+
+    public void setUploadedAt(LocalDateTime now) {
+        this.uploadedAt = now;
+    }
+
 }
