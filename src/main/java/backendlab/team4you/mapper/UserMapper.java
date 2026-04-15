@@ -13,6 +13,7 @@ public class UserMapper {
         if (dto == null) return null;
 
         UserEntity entity = new UserEntity();
+        entity.setName(dto.name());
         entity.setFirstName(dto.firstName());
         entity.setLastName(dto.lastName());
         entity.setEmail(dto.email());
@@ -36,4 +37,3 @@ public class UserMapper {
 
 
 }
-

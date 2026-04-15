@@ -25,12 +25,15 @@ public class SecurityConfig {
                                             CustomAuthenticationSuccessHandler successHandler) throws Exception {
 
         return http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(
                         authorizeHttp -> authorizeHttp
                                 // Public endpoints
                                 .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                                 .requestMatchers( "/","/login", "/login/webauthn", "/signup", "/error").permitAll()
                                 .requestMatchers("/webauthn/authenticate/**").permitAll()
+                                .requestMatchers("/api/files/**").permitAll()
+
 
 //                                .requestMatchers("/profile", "/logout").authenticated()
                                 .requestMatchers("/webauthn-check").authenticated()
@@ -68,13 +71,13 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(UserService userService){
         return username -> {
-            UserEntity user = userService.findByEmail(username);
+            UserEntity user = userService.findByName(username);
             if (user == null) {
                 throw new UsernameNotFoundException("User not found: " + username);
             }
 
             return User.builder()
-                    .username(user.getEmail())
+                    .username(user.getName())
                     .password(user.getPasswordHash())
                     .roles(user.getRole())
                     .accountLocked(false)
