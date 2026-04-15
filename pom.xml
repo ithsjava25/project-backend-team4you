@@ -38,14 +38,14 @@
                 <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy-bom</artifactId>
                 <version>5.0.3</version>
-
-    <dependencyManagement>
-        <dependencies>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            
             <dependency>
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>bom</artifactId>
                 <version>2.42.25</version>
-
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
