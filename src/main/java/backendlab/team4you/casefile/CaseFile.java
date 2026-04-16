@@ -6,6 +6,12 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(
+        name = "case_file",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_case_file_s3_key", columnNames = "s3_key")
+        }
+)
 public class CaseFile {
 
     @Id

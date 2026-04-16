@@ -6,6 +6,9 @@ import backendlab.team4you.exceptions.CaseFileNotFoundException;
 import backendlab.team4you.exceptions.CaseRecordNotFoundException;
 import backendlab.team4you.exceptions.InvalidFileNameException;
 import backendlab.team4you.s3.S3Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +21,9 @@ import java.util.UUID;
 
 @Service
 public class CaseFileService {
+
+    private static final Logger log = LoggerFactory.getLogger(CaseFileService.class);
+
     private final CaseRecordRepository caseRecordRepository;
     private final CaseFileRepository caseFileRepository;
     private final S3Service s3Service;
@@ -39,17 +45,15 @@ public class CaseFileService {
 
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null || originalFilename.isBlank()) {
-            throw new InvalidFileNameException("Filename cannot be blank");
+            throw new InvalidFileNameException("Filename must not be blank");
         }
 
-        String contentType = file.getContentType() != null
-                ? file.getContentType()
-                : "application/octet-stream";
+        String contentType = normalizeContentType(file.getContentType());
 
-        String s3Key = buildS3Key(caseRecord, originalFilename);
+        String s3Key = buildUniqueS3Key(caseRecord, originalFilename);
 
         try {
-            s3Service.uploadFile(s3Key, file.getBytes(), contentType);
+            s3Service.uploadFileIfAbsent(s3Key, file.getBytes(), contentType);
 
             CaseFile caseFile = new CaseFile();
             caseFile.setCaseRecord(caseRecord);
@@ -60,8 +64,10 @@ public class CaseFileService {
             caseFile.setUploadedAt(LocalDateTime.now());
 
             return caseFileRepository.save(caseFile);
-        } catch (RuntimeException | IOException e) {
-            throw e;
+
+        } catch (RuntimeException | IOException exception) {
+            cleanupUploadedObjectIfPossible(s3Key, exception);
+            throw exception;
         }
     }
 
@@ -91,9 +97,20 @@ public class CaseFileService {
         caseFileRepository.delete(caseFile);
     }
 
-    private String buildS3Key(CaseRecord caseRecord, String originalFilename) {
-        String safeFilename = originalFilename.replaceAll("[^a-zA-Z0-9._-]", "_");
+    private String normalizeContentType(String contentType) {
+        if (contentType == null || contentType.isBlank()) {
+            return "application/octet-stream";
+        }
+        return contentType;
+    }
+
+    private String buildUniqueS3Key(CaseRecord caseRecord, String originalFilename) {
+        String safeFilename = sanitizeFilename(originalFilename);
         return "cases/" + caseRecord.getId() + "/" + UUID.randomUUID() + "-" + safeFilename;
+    }
+
+    private String sanitizeFilename(String filename) {
+        return filename.replaceAll("[^a-zA-Z0-9._-]", "_");
     }
 
     private void ensureCaseRecordExists(Long caseRecordId) {
@@ -102,4 +119,19 @@ public class CaseFileService {
         }
     }
 
+    private void cleanupUploadedObjectIfPossible(String s3Key, Exception originalException) {
+        try {
+            s3Service.deleteFile(s3Key);
+        } catch (Exception cleanupException) {
+            log.error(
+                    "Failed to clean up S3 object after upload/save failure. key={}",
+                    s3Key,
+                    cleanupException
+            );
+        }
+
+        if (originalException instanceof DataIntegrityViolationException) {
+            log.warn("Database integrity violation after S3 upload. Attempted cleanup for key={}", s3Key);
+        }
+    }
 }

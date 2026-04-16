@@ -1,5 +1,6 @@
 package backendlab.team4you.s3;
 
+import backendlab.team4you.exceptions.FileKeyConflictException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -8,6 +9,7 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 
 import java.io.InputStream;
@@ -55,5 +57,24 @@ public class S3Service {
                         .key(key)
                         .build()
         );
+    }
+
+    public void uploadFileIfAbsent(String key, byte[] data, String contentType) {
+        try {
+            s3Client.putObject(
+                    PutObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(key)
+                            .contentType(contentType)
+                            .ifNoneMatch("*")
+                            .build(),
+                    RequestBody.fromBytes(data)
+            );
+        } catch (S3Exception exception) {
+            if (exception.statusCode() == 409 || exception.statusCode() == 412) {
+                throw new FileKeyConflictException(key, exception);
+            }
+            throw exception;
+        }
     }
 }
