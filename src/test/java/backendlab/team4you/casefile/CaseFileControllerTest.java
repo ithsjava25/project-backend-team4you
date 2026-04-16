@@ -220,7 +220,7 @@ class CaseFileControllerTest {
                 .andExpect(jsonPath("$.status").value(409))
                 .andExpect(jsonPath("$.error").value("conflict"))
                 .andExpect(jsonPath("$.message")
-                        .value("A file with the same storage key already exists: cases/1/conflict-key"));
+                        .value("A file with the same name already exists."));
     }
 
 }
