@@ -81,4 +81,16 @@ public class CaseFile {
     public LocalDateTime getUploadedAt() {
         return uploadedAt;
     }
+
+    public void setId(long l) {
+        this.id = l;
+    }
+
+    public CaseRecord getCaseRecord() {
+        return caseRecord;
+    }
+
+    public String getOriginalFilename() {
+        return originalFileName;
+    }
 }

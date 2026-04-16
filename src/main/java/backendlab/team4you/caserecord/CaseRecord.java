@@ -65,7 +65,7 @@ public class CaseRecord {
     @OneToMany(mappedBy = "caseRecord", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CaseFile> caseFiles = new ArrayList<>();
 
-    protected CaseRecord() {
+    public CaseRecord() {
     }
 
     public CaseRecord(
@@ -175,5 +175,9 @@ public class CaseRecord {
 
     public LocalDateTime getClosedAt() {
         return closedAt;
+    }
+
+    public void setId(long l) {
+        this.id = l;
     }
 }
