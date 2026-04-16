@@ -2,6 +2,9 @@ package backendlab.team4you.casefile;
 
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
+import backendlab.team4you.exceptions.CaseFileNotFoundException;
+import backendlab.team4you.exceptions.CaseRecordNotFoundException;
+import backendlab.team4you.exceptions.InvalidFileNameException;
 import backendlab.team4you.s3.S3Service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +35,11 @@ public class CaseFileService {
     @Transactional
     public CaseFile uploadFile(Long caseRecordId, MultipartFile file) throws IOException {
         CaseRecord caseRecord = caseRecordRepository.findById(caseRecordId)
-                .orElseThrow(() -> new IllegalArgumentException("case record not found: " + caseRecordId));
+                .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
 
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null || originalFilename.isBlank()) {
-            throw new IllegalArgumentException("invalid filename");
+            throw new InvalidFileNameException("Filename cannot be blank");
         }
 
         String contentType = file.getContentType() != null
@@ -71,9 +74,7 @@ public class CaseFileService {
     @Transactional(readOnly = true)
     public CaseFile getCaseFile(Long caseRecordId, Long fileId) {
         return caseFileRepository.findByIdAndCaseRecordId(fileId, caseRecordId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "file not found for case record. caseRecordId=" + caseRecordId + ", fileId=" + fileId
-                ));
+                .orElseThrow(() -> new CaseFileNotFoundException(caseRecordId, fileId));
     }
 
     @Transactional(readOnly = true)
@@ -97,7 +98,8 @@ public class CaseFileService {
 
     private void ensureCaseRecordExists(Long caseRecordId) {
         if (!caseRecordRepository.existsById(caseRecordId)) {
-            throw new IllegalArgumentException("case record not found: " + caseRecordId);
+            throw new CaseRecordNotFoundException(caseRecordId);
         }
     }
+
 }
