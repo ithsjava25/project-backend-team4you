@@ -6,8 +6,17 @@
 
 <head>
     <title>Admin</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12"
+            integrity="sha384-ujb9W0Re9sp6BhqewmYDAsjMV3LykVLI78pLo6bbS9X8lFtoqXsnzRHnC/oZ9ZNR"
+            crossorigin="anonymous"></script>
+    <script>
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRF-TOKEN'] = document.querySelector('meta[name="_csrf"]').content;
+        });
+    </script>
     <link rel="stylesheet" th:href="@{/css/admin.css}">
     <link rel="stylesheet" th:href="@{/css/components/form.css}">
 

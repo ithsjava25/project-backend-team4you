@@ -2,14 +2,16 @@
 
     <h2>Ansökningar</h2>
 
+    <div id="alert-area"></div>
+
     <ul>
         <li th:each="application : ${applications}">
 
-            <span th:text="${application}"></span>
-            <div id="alert-area"></div>
+            <span th:text="${application.name}"></span>
+            (<span th:text="${application.email}"></span>)
 
             <button
-                    th:attr="hx-post=@{/admin/applications(id=${application})}"
+                    th:attr="hx-post=@{/admin/applications/delete(id=${application.id})}"
                     hx-target="closest li"
                     hx-swap="outerHTML"
                     hx-confirm="Är du säker?"

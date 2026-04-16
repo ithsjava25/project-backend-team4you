@@ -4,19 +4,15 @@
 
     <ul>
         <li th:each="booking : ${bookings}">
-
-            <span th:text="${booking.displayName}"></span>
-            <div id="alert-area"></div>
+            <span th:text="${booking}"></span>
 
             <button
-                    th:attr="hx-post=@{/admin/bookings(id=${booking.id})}"
+                    th:attr="hx-post=@{/admin/bookings(id=${booking})}"
                     hx-target="closest li"
                     hx-swap="outerHTML"
-                    hx-confirm="Är du säker?"
-            >
+                    hx-confirm="Är du säker?">
                 Ta bort
             </button>
-
         </li>
     </ul>
 

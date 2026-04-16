@@ -29,4 +29,12 @@ public class BookingService {
 
         bookingRepository.deleteById(id);
     }
+    @Transactional
+    public BookingEntity save(BookingEntity bookingEntity){
+        return bookingRepository.save(bookingEntity);
+    }
+    @Transactional
+    public BookingEntity findById(Long id){
+        return bookingRepository.findById(id).orElse(null);
+    }
 }

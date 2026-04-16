@@ -3,15 +3,17 @@
     <h2>Användare</h2>
 
     <ul>
+
+
+
         <li th:each="user : ${users}">
-            <span th:text="${user.username}"></span>
+            <span th:text="${user.name}"></span>
 
             <button
-                th:attr="hx-post=@{/admin/users(id=${user})}"
-                hx-target="closest li"
-                hx-swap="outerHTML"
-                hx-confirm="Är du säker?"
-            >
+                    th:attr="hx-post=@{/admin/users(id=${user.id})}"
+                    hx-target="closest li"
+                    hx-swap="outerHTML"
+                    hx-confirm="Är du säker?">
                 Ta bort
             </button>
         </li>

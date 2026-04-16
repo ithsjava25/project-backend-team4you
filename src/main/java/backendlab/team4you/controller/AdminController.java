@@ -1,5 +1,7 @@
 package backendlab.team4you.controller;
 
+import backendlab.team4you.application.ApplicationEntity;
+import backendlab.team4you.application.ApplicationService;
 import backendlab.team4you.booking.BookingService;
 import backendlab.team4you.service.LogService;
 import backendlab.team4you.user.UserEntity;
@@ -30,10 +32,12 @@ public class AdminController {
 
     private final UserService userService;
     private final BookingService bookingService;
+    private final ApplicationService applicationService;
 
-    public AdminController(UserService userService, BookingService bookingService) {
+    public AdminController(UserService userService, BookingService bookingService, ApplicationService applicationService) {
         this.userService = userService;
         this.bookingService = bookingService;
+        this.applicationService = applicationService;
 
     }
 
@@ -76,26 +80,15 @@ public class AdminController {
 
 
     @GetMapping("/admin/applications")
-    public String adminApplication(Model model){
+    public String adminApplication(Model model) {
 
-        List<String> applications = List.of(
-                "Ansökan #1",
-                "Ansökan #2",
-                "Ansökan #3"
-        );
+        List<ApplicationEntity> applications = applicationService.getAll();
 
         model.addAttribute("applications", applications);
 
         return "fragments/admin-applications :: content";
     }
 
-    @PostMapping("/admin/applications")
-    public String deleteApplication(@RequestParam String id){
-
-
-
-        return "fragments/empty :: content";
-    }
 
     @GetMapping("/admin/bookings")
     public String adminBookings(Model model){
@@ -132,6 +125,16 @@ public class AdminController {
         model.addAttribute("totalPages", users.getTotalPages());
 
         return "fragments/admin-users :: content";
+    }
+
+    @PostMapping("/admin/applications/delete")
+    public String deleteApplication(@RequestParam Long id, Model model) {
+
+        applicationService.delete(id);
+
+        model.addAttribute("message", "Ansökan borttagen");
+
+        return "fragments/alert :: success";
     }
 }
 
