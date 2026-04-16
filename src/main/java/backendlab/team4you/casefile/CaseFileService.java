@@ -23,6 +23,7 @@ import java.util.UUID;
 public class CaseFileService {
 
     private static final Logger log = LoggerFactory.getLogger(CaseFileService.class);
+    private static final long MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 
     private final CaseRecordRepository caseRecordRepository;
     private final CaseFileRepository caseFileRepository;
@@ -40,6 +41,11 @@ public class CaseFileService {
 
     @Transactional
     public CaseFile uploadFile(Long caseRecordId, MultipartFile file) throws IOException {
+
+        if (file.getSize() > MAX_FILE_SIZE_BYTES) {
+            throw new IllegalArgumentException("File exceeds maximum size");
+        }
+
         CaseRecord caseRecord = caseRecordRepository.findById(caseRecordId)
                 .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
 
@@ -65,7 +71,7 @@ public class CaseFileService {
             caseFile.setSize(file.getSize());
             caseFile.setUploadedAt(LocalDateTime.now());
 
-            return caseFileRepository.save(caseFile);
+            return caseFileRepository.saveAndFlush(caseFile);
 
         } catch (RuntimeException | IOException exception) {
             if (uploadedToS3) {
