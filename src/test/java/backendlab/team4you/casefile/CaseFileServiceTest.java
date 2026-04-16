@@ -75,7 +75,7 @@ class CaseFileServiceTest {
         assertThat(result.getS3Key()).contains("cases/1/");
         assertThat(result.getS3Key()).endsWith("-test.pdf");
 
-        verify(s3Service).uploadFile(
+        verify(s3Service).uploadFileIfAbsent(
                 startsWith("cases/1/"),
                 eq(file.getBytes()),
                 eq("application/pdf")
@@ -99,7 +99,7 @@ class CaseFileServiceTest {
                 .isInstanceOf(CaseRecordNotFoundException.class)
                 .hasMessage("Case record not found: 99");
 
-        verify(s3Service, never()).uploadFile(anyString(), any(), anyString());
+        verify(s3Service, never()).uploadFileIfAbsent(anyString(), any(), anyString());
         verify(caseFileRepository, never()).save(any());
     }
 
@@ -113,9 +113,9 @@ class CaseFileServiceTest {
 
         assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
                 .isInstanceOf(InvalidFileNameException.class)
-                .hasMessage("Filename cannot be blank");
+                .hasMessage("Filename must not be blank");
 
-        verify(s3Service, never()).uploadFile(anyString(), any(), anyString());
+        verify(s3Service, never()).uploadFileIfAbsent(anyString(), any(), anyString());
         verify(caseFileRepository, never()).save(any());
     }
 
@@ -136,7 +136,7 @@ class CaseFileServiceTest {
 
         assertThat(result.getContentType()).isEqualTo("application/octet-stream");
 
-        verify(s3Service).uploadFile(
+        verify(s3Service).uploadFileIfAbsent(
                 startsWith("cases/1/"),
                 eq(file.getBytes()),
                 eq("application/octet-stream")
@@ -258,7 +258,7 @@ class CaseFileServiceTest {
         caseFileService.uploadFile(1L, file);
 
         ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
-        verify(s3Service).uploadFile(keyCaptor.capture(), any(byte[].class), eq("application/pdf"));
+        verify(s3Service).uploadFileIfAbsent(keyCaptor.capture(), any(byte[].class), eq("application/pdf"));
 
         String generatedKey = keyCaptor.getValue();
         assertThat(generatedKey).contains("cases/1/");
