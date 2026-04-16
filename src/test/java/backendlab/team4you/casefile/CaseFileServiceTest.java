@@ -63,7 +63,7 @@ class CaseFileServiceTest {
         );
 
         when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
-        when(caseFileRepository.save(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         CaseFile result = caseFileService.uploadFile(1L, file);
 
@@ -82,7 +82,7 @@ class CaseFileServiceTest {
                 eq(file.getBytes()),
                 eq("application/pdf")
         );
-        verify(caseFileRepository).save(any(CaseFile.class));
+        verify(caseFileRepository).saveAndFlush(any(CaseFile.class));
     }
 
     @Test
@@ -102,7 +102,7 @@ class CaseFileServiceTest {
                 .hasMessage("Case record not found: 99");
 
         verify(s3Service, never()).uploadFileIfAbsent(anyString(), any(), anyString());
-        verify(caseFileRepository, never()).save(any());
+        verify(caseFileRepository, never()).saveAndFlush(any());
     }
 
     @Test
@@ -118,7 +118,7 @@ class CaseFileServiceTest {
                 .hasMessage("Filename must not be blank");
 
         verify(s3Service, never()).uploadFileIfAbsent(anyString(), any(), anyString());
-        verify(caseFileRepository, never()).save(any());
+        verify(caseFileRepository, never()).saveAndFlush(any());
     }
 
     @Test
@@ -132,7 +132,7 @@ class CaseFileServiceTest {
         );
 
         when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
-        when(caseFileRepository.save(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         CaseFile result = caseFileService.uploadFile(1L, file);
 
@@ -255,7 +255,7 @@ class CaseFileServiceTest {
         );
 
         when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
-        when(caseFileRepository.save(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         caseFileService.uploadFile(1L, file);
 
@@ -279,7 +279,7 @@ class CaseFileServiceTest {
 
         when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
         doNothing().when(s3Service).uploadFileIfAbsent(anyString(), any(byte[].class), eq("application/pdf"));
-        when(caseFileRepository.save(any(CaseFile.class)))
+        when(caseFileRepository.saveAndFlush(any(CaseFile.class)))
                 .thenThrow(new DataIntegrityViolationException("database failure"));
 
         assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
@@ -294,7 +294,7 @@ class CaseFileServiceTest {
                 eq("application/pdf")
         );
         verify(s3Service).deleteFile(keyCaptor.getValue());
-        verify(caseFileRepository).save(any(CaseFile.class));
+        verify(caseFileRepository).saveAndFlush(any(CaseFile.class));
     }
 
     @Test
@@ -313,7 +313,7 @@ class CaseFileServiceTest {
         DataIntegrityViolationException originalException =
                 new DataIntegrityViolationException("database failure");
 
-        when(caseFileRepository.save(any(CaseFile.class))).thenThrow(originalException);
+        when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenThrow(originalException);
         doThrow(new RuntimeException("cleanup failed"))
                 .when(s3Service)
                 .deleteFile(anyString());
@@ -324,7 +324,7 @@ class CaseFileServiceTest {
 
         verify(s3Service).uploadFileIfAbsent(anyString(), eq(file.getBytes()), eq("application/pdf"));
         verify(s3Service).deleteFile(anyString());
-        verify(caseFileRepository).save(any(CaseFile.class));
+        verify(caseFileRepository).saveAndFlush(any(CaseFile.class));
     }
 
     @Test
@@ -339,21 +339,21 @@ class CaseFileServiceTest {
 
         when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
 
-        doThrow(new FileKeyConflictException("cases/1/conflict-key"))
+        doThrow(new FileKeyConflictException(""))
                 .when(s3Service)
                 .uploadFileIfAbsent(anyString(), any(byte[].class), eq("application/pdf"));
 
         assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
                 .isInstanceOf(FileKeyConflictException.class)
-                .hasMessageContaining("cases/1/conflict-key");
+                .hasMessageContaining("A file with the same name already exists.");
 
-        verify(caseFileRepository, never()).save(any());
+        verify(caseFileRepository, never()).saveAndFlush(any());
         verify(s3Service, never()).deleteFile(anyString());
     }
 
     @Test
-    @DisplayName("deleteFile should not delete metadata when s3 delete fails")
-    void deleteFile_shouldNotDeleteMetadataWhenS3DeleteFails() {
+    @DisplayName("deleteFile should delete metadata before attempting s3 delete")
+    void deleteFile_shouldDeleteMetadataBeforeAttemptingS3Delete() {
         CaseFile caseFile = new CaseFile();
         caseFile.setId(100L);
         caseFile.setS3Key("cases/1/uuid-test.pdf");
@@ -369,8 +369,40 @@ class CaseFileServiceTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("s3 delete failed");
 
+        verify(caseFileRepository).delete(caseFile);
         verify(s3Service).deleteFile("cases/1/uuid-test.pdf");
-        verify(caseFileRepository, never()).delete(any());
+    }
+
+    @Test
+    @DisplayName("uploadFile should throw IllegalArgumentException when file is too large")
+    void uploadFile_shouldThrowIllegalArgumentException_whenFileTooLarge() {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "big.pdf",
+                "application/pdf",
+                new byte[6 * 1024 * 1024]
+        );
+
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("maximum size");
+    }
+
+    @Test
+    @DisplayName("uploadFile should not access repositories or s3 when file is too large")
+    void uploadFile_shouldNotAccessRepositoriesOrS3_whenFileTooLarge() {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "big.pdf",
+                "application/pdf",
+                new byte[6 * 1024 * 1024]
+        );
+
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("maximum size");
+
+        verifyNoInteractions(caseRecordRepository, caseFileRepository, s3Service);
     }
 
 }
