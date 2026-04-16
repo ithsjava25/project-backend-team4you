@@ -1,7 +1,5 @@
 package backendlab.team4you.controller;
 
-
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,19 +15,6 @@ public class UserController {
 
     @GetMapping("/home")
     public String userHome() {
-        return "index";
+        return "home";
     }
-
-
-
-
-
-
-     @GetMapping("/admin")
-     @PreAuthorize("hasRole('ADMIN')")
-    public String admin(){
-        return "admin";
-    }
-
-
 }

@@ -24,21 +24,22 @@ public class Team4youApplication {
 			if (repository.count() == 0) {
 
 				UserEntity devAdmin = new UserEntity(
-						Bytes.fromBase64("01"),
+						Bytes.fromBase64("YWRtaW4="),
 						"dev",           // name (username)
-						"Developer"      // displayName
+						"admin"      // displayName
 				);
 
 				devAdmin.setPasswordHash(encoder.encode("123456"));
-				devAdmin.setRole("ADMIN");
+				devAdmin.setRole("ROLE_ADMIN");
 				devAdmin.setEmail("devadmin@gmail.com");
 
 				repository.save(devAdmin);
+				System.out.println("✅ Admin created");
 
 				UserEntity devUser = new UserEntity(
-						Bytes.fromBase64("02"),
+						Bytes.fromBase64("dXNlcg=="),
 						"user",           // name (username)
-						"Developer"      // displayName
+						"user"      // displayName
 				);
 
 				devUser.setPasswordHash(encoder.encode("1234"));
@@ -46,6 +47,7 @@ public class Team4youApplication {
 				devUser.setEmail("devuser@gmail.com");
 
 				repository.save(devUser);
+				System.out.println("✅ User created");
 			}
 		};
 	}

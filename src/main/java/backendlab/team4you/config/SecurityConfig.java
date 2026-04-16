@@ -15,7 +15,6 @@ import org.springframework.security.web.webauthn.management.UserCredentialReposi
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.core.userdetails.User;
 
 @Configuration
 public class SecurityConfig {
@@ -38,8 +37,8 @@ public class SecurityConfig {
 //                                .requestMatchers("/profile", "/logout").authenticated()
                                 .requestMatchers("/webauthn-check").authenticated()
 
-                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .requestMatchers("/home", "/dashboard", "/profile/**").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers("/dashboard").hasRole("ADMIN")
+                                .requestMatchers("/home", "/profile/**").hasRole("USER")
                                 .requestMatchers("/add-passkey").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers("/webauthn/register/**").hasAnyRole("USER", "ADMIN")
 

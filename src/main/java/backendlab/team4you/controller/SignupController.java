@@ -24,7 +24,6 @@ import java.util.List;
 @Controller
 public class SignupController {
 
-    private final PublicKeyCredentialUserEntityRepository users;
     private final UserService userService;
 
     public SignupController(PublicKeyCredentialUserEntityRepository users,
@@ -36,10 +35,6 @@ public class SignupController {
     @GetMapping("/webauthn-check")
     public String showWebAuthnCheck(){
         return "webauthn-check";
-    }
-    @GetMapping("/dashboard")
-    public String dashboard() {
-        return "dashboard";
     }
 
     @GetMapping("/signup")

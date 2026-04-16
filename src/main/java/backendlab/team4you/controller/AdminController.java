@@ -4,8 +4,7 @@ import backendlab.team4you.service.LogService;
 import backendlab.team4you.user.UserService;
 import groovy.util.logging.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +24,12 @@ public class AdminController {
 
     public AdminController(UserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping("/dashboard")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String admin(){
+        return "dashboard";
     }
 
     @GetMapping("/admin/logs")
@@ -67,4 +72,3 @@ public class AdminController {
 
 
 }
-
