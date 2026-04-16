@@ -200,4 +200,27 @@ class CaseFileControllerTest {
                 .andExpect(jsonPath("$.message")
                         .value("File not found for case record. caseRecordId=1, fileId=100"));
     }
+
+    @Test
+    @DisplayName("uploadFile should return conflict when file key conflict occurs")
+    void uploadFile_shouldReturnConflictWhenFileKeyConflictOccurs() throws Exception {
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file",
+                "test.pdf",
+                "application/pdf",
+                "hello".getBytes()
+        );
+
+        when(caseFileService.uploadFile(eq(1L), any()))
+                .thenThrow(new FileKeyConflictException("cases/1/conflict-key"));
+
+        mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 1L)
+                        .file(multipartFile))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.error").value("conflict"))
+                .andExpect(jsonPath("$.message")
+                        .value("A file with the same storage key already exists: cases/1/conflict-key"));
+    }
+
 }

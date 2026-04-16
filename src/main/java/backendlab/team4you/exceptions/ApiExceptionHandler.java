@@ -166,5 +166,16 @@ public class ApiExceptionHandler {
                 ));
     }
 
+    @ExceptionHandler(FileKeyConflictException.class)
+    public ResponseEntity<ErrorResponseDto> handleFileKeyConflictException(FileKeyConflictException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponseDto(
+                        HttpStatus.CONFLICT.value(),
+                        "conflict",
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
+
 
 }
