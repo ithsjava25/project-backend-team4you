@@ -22,22 +22,19 @@ public class CaseFile {
     @JoinColumn(name = "case_record_id", nullable = false)
     private CaseRecord caseRecord;
 
-    @Column(nullable = false)
+    @Column(name = "original_file_name", nullable = false)
     private String originalFileName;
 
-    @Column(nullable = false)
+    @Column(name = "s3_key", nullable = false, length = 1024)
     private String s3Key;
 
-    @Column(nullable = false)
+    @Column(name = "content_type", nullable = false)
     private String contentType;
 
-    @Column(nullable = false)
+    @Column(name = "size_in_bytes", nullable = false)
     private long size;
 
-    @Column(nullable = false)
-    private String bucketName;
-
-    @Column(nullable = false)
+    @Column(name = "uploaded_at", nullable = false)
     private LocalDateTime uploadedAt;
 
     public String getS3Key() {
