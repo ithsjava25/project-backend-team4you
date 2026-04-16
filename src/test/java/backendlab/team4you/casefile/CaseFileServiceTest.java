@@ -4,6 +4,7 @@ import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
 import backendlab.team4you.exceptions.CaseFileNotFoundException;
 import backendlab.team4you.exceptions.CaseRecordNotFoundException;
+import backendlab.team4you.exceptions.FileKeyConflictException;
 import backendlab.team4you.exceptions.InvalidFileNameException;
 import backendlab.team4you.s3.S3Service;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -264,4 +266,111 @@ class CaseFileServiceTest {
         assertThat(generatedKey).contains("cases/1/");
         assertThat(generatedKey).endsWith("-my_file_1_.pdf");
     }
+
+    @Test
+    @DisplayName("uploadFile should delete uploaded object when repository save fails")
+    void uploadFile_shouldDeleteUploadedObjectWhenRepositorySaveFails() throws IOException {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "test.pdf",
+                "application/pdf",
+                "hello".getBytes()
+        );
+
+        when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
+        doNothing().when(s3Service).uploadFileIfAbsent(anyString(), any(byte[].class), eq("application/pdf"));
+        when(caseFileRepository.save(any(CaseFile.class)))
+                .thenThrow(new DataIntegrityViolationException("database failure"));
+
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("database failure");
+
+        ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(s3Service).uploadFileIfAbsent(
+                keyCaptor.capture(),
+                eq(file.getBytes()),
+                eq("application/pdf")
+        );
+        verify(s3Service).deleteFile(keyCaptor.getValue());
+        verify(caseFileRepository).save(any(CaseFile.class));
+    }
+
+    @Test
+    @DisplayName("uploadFile should rethrow original exception when cleanup delete fails")
+    void uploadFile_shouldRethrowOriginalExceptionWhenCleanupDeleteFails() throws IOException {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "test.pdf",
+                "application/pdf",
+                "hello".getBytes()
+        );
+
+        when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
+        doNothing().when(s3Service).uploadFileIfAbsent(anyString(), any(byte[].class), eq("application/pdf"));
+
+        DataIntegrityViolationException originalException =
+                new DataIntegrityViolationException("database failure");
+
+        when(caseFileRepository.save(any(CaseFile.class))).thenThrow(originalException);
+        doThrow(new RuntimeException("cleanup failed"))
+                .when(s3Service)
+                .deleteFile(anyString());
+
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("database failure");
+
+        verify(s3Service).uploadFileIfAbsent(anyString(), eq(file.getBytes()), eq("application/pdf"));
+        verify(s3Service).deleteFile(anyString());
+        verify(caseFileRepository).save(any(CaseFile.class));
+    }
+
+    @Test
+    @DisplayName("uploadFile should throw FileKeyConflictException when s3 key already exists")
+    void uploadFile_shouldThrowFileKeyConflictExceptionWhenS3KeyAlreadyExists() throws IOException {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "test.pdf",
+                "application/pdf",
+                "hello".getBytes()
+        );
+
+        when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
+
+        doThrow(new FileKeyConflictException("cases/1/conflict-key"))
+                .when(s3Service)
+                .uploadFileIfAbsent(anyString(), any(byte[].class), eq("application/pdf"));
+
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
+                .isInstanceOf(FileKeyConflictException.class)
+                .hasMessageContaining("cases/1/conflict-key");
+
+        verify(caseFileRepository, never()).save(any());
+        verify(s3Service, never()).deleteFile(anyString());
+    }
+
+    @Test
+    @DisplayName("deleteFile should not delete metadata when s3 delete fails")
+    void deleteFile_shouldNotDeleteMetadataWhenS3DeleteFails() {
+        CaseFile caseFile = new CaseFile();
+        caseFile.setId(100L);
+        caseFile.setS3Key("cases/1/uuid-test.pdf");
+
+        when(caseFileRepository.findByIdAndCaseRecordId(100L, 1L))
+                .thenReturn(Optional.of(caseFile));
+
+        doThrow(new RuntimeException("s3 delete failed"))
+                .when(s3Service)
+                .deleteFile("cases/1/uuid-test.pdf");
+
+        assertThatThrownBy(() -> caseFileService.deleteFile(1L, 100L))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("s3 delete failed");
+
+        verify(s3Service).deleteFile("cases/1/uuid-test.pdf");
+        verify(caseFileRepository, never()).delete(any());
+    }
+
 }

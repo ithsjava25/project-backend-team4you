@@ -49,11 +49,13 @@ public class CaseFileService {
         }
 
         String contentType = normalizeContentType(file.getContentType());
-
         String s3Key = buildUniqueS3Key(caseRecord, originalFilename);
+
+        boolean uploadedToS3 = false;
 
         try {
             s3Service.uploadFileIfAbsent(s3Key, file.getBytes(), contentType);
+            uploadedToS3 = true;
 
             CaseFile caseFile = new CaseFile();
             caseFile.setCaseRecord(caseRecord);
@@ -66,7 +68,9 @@ public class CaseFileService {
             return caseFileRepository.save(caseFile);
 
         } catch (RuntimeException | IOException exception) {
-            cleanupUploadedObjectIfPossible(s3Key, exception);
+            if (uploadedToS3) {
+                cleanupUploadedObjectIfPossible(s3Key, exception);
+            }
             throw exception;
         }
     }
