@@ -6,9 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import org.springframework.http.ContentDisposition;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -65,11 +67,6 @@ public class CaseFileController {
                 )
                 .contentType(mediaType)
                 .body(body);
-                .contentType(mediaType)
-                .body(body);
-
-
-
     }
 
     @DeleteMapping("/{fileId}")

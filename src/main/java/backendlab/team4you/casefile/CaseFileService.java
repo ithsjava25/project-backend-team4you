@@ -9,6 +9,8 @@ import backendlab.team4you.s3.S3Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.InvalidMediaTypeException;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -115,9 +117,13 @@ public class CaseFileService {
 
     private String normalizeContentType(String contentType) {
         if (contentType == null || contentType.isBlank()) {
-            return "application/octet-stream";
+            return MediaType.APPLICATION_OCTET_STREAM_VALUE;
         }
-        return contentType;
+        try {
+                return MediaType.parseMediaType(contentType).toString();
+        } catch (InvalidMediaTypeException exception) {
+            return MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        }
     }
 
     private String buildUniqueS3Key(CaseRecord caseRecord, String originalFilename) {
