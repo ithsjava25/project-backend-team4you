@@ -1,6 +1,7 @@
 package backendlab.team4you.controller;
 
 import backendlab.team4you.application.ApplicationEntity;
+import backendlab.team4you.application.ApplicationRepository;
 import backendlab.team4you.application.ApplicationService;
 import backendlab.team4you.booking.BookingService;
 import backendlab.team4you.service.LogService;
@@ -11,6 +12,7 @@ import groovy.util.logging.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Scanner;
 
 
 @Slf4j
@@ -33,11 +36,14 @@ public class AdminController {
     private final UserService userService;
     private final BookingService bookingService;
     private final ApplicationService applicationService;
+    private final ApplicationRepository applicationRepository;
 
-    public AdminController(UserService userService, BookingService bookingService, ApplicationService applicationService) {
+    public AdminController(UserService userService, BookingService bookingService, ApplicationService applicationService, ApplicationRepository applicationRepository) {
         this.userService = userService;
         this.bookingService = bookingService;
         this.applicationService = applicationService;
+        this.applicationRepository = applicationRepository;
+
 
     }
 
@@ -80,11 +86,18 @@ public class AdminController {
 
 
     @GetMapping("/admin/applications")
-    public String adminApplication(Model model) {
+    public String adminApplications(
+            @RequestParam(defaultValue = "0") int page,
+            Model model
+    ) {
 
-        List<ApplicationEntity> applications = applicationService.getAll();
 
-        model.addAttribute("applications", applications);
+        Page<ApplicationEntity> applications =
+                applicationRepository.findAll(PageRequest.of(page, 5));
+
+        model.addAttribute("applications", applications.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", applications.getTotalPages());
 
         return "fragments/admin-applications :: content";
     }
