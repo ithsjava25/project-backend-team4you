@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,26 +40,29 @@ public class CaseFileController {
     }
 
     @GetMapping("/{fileId}")
-    public ResponseEntity<byte[]> downloadFile(
+    public ResponseEntity<StreamingResponseBody> downloadFile(
             @PathVariable Long caseRecordId,
             @PathVariable Long fileId
-    ) throws IOException {
+    ) {
         CaseFile caseFile = caseFileService.getCaseFile(caseRecordId, fileId);
 
-        try (InputStream stream = caseFileService.downloadFile(caseRecordId, fileId)) {
-            byte[] bytes = stream.readAllBytes();
-
-            MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
-            if (caseFile.getContentType() != null && !caseFile.getContentType().isBlank()) {
-                mediaType = MediaType.parseMediaType(caseFile.getContentType());
-            }
-
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"" + caseFile.getOriginalFilename() + "\"")
-                    .contentType(mediaType)
-                    .body(bytes);
+        MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
+        if (caseFile.getContentType() != null && !caseFile.getContentType().isBlank()) {
+            mediaType = MediaType.parseMediaType(caseFile.getContentType());
         }
+        StreamingResponseBody body = outputStream -> {
+            try (InputStream stream = caseFileService.downloadFile(caseRecordId, fileId)) {
+                stream.transferTo(outputStream);
+            }
+        };
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + caseFile.getOriginalFilename() + "\"")
+                .contentType(mediaType)
+                .body(body);
+
+
+
     }
 
     @DeleteMapping("/{fileId}")
