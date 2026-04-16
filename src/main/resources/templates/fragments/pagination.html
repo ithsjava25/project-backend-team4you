@@ -1,0 +1,35 @@
+<div th:fragment="pagination(baseUrl)">
+
+    <div class="pagination">
+
+        <button
+                th:if="${currentPage > 0}"
+                th:attr="hx-get=@{${baseUrl}(page=${currentPage - 1})}"
+                hx-target="#content-area"
+                hx-swap="innerHTML">
+            Föregående
+        </button>
+
+        <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+
+            <button
+                    th:attr="hx-get=@{${baseUrl}(page=${i})}"
+                    hx-target="#content-area"
+                    hx-swap="innerHTML"
+                    th:classappend="${currentPage == i} ? 'active'">
+                <span th:text="${i + 1}"></span>
+            </button>
+
+        </span>
+
+        <button
+                th:if="${currentPage < totalPages - 1}"
+                th:attr="hx-get=@{${baseUrl}(page=${currentPage + 1})}"
+                hx-target="#content-area"
+                hx-swap="innerHTML">
+            Nästa
+        </button>
+
+    </div>
+
+</div>

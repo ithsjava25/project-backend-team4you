@@ -4,6 +4,8 @@
 
     <div id="alert-area"></div>
 
+
+
     <ul>
         <li th:each="application : ${applications}">
 
@@ -21,5 +23,7 @@
 
         </li>
     </ul>
+
+    <div th:replace="fragments/pagination :: pagination('/admin/applications')"></div>
 
 </div>

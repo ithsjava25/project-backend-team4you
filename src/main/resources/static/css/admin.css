@@ -67,3 +67,21 @@ li{
     flex: 1;
     padding: 20px;
 }
+
+.pagination {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 6px 10px;
+    border: none;
+    background: #eee;
+    cursor: pointer;
+}
+
+.pagination button.active {
+    background: #6017a8;
+    color: white;
+}

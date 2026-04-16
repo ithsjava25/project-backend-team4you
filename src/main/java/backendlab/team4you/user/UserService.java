@@ -184,4 +184,10 @@ public class UserService {
     public Page<UserEntity> getUsers(int page, int size) {
         return userRepository.findAll(PageRequest.of(page, size));
     }
+    public Page<UserEntity> getAdmins(int page, int size) {
+        return userRepository.findByRole("ADMIN", PageRequest.of(page, size));
+    }
+    public UserEntity findByUsername(String disPlayName) {
+        return userRepository.findByDisplayName(disPlayName);
+    }
 }
