@@ -56,8 +56,15 @@ public class CaseFileController {
             }
         };
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + caseFile.getOriginalFilename() + "\"")
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.attachment()
+                                .filename(caseFile.getOriginalFilename(), StandardCharsets.UTF_8)
+                                .build()
+                                .toString()
+                )
+                .contentType(mediaType)
+                .body(body);
                 .contentType(mediaType)
                 .body(body);
 
