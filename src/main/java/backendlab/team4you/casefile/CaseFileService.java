@@ -103,8 +103,14 @@ public class CaseFileService {
     public void deleteFile(Long caseRecordId, Long fileId) {
         CaseFile caseFile = getCaseFile(caseRecordId, fileId);
 
-        s3Service.deleteFile(caseFile.getS3Key());
+        String s3Key = caseFile.getS3Key();
         caseFileRepository.delete(caseFile);
+        try {
+            s3Service.deleteFile(s3Key);
+        } catch (Exception e) {
+            log.error("Failed to delete S3 object after DB deletion: {}", s3Key, e);
+            throw e;
+        }
     }
 
     private String normalizeContentType(String contentType) {
