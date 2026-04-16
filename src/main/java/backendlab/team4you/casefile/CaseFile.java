@@ -66,10 +66,6 @@ public class CaseFile {
         return id;
     }
 
-    public String getOriginalFileName() {
-        return originalFileName;
-    }
-
     public String getContentType() {
         return contentType;
     }

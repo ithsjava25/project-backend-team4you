@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public record CaseFileResponseDto(
         Long id,
-        String originalFileName,
+        String originalFilename,
         String contentType,
         long size,
         LocalDateTime uploadedAt
@@ -12,7 +12,7 @@ public record CaseFileResponseDto(
     public static CaseFileResponseDto from(CaseFile caseFile) {
         return new CaseFileResponseDto(
                 caseFile.getId(),
-                caseFile.getOriginalFileName(),
+                caseFile.getOriginalFilename(),
                 caseFile.getContentType(),
                 caseFile.getSize(),
                 caseFile.getUploadedAt()

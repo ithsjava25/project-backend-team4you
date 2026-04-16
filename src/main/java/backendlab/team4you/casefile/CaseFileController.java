@@ -1,6 +1,5 @@
 package backendlab.team4you.casefile;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,20 +42,20 @@ public class CaseFileController {
     public ResponseEntity<byte[]> downloadFile(
             @PathVariable Long caseRecordId,
             @PathVariable Long fileId
-    )  throws IOException {
+    ) throws IOException {
         CaseFile caseFile = caseFileService.getCaseFile(caseRecordId, fileId);
 
         try (InputStream stream = caseFileService.downloadFile(caseRecordId, fileId)) {
             byte[] bytes = stream.readAllBytes();
 
             MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
-            if (caseFile.getContentType() != null && caseFile.getContentType().isBlank()) {
+            if (caseFile.getContentType() != null && !caseFile.getContentType().isBlank()) {
                 mediaType = MediaType.parseMediaType(caseFile.getContentType());
             }
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"" +caseFile.getOriginalFileName() + "\"")
+                            "attachment; filename=\"" + caseFile.getOriginalFilename() + "\"")
                     .contentType(mediaType)
                     .body(bytes);
         }
