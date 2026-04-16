@@ -62,4 +62,23 @@ public class CaseFile {
         this.uploadedAt = now;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getOriginalFileName() {
+        return originalFileName;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public LocalDateTime getUploadedAt() {
+        return uploadedAt;
+    }
 }
