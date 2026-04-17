@@ -1,10 +1,13 @@
 package backendlab.team4you.caserecord;
 
+import backendlab.team4you.casefile.CaseFile;
 import backendlab.team4you.registry.Registry;
 import backendlab.team4you.user.UserEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -59,7 +62,10 @@ public class CaseRecord {
     @Column(name = "closed_at")
     private LocalDateTime closedAt;
 
-    protected CaseRecord() {
+    @OneToMany(mappedBy = "caseRecord", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CaseFile> caseFiles = new ArrayList<>();
+
+    public CaseRecord() {
     }
 
     public CaseRecord(
@@ -169,5 +175,9 @@ public class CaseRecord {
 
     public LocalDateTime getClosedAt() {
         return closedAt;
+    }
+
+    public void setId(long l) {
+        this.id = l;
     }
 }
