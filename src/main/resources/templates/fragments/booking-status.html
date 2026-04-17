@@ -1,0 +1,11 @@
+<div th:fragment="content">
+    <p>Bokning skickad</p>
+
+    <button
+            hx-post="/booking/cancel"
+            hx-target="#booking-status"
+            hx-swap="innerHTML"
+    >
+        Avbryt
+    </button>
+</div>

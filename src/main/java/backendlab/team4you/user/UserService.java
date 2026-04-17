@@ -4,15 +4,28 @@ import backendlab.team4you.dto.UserRegistrationDTO;
 import backendlab.team4you.exceptions.DuplicateEmailException;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import jakarta.transaction.Transactional;
+
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.stereotype.Service;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+
+
+import java.security.Principal;
+
 import org.springframework.web.server.ResponseStatusException;
 
 
 import java.security.SecureRandom;
+
 import java.util.List;
 
 
@@ -20,11 +33,13 @@ import java.util.List;
 public class UserService {
 
 
+
     UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final SecureRandom random = new SecureRandom();
 
     public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder){
+
 
 
         this.userRepository = userRepository;
@@ -44,7 +59,8 @@ public class UserService {
 
     @Transactional
     public UserEntity findById(String id){
-        return userRepository.findById(id).orElse(null);
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     @Transactional
@@ -140,9 +156,38 @@ public class UserService {
     @Transactional
     public void deleteUser(String id) {
         if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException("User not found with id: " + id);
+            throw new UserNotFoundException("User not found");
         }
 
         userRepository.deleteById(id);
+    }
+
+    @Transactional
+    public String deleteByEmail(String email) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(
+                        "User not found with email: " + email
+                ));
+
+        userRepository.delete(user);
+
+        return email;
+    }
+
+
+    public String search(String searchTerm) {
+
+
+        return searchTerm;
+
+    }
+    public Page<UserEntity> getUsers(int page, int size) {
+        return userRepository.findAll(PageRequest.of(page, size));
+    }
+    public Page<UserEntity> getAdmins(int page, int size) {
+        return userRepository.findByRole("ADMIN", PageRequest.of(page, size));
+    }
+    public UserEntity findByUsername(String disPlayName) {
+        return userRepository.findByDisplayName(disPlayName);
     }
 }

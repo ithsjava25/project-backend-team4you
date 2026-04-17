@@ -1,53 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link th:href="@{/css/side-navbar.css}" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-</head>
-<body>
-<aside th:fragment="aside">
-    <div class="container">
-        <div class="head"></div>
-        <ol class="side-nav">
-            <li class="home">
-                <a th:href="@{/static}">
+<aside th:fragment="aside" class="main-sidebar">
+    <div class="sidenav-container">
+        <div class="sidenav-header">
+        </div>
+
+        <ul class="sidenav-list">
+            <li class="sidenav-item">
+                <a th:href="@{/}">
                     <i class="fa-solid fa-house"></i>
                     <span>Hem</span>
                 </a>
             </li>
-            <li class="application">
-                <a th:href="@{/application}">
-                    <i class="fa-solid fa-file-invoice"></i>
-                    <span>Ansökningar </span>
-                </a>
-            </li>
-            <li class="booking">
-                <a th:href="@{/booking}">
-                    <i class="fa-solid fa-calendar-days"></i>
-                    <span>Boka tid</span>
-                </a>
-            </li>
-            <li class="profile">
+            <li class="sidenav-item">
                 <a th:href="@{/profile}">
-                    <i class="fa-solid fa-user"></i>
+                    <i class="fa-solid fa-right-from-bracket"></i>
                     <span>Profil</span>
                 </a>
             </li>
-            <li class="contact">
-                <a th:href="@{/contact}">
-                    <i class="fa-solid fa-envelope"></i>
-                    <span>Kontakta oss</span>
+
+
+            <li class="sidenav-item">
+                <a th:href="@{/booking}">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Boka tid</span>
                 </a>
             </li>
-            <li class="logout">
+            <li class="sidenav-item">
+                <a th:href="@{/application}">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Ansökningar</span>
+                </a>
+            </li>
+            <li class="sidenav-item">
                 <a th:href="@{/logout}">
                     <i class="fa-solid fa-right-from-bracket"></i>
                     <span>Logga ut</span>
                 </a>
             </li>
-        </ol>
+
+
+        </ul>
     </div>
 </aside>
-</body>
-</html>

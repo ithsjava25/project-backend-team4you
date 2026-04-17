@@ -1,0 +1,28 @@
+<div th:fragment="content">
+
+    <h2>Användare</h2>
+
+    <div id="alert-area"></div>
+
+    <ul>
+        <li th:each="user : ${users}">
+
+            <span th:text="${user.displayName}"></span>
+            <span th:text="${user.email}"></span>
+             <span th:text="${user.role}"></span>
+
+            <button
+                    th:attr="hx-post=@{/admin/users/delete(id=${user.id})}"
+                    hx-target="closest li"
+                    hx-swap="outerHTML"
+                    hx-confirm="Är du säker?"
+            >
+                Ta bort
+            </button>
+
+        </li>
+    </ul>
+
+    <div th:replace="fragments/pagination :: pagination('/admin/users')"></div>
+
+</div>

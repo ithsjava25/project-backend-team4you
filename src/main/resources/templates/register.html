@@ -1,41 +1,69 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" lang="">
+<html lang="sv"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
 <head>
     <meta charset="UTF-8">
-    <title>navbar</title>
-    <link rel="stylesheet" th:href="@{/css/navbar.css}">
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>Register</title>
+    <link rel="stylesheet" th:href="@{/css/register.css}">
 </head>
-<div class="signup-box" xmlns:th="http://www.w3.org/1999/xhtml">
-    <h1>Registrera dig</h1>
-    <form th:action="@{/register}" method="post">
-        <label for="firstName">Förnamn </label>
-        <input type="text" id="firstName" name="firstName" required>
 
-        <label for="lastName">Efternamn </label>
-        <input type="text" id="lastName" name="lastName" required>
+<body>
 
-        <label for="email">E-post</label>
-        <input type="email" id="email" name="email" required>
+<section layout:fragment="content">
 
-        <label for="phone">Mobilnummer</label>
-        <input type="tel" id="phone" name="phoneNumber" placeholder="07x-xxx xx xx">
+    <div class="login-wrapper">
 
-        <label for="password">Lösenord</label>
-        <input type="password" id="password" name="password" required>
+        <div class="form-wrapper">
 
-        <label for="confirmPassword">Bekräfta lösenord</label>
-        <input type="password" id="confirmPassword" name="confirmPassword" required>
+            <div th:replace="fragments/form-errors :: errors"></div>
+            <div th:replace="fragments/success-message :: success"></div>
 
-        <input type="submit" value="Skapa konto" class="submit-btn">
-    </form>
+            <div class="form-container">
 
-    <div class="footer-links">
-        <p>Har du redan ett konto? <a th:href="@{/login}">Logga in</a></p>
-        <p><a th:href="@{/}">Tillbaka till start</a></p>
+            <form class="register-form" th:action="@{/register}" method="post">
+
+                <h1 class="register-h1">Registrera dig</h1>
+                <div class="form-group">
+                <label for="firstName">Förnamn</label>
+                <input type="text" id="firstName" name="firstName" required>
+                </div>
+                <div class="form-group">
+                <label for="lastName">Efternamn</label>
+                <input type="text" id="lastName" name="lastName" required>
+                </div>
+                <label for="email">E-post</label>
+                <input type="email" id="email" name="email" required>
+                <div class="form-group">
+                <label for="phone">Mobilnummer</label>
+
+                <input type="tel" id="phone" name="phoneNumber">
+                </div>
+
+                <label for="password">Lösenord</label>
+
+                <input type="password" id="password" name="password" required>
+                <div class="form-group">
+                <label for="confirmPassword">Bekräfta lösenord</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+                <button type="submit" class="btn-primary">Skapa konto</button>
+
+            </form>
+
+            <div class="footer-links">
+                <p>Har du redan ett konto? <a th:href="@{/login}">Logga in</a></p>
+                <p><a th:href="@{/}">Tillbaka</a></p>
+            </div>
+
+        </div>
+        </div>
+
     </div>
-</div>
 
+</section>
+
+</body>
 </html>

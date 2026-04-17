@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="sv"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+
+<head>
+    <title>Contact</title>
+    <link rel="stylesheet" th:href="@{/css/contact.css}">
+</head>
+
+<body>
+
+<section layout:fragment="content">
+
+    <div class="form-wrapper">
+
+        <div class="form-container">
+
+            <h1>Contact Us</h1>
+
+            <form th:action="@{/contact/send}" th:object="${contactForm}" method="post">
+
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" th:field="*{firstName}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" th:field="*{lastName}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" th:field="*{email}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" th:field="*{phone}">
+                </div>
+
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea th:field="*{message}" required></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    Send Message
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>
+
+</body>
+</html>

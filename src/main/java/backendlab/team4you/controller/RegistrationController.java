@@ -66,7 +66,7 @@ public class RegistrationController {
 
     @GetMapping("/welcome")
     public String welcome(Model model, Principal principal) {
-        if (principal == null) return "redirect:/login"; // Säkerhetskoll
+        if (principal == null) return "redirect:/login";
 
         String name = principal.getName();
         UserEntity user = userService.findByName(name);
