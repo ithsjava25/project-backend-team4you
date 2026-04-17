@@ -13,7 +13,7 @@
         <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
 
             <button
-                    th:attr="hx-get=@{${baseUrl}(page=${i})}"
+                    th:attr="hx-get=@{${baseUrl}(page=${i}, sort=${sort}, direction=${direction})}"
                     hx-target="#content-area"
                     hx-swap="innerHTML"
                     th:classappend="${currentPage == i} ? 'active'">

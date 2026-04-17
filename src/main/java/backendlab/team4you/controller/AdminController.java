@@ -6,6 +6,7 @@ import backendlab.team4you.application.ApplicationService;
 import backendlab.team4you.booking.BookingService;
 import backendlab.team4you.service.LogService;
 import backendlab.team4you.user.UserEntity;
+import backendlab.team4you.user.UserRepository;
 import backendlab.team4you.user.UserService;
 import groovy.util.logging.Slf4j;
 
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -39,12 +41,15 @@ public class AdminController {
     private final BookingService bookingService;
     private final ApplicationService applicationService;
     private final ApplicationRepository applicationRepository;
+    private final UserRepository userRepository;
 
-    public AdminController(UserService userService, BookingService bookingService, ApplicationService applicationService, ApplicationRepository applicationRepository) {
+    public AdminController(UserService userService, BookingService bookingService, ApplicationService applicationService, ApplicationRepository applicationRepository, UserRepository userRepository) {
         this.userService = userService;
         this.bookingService = bookingService;
         this.applicationService = applicationService;
         this.applicationRepository = applicationRepository;
+        this.userRepository = userRepository;
+
 
 
     }
@@ -134,14 +139,27 @@ public class AdminController {
     }
 
     @GetMapping("/admin/users")
-    public String getUsers(@RequestParam(defaultValue = "0") int page,
-                           Model model) {
+    public String getUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "displayName") String sort,
+            @RequestParam(defaultValue = "asc") String direction,
+            Model model
+    ) {
 
-        Page<UserEntity> users = userService.getUsers(page, 5);
+        Sort.Direction dir = direction.equalsIgnoreCase("desc")
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        Page<UserEntity> users = userRepository.findAll(
+                PageRequest.of(page, 5, Sort.by(dir, sort))
+        );
 
         model.addAttribute("users", users.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", users.getTotalPages());
+
+        model.addAttribute("sort", sort);
+        model.addAttribute("direction", direction);
 
         return "fragments/admin-users :: content";
     }
