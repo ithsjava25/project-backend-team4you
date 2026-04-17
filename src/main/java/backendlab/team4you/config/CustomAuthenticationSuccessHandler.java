@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.webauthn.authentication.WebAuthnAuthenticationRequestToken;
 import org.springframework.security.web.webauthn.management.UserCredentialRepository;
 import org.springframework.stereotype.Component;
 
@@ -30,10 +31,11 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                                         ) throws IOException {
 
         String username = authentication.getName();
-
         var userEntity = userService.findByName(username);
 
-        if (userEntity != null){
+        boolean isWebAuthn = authentication instanceof WebAuthnAuthenticationRequestToken;
+
+        if (userEntity != null && !isWebAuthn){
             var credentials = userCredentialRepository.findByUserId(userEntity.getId());
 
             if (!credentials.isEmpty()){

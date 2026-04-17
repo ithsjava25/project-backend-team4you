@@ -25,22 +25,20 @@ public class SecurityConfig {
                                             CustomAuthenticationSuccessHandler successHandler) throws Exception {
 
         return http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/webauthn/**", "/api/files/**", "/login"))
                 .authorizeHttpRequests(
                         authorizeHttp -> authorizeHttp
                                 // Public endpoints
-                                .requestMatchers("/static/css/**", "/js/**", "/images/**").permitAll()
+                                .requestMatchers("/static/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
                                 .requestMatchers( "/","/login", "/login/webauthn", "/signup", "/error").permitAll()
-                                .requestMatchers("/webauthn/authenticate/**").permitAll()
-                                .requestMatchers("/api/files/**").permitAll()
 
+                                .requestMatchers("/api/files/**", "/webauthn/authenticate/**", "/webauthn/login/**").permitAll()
 
-                                .requestMatchers("/admin/**").hasRole("ADMIN")
-//
-                                .requestMatchers("/dashboard").hasRole("ADMIN")
+                                .requestMatchers("/webauthn/**").hasAnyRole("USER", "ADMIN")
+
+                                .requestMatchers("/admin/**", "/dashboard").hasRole("ADMIN")
                                 .requestMatchers("/home", "/profile/**").hasRole("USER")
-                                .requestMatchers("/add-passkey").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers("/webauthn/register/**").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers("/add-passkey", "/webauthn/register/**").hasAnyRole("USER", "ADMIN")
 
                                 .anyRequest().authenticated()
                 )
@@ -48,7 +46,6 @@ public class SecurityConfig {
                         .rpId("localhost") //identity of the website
                         .allowedOrigins("http://localhost:8080")
                         .rpName("Passkey team4you")
-
                 )
                 .formLogin(form -> form
                         .loginPage("/")
