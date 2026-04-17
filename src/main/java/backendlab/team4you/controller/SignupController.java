@@ -38,11 +38,6 @@ public class SignupController {
         return "check";
     }
 
-    @GetMapping("/dashboard")
-    public String dashboard() {
-        return "dashboard";
-    }
-
     @GetMapping("/signup")
     String signup(org.springframework.security.web.csrf.CsrfToken token, Model model) {
         model.addAttribute("csrfToken", token.getToken());

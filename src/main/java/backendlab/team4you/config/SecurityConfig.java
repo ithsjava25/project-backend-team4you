@@ -25,15 +25,20 @@ public class SecurityConfig {
                                             CustomAuthenticationSuccessHandler successHandler) throws Exception {
 
         return http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(
                         authorizeHttp -> authorizeHttp
                                 // Public endpoints
                                 .requestMatchers("/static/css/**", "/js/**", "/images/**").permitAll()
                                 .requestMatchers( "/","/login", "/login/webauthn", "/signup", "/error").permitAll()
                                 .requestMatchers("/webauthn/authenticate/**").permitAll()
+                                .requestMatchers("/api/files/**").permitAll()
+
 
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .requestMatchers("/dashboard", "/profile/**").hasAnyRole("USER", "ADMIN")
+//
+                                .requestMatchers("/dashboard").hasRole("ADMIN")
+                                .requestMatchers("/home", "/profile/**").hasRole("USER")
                                 .requestMatchers("/add-passkey").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers("/webauthn/register/**").hasAnyRole("USER", "ADMIN")
 
@@ -46,8 +51,10 @@ public class SecurityConfig {
 
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")
+                        .loginPage("/")
+                        .loginProcessingUrl("/login")
                         .successHandler(successHandler)
+                        .permitAll()
                 )
                 .logout(logout -> logout.logoutSuccessUrl("/").permitAll())
                 .build();
@@ -74,7 +81,7 @@ public class SecurityConfig {
             return User.builder()
                     .username(user.getName())
                     .password(user.getPasswordHash())
-                    .roles(user.getRole())
+                    .roles(user.getRole().replace("ROLE_", ""))
                     .accountLocked(false)
                     .build();
         };

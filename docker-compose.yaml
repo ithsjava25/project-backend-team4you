@@ -11,5 +11,21 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  localstack:
+    image: localstack/localstack:3.8.1
+    container_name: team4you-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - DEFAULT_REGION=eu-north-1
+    volumes:
+      - ./init-localstack.sh:/etc/localstack/init/ready.d/init-localstack.sh
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   postgres_data:
