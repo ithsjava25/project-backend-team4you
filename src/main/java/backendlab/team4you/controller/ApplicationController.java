@@ -31,4 +31,6 @@ public class ApplicationController {
 
         return "application";
     }
+
+
 }

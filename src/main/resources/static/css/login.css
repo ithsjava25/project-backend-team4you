@@ -1,37 +1,34 @@
-.signup-box {
-    width: 380px;
-    min-height: 700px;
-    margin: 50px auto;
-    background-color: white;
-    border-radius: 8px;
-    padding-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
 
-form label {
-    display: block;
-    margin-top: 15px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --color-bg: #161a2d;
+    --color-surface: #1f2544;
+    --color-primary: #6017a8;
+    --color-accent: #00d4ff;
+    --color-text: #ffffff;
+    --color-muted: #a0a0b0;
+    --color-success: #28a745;
 }
 
 
-input[type="submit"] {
+
+/*.form-container h2 {*/
+/*    margin-bottom: 20px;*/
+/*}*/
+
+
+
+/*.login-submit{*/
+/*    color:white;*/
+/*    border:none;*/
+/*    background: #161a2d;*/
+/*}*/
+
+.passkey-button{
+    margin-top: 10px;
+    color:white;
+    border-radius: 30px;
     width: 100%;
-    height: 45px;
-    margin-top: 25px;
-    border: none;
-    background-color: #49c1a2;
-    color: white;
-    font-size: 18px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s;
 }
-
-input[type="submit"]:hover {
-    background-color: #3ba88c;
-}
-
-{}
