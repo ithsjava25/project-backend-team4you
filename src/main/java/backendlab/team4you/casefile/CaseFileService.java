@@ -153,7 +153,7 @@ public class CaseFileService {
         }
 
         if (originalException instanceof DataIntegrityViolationException) {
-            log.warn("Database integrity violation after S3 upload. Attempted cleanup for key={}", s3Key);
+            log.warn("Data integrity violation while persisting CaseFile (possible duplicate s3_key or invalid FK/NULL). Attempted cleanup for key={}", s3Key);
         }
     }
 }
