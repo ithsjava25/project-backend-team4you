@@ -48,8 +48,8 @@
                 }
 
                 try {
-                    await webauthn.authenticate(headers, '', false);
-                    window.location.href = "/";
+                    const redirectUrl = await webauthn.authenticate(headers, '', false);
+                    window.location.href = redirectUrl || "/";
                 } catch (error) {
                     console.error("Authentication Error:", error);
                     errorDiv.textContent = "Authentication failed: " + error.message;

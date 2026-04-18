@@ -25,14 +25,14 @@ public class SecurityConfig {
                                             CustomAuthenticationSuccessHandler successHandler) throws Exception {
 
         return http
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/webauthn/**", "/api/files/**", "/login"))
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/webauthn/**", "/api/files/**"))
                 .authorizeHttpRequests(
                         authorizeHttp -> authorizeHttp
                                 // Public endpoints
                                 .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                                 .requestMatchers( "/","/login", "/login/webauthn", "/signup", "/error").permitAll()
 
-                                .requestMatchers("/api/files/**", "/webauthn/authenticate/**", "/webauthn/login/**").permitAll()
+                                .requestMatchers("/api/files/**", "/webauthn/authenticate/**").permitAll()
 
                                 .requestMatchers("/webauthn/**").hasAnyRole("USER", "ADMIN")
 

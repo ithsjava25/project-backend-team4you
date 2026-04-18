@@ -34,7 +34,7 @@ public class SignupController {
         this.userService = userService;
     }
 
-    @GetMapping("/login/webauthn/")
+    @GetMapping("/login/webauthn")
     public String webauthnCheck() {
         return "check";
     }
@@ -58,7 +58,7 @@ public class SignupController {
         );
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                userEntity.getName(), null, List.of(new SimpleGrantedAuthority("ROLE_" + userEntity.getRole())));
+                userEntity.getName(), null, List.of(new SimpleGrantedAuthority(userEntity.getRole())));
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(auth);
