@@ -1,10 +1,14 @@
 package backendlab.team4you.user;
 
+
+import jakarta.persistence.*;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import org.jspecify.annotations.Nullable;
+
 import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.security.web.webauthn.api.PublicKeyCredentialUserEntity;
 
@@ -18,14 +22,17 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     @Column(name = "id")
     private String id;
 
+
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
+
     @Column(name = "display_name")
     private String displayName;
-
-    @Column(name = "email")
-    private String email;
+    
 
     @Column(name = "first_name")
     private String firstName;
@@ -33,8 +40,9 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "role")
-    private String role = "USER";
+
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -54,10 +62,6 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
         this.displayName = displayName;
     }
 
-    @Override
-    public Bytes getId() {
-        return id != null ? Bytes.fromBase64(id) : null;
-    }
 
     public void setId(Bytes id) {
         this.id = id != null ? id.toBase64UrlString() : null;
@@ -73,13 +77,23 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     }
 
     @Override
-    public @Nullable String getDisplayName() {
-        return displayName;
+
+    public Bytes getId() {
+        return id != null ? Bytes.fromBase64(id) : null;
     }
+
+    @Override
+    public String getDisplayName() {
+        return (this.firstName != null ? this.firstName : "") + " " + (this.lastName != null ? this.lastName : "");
+    }
+
+
+
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
+
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -130,14 +144,21 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     }
 
     public String getRole() {
-        return role;
+
+        return role.name();
     }
 
     public void setRole(String role) {
-        this.role = role;
+
+        this.role = UserRole.valueOf(role);
     }
 
-    public String getIdAsString() {
+     public String getIdAsString() {
         return this.id;
     }
+
+
 }
+
+
+

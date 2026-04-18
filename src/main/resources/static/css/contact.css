@@ -1,58 +1,52 @@
 :root {
-    --primary-color: #2c3e50;
-    --accent-color: #3498db;
-    --bg-color: #f4f7f6;
-    --text-color: #333;
+    --color-bg: #161a2d;
+    --color-surface: #1f2544;
+    --color-primary: #6017a8;
+    --color-accent: #00d4ff;
+    --color-text: #ffffff;
+    --color-muted: #a0a0b0;
+    --color-success: #28a745;
 }
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-}
 
-.contact-wrapper {
-    background: white;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 500px;
-}
 
-h1 {
-    font-family: 'Miniver', cursive;
-    color: var(--primary-color);
-    text-align: center;
-    font-size: 2.5rem;
-    margin-bottom: 30px;
-}
+/*.contact-wrapper {*/
+/*    background-color: #161a2d;*/
+/*    padding: 40px;*/
+/*    border-radius: 12px;*/
+/*    box-shadow: 0 10px 25px rgba(0,0,0,0.1);*/
+/*    width: 100%;*/
+/*    max-width: 500px;*/
+/*}*/
 
-.form-label {
-    display: block;
-    font-weight: 500;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-}
+/*.h1-contact {*/
+/*    font-family: 'Miniver', cursive;*/
+/*    color: var(#ffffff);*/
+/*    text-align: center;*/
+/*    font-size: 2.5rem;*/
+/*    margin-bottom: 30px;*/
+/*}*/
 
-.form-control {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-family: 'Poppins', sans-serif;
-    transition: border-color 0.3s;
-}
+/*.form-label {*/
+/*    display: block;*/
+/*    font-weight: 500;*/
+/*    margin-bottom: 8px;*/
+/*    font-size: 0.9rem;*/
+/*}*/
+
+/*.form-control {*/
+/*    width: 100%;*/
+/*    padding: 12px;*/
+/*    margin-bottom: 20px;*/
+/*    border: 1px solid #ddd;*/
+/*    border-radius: 6px;*/
+/*    font-family: 'Poppins', sans-serif;*/
+/*    transition: border-color 0.3s;*/
+/*}*/
 
 .form-control:focus {
     outline: none;
-    border-color: var(--accent-color);
+    border-color: var(#6017a8);
     box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
 }
 
@@ -61,10 +55,10 @@ textarea.form-control {
     min-height: 100px;
 }
 
-.submit-btn {
+.submit-btn-contact {
     width: 100%;
     padding: 14px;
-    background-color: var(--primary-color);
+    background-color: var(#6017a8);
     color: white;
     border: none;
     border-radius: 6px;
@@ -89,4 +83,3 @@ textarea.form-control {
     text-align: center;
     border: 1px solid #c3e6cb;
 }
-{}

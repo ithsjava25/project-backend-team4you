@@ -1,23 +1,41 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" lang="en">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+
 <head>
     <meta charset="UTF-8">
     <title>Ärendehantering</title>
+
+    <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/layout.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link rel="stylesheet" th:href="@{/css/sidenav.css}">
+    <link rel="stylesheet" th:href="@{/css/contact.css}">
+    <link rel="stylesheet" th:href="@{/css/components/form.css}">
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
 
 <header th:replace="~{fragments/navbar :: header}"></header>
 
-<div class="main-wrapper" style="display: flex;">
+<div class="main-wrapper">
 
-    <aside th:replace="~{fragments/side-navbar :: aside}"></aside>
+
+
+    <div sec:authorize="!isAnonymous()">
+        <aside th:replace="~{fragments/side-navbar :: aside}"></aside>
+    </div>
+
+
+
+    <div id="alert-area"></div>
 
     <main class="container">
-        <div id="content-area">
-
+        <div id="content-area" layout:fragment="content">
         </div>
     </main>
 

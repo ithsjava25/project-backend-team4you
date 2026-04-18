@@ -110,4 +110,72 @@ public class ApiExceptionHandler {
                 .status(status)
                 .body(body);
     }
+
+    @ExceptionHandler(DuplicateRegistryNameException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicateRegistryName(DuplicateRegistryNameException exception) {
+        log.warn("Duplicate registry name: {}", exception.getMessage());
+
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
+                "conflict",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(DuplicateRegistryCodeException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicateRegistryCode(DuplicateRegistryCodeException exception) {
+        log.warn("Duplicate registry code: {}", exception.getMessage());
+
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
+                "conflict",
+                exception.getMessage()
+        );
+    }
+
+    @ExceptionHandler(InvalidFileNameException.class)
+    public ResponseEntity<ErrorResponseDto> handleInvalidFileName(InvalidFileNameException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponseDto(
+                        HttpStatus.BAD_REQUEST.value(),
+                        "bad request",
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
+
+    @ExceptionHandler(CaseRecordNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleCaseRecordNotFoundException(CaseRecordNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponseDto(
+                        HttpStatus.NOT_FOUND.value(),
+                        "not found",
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
+
+    @ExceptionHandler(CaseFileNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleCaseFileNotFoundException(CaseFileNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponseDto(
+                        HttpStatus.NOT_FOUND.value(),
+                        "not found",
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
+
+    @ExceptionHandler(FileKeyConflictException.class)
+    public ResponseEntity<ErrorResponseDto> handleFileKeyConflictException(FileKeyConflictException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponseDto(
+                        HttpStatus.CONFLICT.value(),
+                        "conflict",
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
+
+
 }

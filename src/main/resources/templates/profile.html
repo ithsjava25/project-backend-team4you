@@ -1,68 +1,45 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" lang="">
+<!doctype html>
+<html lang="sv"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
-    <title>navbar</title>
-    <link rel="stylesheet" th:href="@{/css/navbar.css}">
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>Profile</title>
+
 </head>
-<header th:fragment="header">
 
-    <nav class="navbar">
-        <div class="navdiv">
-            <div class="logo">
-                <a th:href="@{/static}">Profil </a>
-            </div>
+<body>
+    <section layout:fragment="content">
 
-            <div class="search-container">
-                <form th:action="@{/search}" method="get">
-                    <label>
-                        <input type="text" name="query" placeholder="Sök ärende eller info...">
-                    </label>
-                    <button type="submit" class="search-btn">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
-                </form>
-            </div>
-
-            <ul class="nav-links">
-                <li>
-                    <a
-                            hx-get="/profile"
-                            hx-target="#content-area"
-                            hx-swap="innerHTML"
-                            th:href="@{/profile}"
-                    >
-                        Min profil
-                    </a>
-                </li>
-                <li>
-                    <a
-                            hx-get="/application"
-                            hx-target="#content-area"
-                            hx-swap="innerHTML"
-                            th:href="@{/application}"
-                    >
-                        Ny Ansökan
-                    </a>
-                </li>
-                <li>
-                    <a
-                            hx-get="/bookings"
-                            hx-target="#content-area"
-                            hx-swap="innerHTML"
-                            th:href="@{/bookings}"
-                    >
-                        Bokade
-                    </a>
-                </li>
-                <li><a th:href="@{/}" class="btn-highlight">Hem</a></li>
-            </ul>
+    <h1>Min profil</h1>
+        <p>Inloggad som <span sec:authentication="name"></span></p>
+        <div sec:authorize="isAuthenticated()">
+            Hej <span sec:authentication="name"></span> 👋
         </div>
 
-    </nav>
+        <hr>
 
-</header>
+        <div class="danger-zone">
+
+
+            <button
+                    hx-delete="/account"
+                    hx-confirm="Är du säker på att du vill ta bort ditt konto?"
+                    hx-target="#content-area"
+                    hx-swap="innerHTML"
+                    class="btn-danger"
+            >
+                Ta bort konto
+            </button>
+        </div>
+
+
+
+
+
+
+</section>
+</body>
 </html>

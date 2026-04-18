@@ -1,0 +1,52 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: Poppins, sans-serif;
+}
+
+body{
+    min-height: 100px;
+
+}
+
+.head{
+    font-size:25px;
+}
+
+aside{
+    background: #161a2d;
+    width: 250px;
+    height: 100%;
+    border: 1px solid purple;
+    transition: all 0.5s ease;
+    align-items: center;
+    gap: 0 20px;
+    padding: 15px 20px;
+    color:white
+
+}
+
+
+li{
+    list-style: none;
+    margin:10px;
+    padding:10px;
+}
+
+
+
+.submit {
+    width: 50%;
+    padding: 10px;
+    border-radius:20px;
+    border: 1px solid purple;
+    margin-bottom: 20px;
+    font-family: sans-serif;
+    font-weight: 100;
+    background: white;
+    cursor: pointer;
+    color:green;
+
+}
+
