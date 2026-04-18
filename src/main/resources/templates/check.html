@@ -49,7 +49,7 @@
 
                 try {
                     await webauthn.authenticate(headers, '', false);
-                    window.location.href = "/dashboard";
+                    window.location.href = "/";
                 } catch (error) {
                     console.error("Authentication Error:", error);
                     errorDiv.textContent = "Authentication failed: " + error.message;

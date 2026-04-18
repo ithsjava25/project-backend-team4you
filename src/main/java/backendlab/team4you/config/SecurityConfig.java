@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         authorizeHttp -> authorizeHttp
                                 // Public endpoints
-                                .requestMatchers("/static/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                                .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                                 .requestMatchers( "/","/login", "/login/webauthn", "/signup", "/error").permitAll()
 
                                 .requestMatchers("/api/files/**", "/webauthn/authenticate/**", "/webauthn/login/**").permitAll()
