@@ -3,8 +3,6 @@ package backendlab.team4you.controller;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
 
-import backendlab.team4you.user.UserRepository;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

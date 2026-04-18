@@ -49,7 +49,7 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-//                        .loginProcessingUrl("/login")
+                        .loginProcessingUrl("/login")
                         .successHandler(successHandler)
                         .permitAll()
                 )
@@ -78,7 +78,7 @@ public class SecurityConfig {
             return User.builder()
                     .username(user.getName())
                     .password(user.getPasswordHash())
-                    .roles(user.getRole())
+                    .authorities(user.getRole())
                     .accountLocked(false)
                     .build();
         };

@@ -29,6 +29,9 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                                         Authentication authentication
                                         ) throws IOException {
 
+        new org.springframework.security.web.savedrequest.HttpSessionRequestCache()
+                .removeRequest(request, response);
+
         String username = authentication.getName();
 
         var userEntity = userService.findByName(username);
