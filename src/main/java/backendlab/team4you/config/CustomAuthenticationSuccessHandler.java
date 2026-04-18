@@ -48,7 +48,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
         if (isAdmin)
-            getRedirectStrategy().sendRedirect(request, response, "/dashboard");
+            getRedirectStrategy().sendRedirect(request, response, "/admin");
         else {
             getRedirectStrategy().sendRedirect(request, response, "/home");
         }

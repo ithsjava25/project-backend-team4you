@@ -55,12 +55,6 @@ public class AdminController {
 
     }
 
-    @GetMapping("/dashboard")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String admin(){
-        return "dashboard";
-    }
-
     @GetMapping("/admin/logs")
     public String logs(Model model) {
         List<String> logs = List.of(

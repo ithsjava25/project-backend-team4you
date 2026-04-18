@@ -43,7 +43,7 @@ public class Team4youApplication {
 				);
 
 				devUser.setPasswordHash(encoder.encode("1234"));
-				devUser.setRole("USER");
+				devUser.setRole("ROLE_USER");
 				devUser.setEmail("devuser@gmail.com");
 
 				repository.save(devUser);
