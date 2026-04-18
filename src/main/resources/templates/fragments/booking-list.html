@@ -1,0 +1,5 @@
+<div th:fragment="list">
+    <div th:each="booking : ${bookings}">
+        <p th:text="${booking}"></p>
+    </div>
+</div>

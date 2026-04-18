@@ -1,0 +1,81 @@
+.navbar *, .navbar a{
+    text-decoration: none;
+}
+
+.navbar{
+    background-color:white;
+    font-family: Poppins, sans-serif;
+    padding-right: 15px;
+    padding-left: 15px;
+    border: 2px solid purple;
+}
+
+.navbar button{
+
+}
+
+.navdiv{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar li{
+    list-style: none;
+    display: inline-block;
+}
+
+.navbar li a {
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 25px;
+    cursor: pointer;
+}
+.search-container {
+    flex-grow: 0.5;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.search-container form {
+    display: flex;
+    background: #f0f2f5;
+    border-radius: 20px;
+    padding: 5px 15px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.search-container input {
+    border: none;
+    background: transparent;
+    padding: 8px;
+    width: 100%;
+    outline: none;
+}
+
+.search-btn {
+    background: none !important;
+    width: auto !important;
+    color: #666 !important;
+    cursor: pointer;
+    border: none;
+
+}
+
+.nav-buttons a:hover {
+    background-color: #333;
+}
+
+
+.navbar button a{
+    color: white;
+    font-weight:bold;
+}
+
+.navbar .nav-buttons a:hover {
+    background-color: #333;
+    color: gold;
+}
+

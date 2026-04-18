@@ -1,11 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<section layout:fragment="content" xmlns:layout="">
 
+    <h2>Sökresultat</h2>
 
-</body>
-</html>
+    <div th:each="user : ${users}" th:text="${user.email}"></div>
+
+</section>

@@ -30,6 +30,9 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                                         Authentication authentication
                                         ) throws IOException {
 
+        new org.springframework.security.web.savedrequest.HttpSessionRequestCache()
+                .removeRequest(request, response);
+
         String username = authentication.getName();
         var userEntity = userService.findByName(username);
 
@@ -50,7 +53,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
         if (isAdmin)
-            getRedirectStrategy().sendRedirect(request, response, "/dashboard");
+            getRedirectStrategy().sendRedirect(request, response, "/admin");
         else {
             getRedirectStrategy().sendRedirect(request, response, "/home");
         }

@@ -36,7 +36,7 @@ public class SecurityConfig {
 
                                 .requestMatchers("/webauthn/**").hasAnyRole("USER", "ADMIN")
 
-                                .requestMatchers("/admin/**", "/dashboard").hasRole("ADMIN")
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/home", "/profile/**").hasRole("USER")
                                 .requestMatchers("/add-passkey", "/webauthn/register/**").hasAnyRole("USER", "ADMIN")
 
@@ -48,7 +48,7 @@ public class SecurityConfig {
                         .rpName("Passkey team4you")
                 )
                 .formLogin(form -> form
-                        .loginPage("/")
+                        .loginPage("/login")
                         .loginProcessingUrl("/login")
                         .successHandler(successHandler)
                         .permitAll()
@@ -78,7 +78,7 @@ public class SecurityConfig {
             return User.builder()
                     .username(user.getName())
                     .password(user.getPasswordHash())
-                    .roles(user.getRole().replace("ROLE_", ""))
+                    .authorities(user.getRole())
                     .accountLocked(false)
                     .build();
         };

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="sv"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <title>Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/components/form.css}">
+
+
+</head>
+
+<body>
+
+<aside th:replace="~{fragments/admin-sidenav :: aside}"></aside>
+
+
+
+</body>
+</html>
