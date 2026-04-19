@@ -64,7 +64,7 @@ public class SignupController {
         );
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                userEntity.getName(), null, List.of(new SimpleGrantedAuthority("ROLE_" + userEntity.getRole())));
+                userEntity.getUsername(), null, List.of(new SimpleGrantedAuthority("ROLE_" + userEntity.getRole())));
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(auth);

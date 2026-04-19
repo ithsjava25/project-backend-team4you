@@ -3,8 +3,12 @@ package backendlab.team4you.caserecord;
 import backendlab.team4you.registry.Registry;
 import backendlab.team4you.user.UserEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 @Entity
@@ -48,19 +52,22 @@ public class CaseRecord {
     private String confidentialityLevel = "OPEN";
 
     @Column(name = "opened_at", nullable = false)
-    private LocalDateTime openedAt;
+    private ZonedDateTime openedAt;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private ZonedDateTime updatedAt;
 
     @Column(name = "closed_at")
-    private LocalDateTime closedAt;
+    private ZonedDateTime closedAt;
 
-    protected CaseRecord() {
-    }
+
+
+
+
+
 
     public CaseRecord(
             Registry registry,
@@ -70,7 +77,7 @@ public class CaseRecord {
             UserEntity owner,
             UserEntity assignedUser,
             String confidentialityLevel,
-            LocalDateTime openedAt
+            ZonedDateTime openedAt
     ) {
         this.registry = Objects.requireNonNull(registry, "registry is required");
         if (title == null || title.isBlank()) {
@@ -87,11 +94,14 @@ public class CaseRecord {
                         : confidentialityLevel.trim();
 
         this.openedAt = openedAt;
+        this.createdAt = ZonedDateTime.now(ZoneId.of("Europe/Stockholm"));
     }
 
     @PrePersist
     void onCreate() {
-        LocalDateTime now = LocalDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now();
+
+
         if (this.caseNumber == null || this.caseNumber.isBlank()) {
             throw new IllegalStateException("caseNumber must be set before persisting");
         }
@@ -99,11 +109,15 @@ public class CaseRecord {
         if (this.openedAt == null) {
             this.openedAt = now;
         }
+        if (this.updatedAt == null) {
+            this.updatedAt = now;
+        }
+
     }
 
     @PreUpdate
     void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = ZonedDateTime.now();
     }
 
     public Long getId() {
@@ -154,20 +168,22 @@ public class CaseRecord {
     public String getConfidentialityLevel() {
         return confidentialityLevel;
     }
-
-    public LocalDateTime getOpenedAt() {
+    public ZonedDateTime getOpenedAt() {
         return openedAt;
     }
-
-    public LocalDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
-
-    public LocalDateTime getUpdatedAt() {
+    public ZonedDateTime getUpdatedAt() {
         return updatedAt;
     }
-
-    public LocalDateTime getClosedAt() {
+    public ZonedDateTime getClosedAt() {
         return closedAt;
     }
+    public void setClosedAt(ZonedDateTime closedAt) {
+        this.closedAt = closedAt;
+    }
+
+
+
 }

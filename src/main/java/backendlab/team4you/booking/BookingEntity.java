@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "booking")
@@ -18,9 +19,15 @@ public class BookingEntity {
 
     private String phone;
 
-    private LocalDateTime bookingTime;
+    private String reference;
 
-    private LocalDateTime createdAt;
+    @Column(name = "created_at")
+    private ZonedDateTime createdAt;
+
+    @Column(name = "booking_time")
+    private ZonedDateTime bookingTime;
+
+
 
     
 
@@ -63,22 +70,28 @@ public class BookingEntity {
     public void setPhone(String phone) {
         this.phone = phone;
     }
-
-    public LocalDateTime getBookingTime() {
+    public ZonedDateTime getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(ZonedDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    public ZonedDateTime getBookingTime() {
         return bookingTime;
     }
-
-    public void setBookingTime(LocalDateTime bookingTime) {
+    public void setBookingTime(ZonedDateTime bookingTime) {
         this.bookingTime = bookingTime;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+
+    public String getReference() {
+        return reference;
+    }
+    public void setReference(String reference) {
+        this.reference = reference;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+
 
     public BookingEnum getStatus() {
         return status;

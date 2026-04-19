@@ -3,6 +3,7 @@ package backendlab.team4you.user;
 import backendlab.team4you.dto.UserRegistrationDTO;
 import backendlab.team4you.exceptions.DuplicateEmailException;
 import backendlab.team4you.exceptions.UserNotFoundException;
+import backendlab.team4you.log.LogService;
 import jakarta.transaction.Transactional;
 
 import org.jspecify.annotations.Nullable;
@@ -37,13 +38,15 @@ public class UserService {
     UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final SecureRandom random = new SecureRandom();
+    private final LogService logService;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder){
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LogService logService){
 
 
 
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.logService = logService;
     }
 
 
@@ -58,13 +61,13 @@ public class UserService {
     }
 
     @Transactional
-    public UserEntity findById(String id){
+    public UserEntity findById(Long id){
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     @Transactional
-    public void deleteById(String id){
+    public void deleteById(Long id){
         if(userRepository.findById(id).isEmpty()){
             throw new DuplicateEmailException("E-posten är redan taken");
         }
@@ -80,7 +83,7 @@ public class UserService {
         if (dto.name() == null || dto.name().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Username is required");
         }
-        if (userRepository.findByName(dto.name().trim()).isPresent()) {
+        if (userRepository.findByUsername(dto.name().trim()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST ,"Username already exists");
         }
 
@@ -91,7 +94,6 @@ public class UserService {
         }
 
         UserEntity user = new UserEntity();
-        user.setName(dto.name().trim());
         user.setFirstName(dto.firstName());
         user.setLastName(dto.lastName());
         user.setEmail(cleanEmail);
@@ -116,7 +118,7 @@ public class UserService {
         String cleanName = username.trim();
         String cleanEmail = email.trim();
 
-        if(userRepository.findByName(cleanName).isPresent())
+        if(userRepository.findByUsername(cleanName).isPresent())
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Användarnamnet är redan taget");
         if(userRepository.findByEmail(cleanEmail).isPresent())
             throw new ResponseStatusException(HttpStatus.CONFLICT, "E-posten är redan tagen");
@@ -125,18 +127,15 @@ public class UserService {
         random.nextBytes(idBytes);
 
         UserEntity userEntity = new UserEntity(
-                new Bytes(idBytes),
-                cleanName,
-                displayName
         );
 
         userEntity.setEmail(cleanEmail);
         userEntity.setFirstName(firstName);
         userEntity.setLastName(lastName);
 
-        //Every user that register themselves will automatically get the role USER assigned
+
         String assignedRole = "USER";
-        userEntity.setRole(assignedRole);
+        userEntity.setRole(UserRole.USER);
 
         try {
             return userRepository.save(userEntity);
@@ -150,16 +149,19 @@ public class UserService {
     }
 
     public UserEntity findByName(String name){
-        return userRepository.findByName(name.trim()).orElse(null);
+        return userRepository.findByUsername(name.trim()).orElse(null);
     }
 
     @Transactional
-    public void deleteUser(String id) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException("User not found");
-        }
+    public void deleteUser(Long id, String adminUsername) {
 
         userRepository.deleteById(id);
+
+        logService.log(
+                "USER_DELETED",
+                adminUsername,
+                "Deleted user with id: " + id
+        );
     }
 
     @Transactional

@@ -7,31 +7,29 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import org.jspecify.annotations.Nullable;
 
 import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.security.web.webauthn.api.PublicKeyCredentialUserEntity;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "user_entities")
-public class UserEntity implements PublicKeyCredentialUserEntity {
+public class UserEntity {
 
     @Id
     @Column(name = "id")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    private String displayName;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "name", nullable = false, unique = true)
-    private String name;
+    private String username;
 
-
-    @Column(name = "display_name")
-    private String displayName;
     
 
     @Column(name = "first_name")
@@ -39,6 +37,7 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
 
     @Column(name = "last_name")
     private String lastName;
+
 
 
     @Enumerated(EnumType.STRING)
@@ -50,58 +49,45 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     @Column(name = "password_hash")
     private String passwordHash;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "created_at")
+    private ZonedDateTime createdAt;
 
-    public UserEntity() {
+
+    public Long getId() {
+        return id;
+
+    }public void setId(Long id) {
+        this.id = id;
+
     }
 
-    public UserEntity(Bytes id, String name, String displayName) {
-        this.id = id != null ? id.toBase64UrlString() : null;
-        this.name = name;
-        this.displayName = displayName;
+    public String getUsername() {
+        return username;
+    }
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-
-    public void setId(Bytes id) {
-        this.id = id != null ? id.toBase64UrlString() : null;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-
-    public Bytes getId() {
-        return id != null ? Bytes.fromBase64(id) : null;
-    }
-
-    @Override
     public String getDisplayName() {
-        return (this.firstName != null ? this.firstName : "") + " " + (this.lastName != null ? this.lastName : "");
+        return displayName;
     }
-
-
-
-
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
 
-
-    public LocalDateTime getCreatedAt() {
+    public void setCreatedAt(ZonedDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+
+
+    public UserEntity() {
     }
+
+
 
     public String getPasswordHash() {
         return passwordHash;
@@ -148,14 +134,16 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
         return role.name();
     }
 
-    public void setRole(String role) {
 
-        this.role = UserRole.valueOf(role);
+    public void setRole(UserRole role) {
+
+        this.role = role;
     }
 
-     public String getIdAsString() {
-        return this.id;
-    }
+
+
+
+
 
 
 }

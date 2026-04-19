@@ -2,17 +2,17 @@ package backendlab.team4you.booking;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Controller
 public class BookingController {
 
     private final BookingService bookingService;
+
 
     public BookingController(BookingService bookingService) {
         this.bookingService = bookingService;
@@ -85,4 +85,6 @@ public class BookingController {
     public String bookingPage() {
         return "booking";
     }
+
+
 }

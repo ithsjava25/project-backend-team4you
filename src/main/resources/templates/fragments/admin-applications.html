@@ -4,10 +4,38 @@
 
     <div id="alert-area"></div>
 
+    <div class="admin-controls">
+
+        <input
+                type="text"
+                name="search"
+                placeholder="Sök ärende..."
+
+                hx-get="/admin/applications?page=${i}&search=${search}&sort=${sort}&direction=${direction}"
+                hx-trigger="keyup changed delay:300ms"
+                hx-target="#content-area"
+                hx-swap="innerHTML"
+
+        />
+
+<!--        hx-get="/admin/applications"-->
+    </div>
+
 
 
     <ul>
         <li th:each="application : ${applications}">
+
+            <a th:href="@{/admin/applications/{id}(id=${application.id})}"
+               target="_blank">
+
+                <strong th:text="${application.title}"></strong>
+                -
+                <span th:text="${application.status}"></span>
+
+            </a>
+
+        </li>
 
             <span th:text="${application.name}"></span>
             (<span th:text="${application.email}"></span>)
@@ -23,6 +51,7 @@
 
         </li>
     </ul>
+
 
     <div th:replace="fragments/pagination :: pagination('/admin/applications')"></div>
 

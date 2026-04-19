@@ -10,5 +10,18 @@ import java.util.Optional;
 public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
     Optional<BookingEntity> findById(String id);
 
+
     Page<BookingEntity> findAll(Pageable pageable);
+
+
+
+
+
+    Page<BookingEntity> findByStatusContainingIgnoreCaseOrReferenceContainingIgnoreCase(
+            String status,
+            String reference,
+            Pageable pageable
+    );
+
+
 }

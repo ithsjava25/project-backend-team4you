@@ -29,7 +29,7 @@ public class UserControllerTest {
 
     @Test
     void get404WhenBookNotFound() throws Exception {
-        when(userService.findById("999"))
+        when(userService.findById(999L))
                 .thenThrow(new UserNotFoundException("Not found"));
 
 

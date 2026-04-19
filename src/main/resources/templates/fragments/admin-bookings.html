@@ -1,10 +1,23 @@
-<div th:fragment="content">
+<div th:fragment="content" xmlns:th="http://www.w3.org/1999/xhtml">
 
     <h2>Bokningar</h2>
 
     <ul>
         <li th:each="booking : ${bookings}">
-            <span th:text="${booking}"></span>
+
+            <a th:href="@{/admin/bookings/{id}(id=${booking.id})}" target="_blank">
+
+                <strong th:text="${#temporals.format(booking.bookingTime, 'dd MMM HH:mm')}"></strong>
+                -
+                <span th:text="${booking.status}"></span>
+
+            </a>
+
+        </li>
+            <strong th:text="${booking.id}"></strong>
+            <span th:text="${booking.status}"></span>
+
+            <span th:text="${#temporals.format(booking.bookingTime, 'dd MMM yyyy HH:mm')}"></span>
 
             <button
                     th:attr="hx-post=@{/admin/bookings(id=${booking})}"
@@ -14,7 +27,12 @@
                 Ta bort
             </button>
         </li>
+
     </ul>
 
     <div th:replace="fragments/pagination :: pagination('/admin/users')"></div>
+
+
+
+
 </div>

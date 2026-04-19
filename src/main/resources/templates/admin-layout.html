@@ -9,15 +9,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
     <link rel="stylesheet" th:href="@{/css/components/form.css}">
+    <script>
+        document.body.addEventListener('htmx:beforeRequest', () => {
+            document.getElementById('loading-spinner').classList.remove('hidden');
+        });
+
+        document.body.addEventListener('htmx:afterRequest', () => {
+            document.getElementById('loading-spinner').classList.add('hidden');
+        });
+    </script>
 
 
 </head>
 
 <body>
 
+<div id="loading-spinner" class="spinner hidden"></div>
+
 <aside th:replace="~{fragments/admin-sidenav :: aside}"></aside>
 
+<main id="content-area" layout:fragment="content">
 
+</main>
 
 </body>
 </html>

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Service
 @Transactional
@@ -50,8 +51,11 @@ public class CaseRecordService {
                 owner,
                 assignedUser,
                 requestDto.confidentialityLevel(),
-                requestDto.openedAt()
+                requestDto.openedAt() != null
+                        ? requestDto.openedAt().atZone(ZoneId.of("Europe/Stockholm"))
+                        : null
         );
+
 
         String nextCaseNumber = allocateNextCaseNumber(registry);
         caseRecord.setCaseNumber(nextCaseNumber);
@@ -105,6 +109,12 @@ public class CaseRecordService {
         return registry.getCode() + shortYear + "-" + sequence;
     }
     private CaseRecordResponseDto toResponseDto(CaseRecord caseRecord) {
+
+        LocalDateTime openedAt = caseRecord.getOpenedAt() != null ? caseRecord.getOpenedAt().toLocalDateTime() : null;
+        LocalDateTime createdAt = caseRecord.getCreatedAt() != null ? caseRecord.getCreatedAt().toLocalDateTime() : null;
+        LocalDateTime updatedAt = caseRecord.getUpdatedAt() != null ? caseRecord.getUpdatedAt().toLocalDateTime() : null;
+        LocalDateTime closedAt = caseRecord.getClosedAt() != null ? caseRecord.getClosedAt().toLocalDateTime() : null;
+
         return new CaseRecordResponseDto(
                 caseRecord.getId(),
                 caseRecord.getCaseNumber(),
@@ -113,13 +123,14 @@ public class CaseRecordService {
                 caseRecord.getTitle(),
                 caseRecord.getDescription(),
                 caseRecord.getStatus(),
-                caseRecord.getOwner().getIdAsString(),
-                caseRecord.getAssignedUser().getIdAsString(),
+                caseRecord.getOwner().getId(),
+                caseRecord.getAssignedUser().getId(),
                 caseRecord.getConfidentialityLevel(),
-                caseRecord.getOpenedAt(),
-                caseRecord.getCreatedAt(),
-                caseRecord.getUpdatedAt(),
-                caseRecord.getClosedAt()
+                openedAt,
+                createdAt,
+                updatedAt,
+                closedAt
         );
     }
+
 }

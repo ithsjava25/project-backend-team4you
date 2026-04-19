@@ -1,13 +1,12 @@
 package backendlab.team4you.config;
 
 import backendlab.team4you.user.UserService;
+import backendlab.team4you.user.UserCredentialRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.security.web.webauthn.management.PublicKeyCredentialUserEntityRepository;
-import org.springframework.security.web.webauthn.management.UserCredentialRepository;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -28,14 +27,15 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication
-                                        ) throws IOException {
+    ) throws IOException {
 
         String username = authentication.getName();
 
         var userEntity = userService.findByName(username);
 
         if (userEntity != null){
-            var credentials = userCredentialRepository.findByUserId(userEntity.getId());
+            var credentials = userCredentialRepository
+                    .findByUserEntityUserId(userEntity.getId().toString());
 
             if (!credentials.isEmpty()){
                 getRedirectStrategy().sendRedirect(request, response, "/webauthn-check");

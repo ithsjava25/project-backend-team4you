@@ -6,6 +6,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.web.webauthn.api.Bytes;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+
 import static org.assertj.core.api.Assertions.*;
 
 class CaseRecordTest {
@@ -14,8 +17,16 @@ class CaseRecordTest {
     @DisplayName("should trim title and default status and confidentiality level")
     void shouldTrimTitleAndApplyDefaults() {
         Registry registry = new Registry("Kommunstyrelsen", "KS");
-        UserEntity owner = new UserEntity(Bytes.random(), "owner@example.com", "Owner");
-        UserEntity assignedUser = new UserEntity(Bytes.random(), "assigned@example.com", "Assigned");
+
+        UserEntity owner = new UserEntity();
+        owner.setId(1L);
+        owner.setUsername("owner@example.com");
+        owner.setDisplayName("Owner");
+
+        UserEntity assignedUser = new UserEntity();
+        assignedUser.setId(2L);
+        assignedUser.setUsername("assigned@example.com");
+        assignedUser.setDisplayName("Assigned");
 
         CaseRecord caseRecord = new CaseRecord(
                 registry,
@@ -25,7 +36,7 @@ class CaseRecordTest {
                 owner,
                 assignedUser,
                 "   ",
-                null
+                (ZonedDateTime) null
         );
 
         assertThat(caseRecord.getTitle()).isEqualTo("test title");
@@ -37,8 +48,16 @@ class CaseRecordTest {
     @DisplayName("should throw when title is blank")
     void shouldThrowWhenTitleIsBlank() {
         Registry registry = new Registry("Kommunstyrelsen", "KS");
-        UserEntity owner = new UserEntity(Bytes.random(), "owner@example.com", "Owner");
-        UserEntity assignedUser = new UserEntity(Bytes.random(), "assigned@example.com", "Assigned");
+        UserEntity owner = new UserEntity();
+        owner.setId(1L);
+        owner.setUsername("owner@example.com");
+        owner.setDisplayName("Owner");
+
+        UserEntity assignedUser = new UserEntity();
+        assignedUser.setId(2L);
+        assignedUser.setUsername("assigned@example.com");
+        assignedUser.setDisplayName("Assigned");
+
 
         assertThatThrownBy(() -> new CaseRecord(
                 registry,
@@ -48,7 +67,7 @@ class CaseRecordTest {
                 owner,
                 assignedUser,
                 "OPEN",
-                null
+                (ZonedDateTime) null
         )).isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("title is required");
     }
@@ -57,8 +76,16 @@ class CaseRecordTest {
     @DisplayName("should not allow case number to be set more than once")
     void shouldNotAllowCaseNumberToBeSetMoreThanOnce() {
         Registry registry = new Registry("Kommunstyrelsen", "KS");
-        UserEntity owner = new UserEntity(Bytes.random(), "owner@example.com", "Owner");
-        UserEntity assignedUser = new UserEntity(Bytes.random(), "assigned@example.com", "Assigned");
+        UserEntity owner = new UserEntity();
+        owner.setId(1L);
+        owner.setUsername("owner@example.com");
+        owner.setDisplayName("Owner");
+
+        UserEntity assignedUser = new UserEntity();
+        assignedUser.setId(2L);
+        assignedUser.setUsername("assigned@example.com");
+        assignedUser.setDisplayName("Assigned");
+
 
         CaseRecord caseRecord = new CaseRecord(
                 registry,
@@ -68,7 +95,7 @@ class CaseRecordTest {
                 owner,
                 assignedUser,
                 "OPEN",
-                null
+                (ZonedDateTime)  null
         );
 
         caseRecord.setCaseNumber("KS26-1");

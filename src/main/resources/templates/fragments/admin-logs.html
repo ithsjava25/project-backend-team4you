@@ -1,27 +1,18 @@
 <div th:fragment="content">
+
     <h2>Systemlogg</h2>
 
-    <div id="alert-area"></div>
-
     <ul>
-        <li th:each="log : ${logs}" th:text="${log}"></li>
+        <li th:each="log : ${logs}">
+
+            <strong th:text="${log.action}"></strong>
+            - <span th:text="${log.performedBy}"></span>
+            - <span th:text="${log.details}"></span>
+            - <small th:text="${log.createdAt}"></small>
+
+        </li>
     </ul>
 
-    <button
-            hx-get="/admin/logs?page=2"
-            hx-target="#logs-container"
-            hx-swap="beforeend"
-    >
-        Ladda fler
-    </button>
-    <button
-            class="btn btn-danger"
-            hx-delete="/admin/users/123"
-            hx-confirm="Är du säker?"
-            hx-target="closest tr"
-            hx-swap="outerHTML"
-    >
-        Ta bort
-    </button>
-    <div th:replace="fragments/pagination :: pagination('/admin/users')"></div>
+    <div th:replace="fragments/pagination :: pagination('/admin/logs')"></div>
+
 </div>

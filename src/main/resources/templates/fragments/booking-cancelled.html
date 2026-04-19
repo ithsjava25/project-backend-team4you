@@ -1,3 +1,10 @@
 <div th:fragment="content">
-    <p>Bokningen är avbokad</p>
+
+    <p>Bokningen har avbokats</p>
+
+    <p>
+        Tid:
+        <span th:text="${#temporals.format(booking.bookingTime, 'dd MMM yyyy HH:mm')}"></span>
+    </p>
+
 </div>

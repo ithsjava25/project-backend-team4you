@@ -36,8 +36,8 @@ class CaseRecordControllerTest {
                   "title": "Test case title",
                   "description": "Test description",
                   "status": "OPEN",
-                  "ownerUserId": "owner-123",
-                  "assignedUserId": "assigned-456",
+                  "ownerUserId": 123,
+                  "assignedUserId": 456,
                   "confidentialityLevel": "OPEN",
                   "openedAt": "2026-04-09T10:30:00"
                 }
@@ -51,8 +51,8 @@ class CaseRecordControllerTest {
                 "Test case title",
                 "Test description",
                 "OPEN",
-                "owner-123",
-                "assigned-456",
+                123L,
+                456L,
                 "OPEN",
                 java.time.LocalDateTime.of(2026, 4, 9, 10, 30),
                 java.time.LocalDateTime.of(2026, 4, 9, 10, 31),
@@ -76,8 +76,8 @@ class CaseRecordControllerTest {
                 .andExpect(jsonPath("$.title").value("Test case title"))
                 .andExpect(jsonPath("$.description").value("Test description"))
                 .andExpect(jsonPath("$.status").value("OPEN"))
-                .andExpect(jsonPath("$.ownerUserId").value("owner-123"))
-                .andExpect(jsonPath("$.assignedUserId").value("assigned-456"))
+                .andExpect(jsonPath("$.ownerUserId").value(123))
+                .andExpect(jsonPath("$.assignedUserId").value(456))
                 .andExpect(jsonPath("$.confidentialityLevel").value("OPEN"));
     }
 
@@ -90,8 +90,8 @@ class CaseRecordControllerTest {
                   "title": "Test case title",
                   "description": "Test description",
                   "status": "OPEN",
-                  "ownerUserId": "owner-123",
-                  "assignedUserId": "assigned-456",
+                  "ownerUserId": 123,
+                  "assignedUserId": 456,
                   "confidentialityLevel": "OPEN",
                   "openedAt": "2026-04-09T10:30:00"
                 }
@@ -116,8 +116,8 @@ class CaseRecordControllerTest {
                   "title": "Test case title",
                   "description": "Test description",
                   "status": "OPEN",
-                  "ownerUserId": "missing-owner",
-                  "assignedUserId": "assigned-456",
+                  "ownerUserId": 123,
+                  "assignedUserId": 456,
                   "confidentialityLevel": "OPEN",
                   "openedAt": "2026-04-09T10:30:00"
                 }

@@ -1,7 +1,7 @@
 package backendlab.team4you.dto;
 
 public record UserDTO(
-        org.springframework.security.web.webauthn.api.Bytes id,
+        Long id,
         String firstName,
         String lastName,
         String email,

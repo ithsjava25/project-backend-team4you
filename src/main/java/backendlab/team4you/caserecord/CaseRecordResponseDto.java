@@ -10,12 +10,14 @@ public record CaseRecordResponseDto(
         String title,
         String description,
         String status,
-        String ownerUserId,
-        String assignedUserId,
+        Long ownerUserId,
+        Long assignedUserId,
         String confidentialityLevel,
         LocalDateTime openedAt,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         LocalDateTime closedAt
 ){
+
+
 }

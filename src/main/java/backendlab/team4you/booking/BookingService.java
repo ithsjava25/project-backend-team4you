@@ -37,4 +37,9 @@ public class BookingService {
     public BookingEntity findById(Long id){
         return bookingRepository.findById(id).orElse(null);
     }
+
+    public void deleteBooking(Long id, String username) {
+        BookingEntity booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+    }
 }

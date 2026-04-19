@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.web.webauthn.api.Bytes;
 
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -46,25 +47,29 @@ class CaseRecordServiceTest {
     void shouldCreateCaseRecordWithNextCaseNumber() {
         Registry registry = new Registry("Kommunstyrelsen", "KS");
 
-        UserEntity owner = new UserEntity(Bytes.random(), "owner@example.com", "Owner");
-        UserEntity assignedUser = new UserEntity(Bytes.random(), "assigned@example.com", "Assigned");
+        UserEntity owner = new UserEntity();
+        owner.setId(1L);
+
+        UserEntity assignedUser = new UserEntity();
+        assignedUser.setId(2L);
 
         CaseRecordRequestDto requestDto = new CaseRecordRequestDto(
                 1L,
                 "test case",
                 "test description",
                 "OPEN",
-                owner.getIdAsString(),
-                assignedUser.getIdAsString(),
+                owner.getId(),
+                assignedUser.getId(),
                 "OPEN",
                 LocalDateTime.of(2026, 4, 9, 10, 0)
         );
 
+
         CaseNumberSequence sequence = new CaseNumberSequence(registry, 2026, 0L);
 
         when(registryRepository.findById(1L)).thenReturn(Optional.of(registry));
-        when(userRepository.findById(owner.getIdAsString())).thenReturn(Optional.of(owner));
-        when(userRepository.findById(assignedUser.getIdAsString())).thenReturn(Optional.of(assignedUser));
+        when(userRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
+        when(userRepository.findById(assignedUser.getId())).thenReturn(Optional.of(assignedUser));
         when(caseNumberSequenceRepository.findWithLockByRegistryAndYear(any(), any())).thenReturn(Optional.of(sequence));
         when(caseRecordRepository.save(any(CaseRecord.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -73,8 +78,8 @@ class CaseRecordServiceTest {
         assertThat(response.caseNumber()).isEqualTo("KS26-1");
         assertThat(response.title()).isEqualTo("test case");
         assertThat(response.registryCode()).isEqualTo("KS");
-        assertThat(response.ownerUserId()).isEqualTo(owner.getIdAsString());
-        assertThat(response.assignedUserId()).isEqualTo(assignedUser.getIdAsString());
+        assertThat(response.ownerUserId()).isEqualTo(owner.getId());
+        assertThat(response.assignedUserId()).isEqualTo(assignedUser.getId());
 
         ArgumentCaptor<CaseRecord> caseRecordCaptor = ArgumentCaptor.forClass(CaseRecord.class);
         verify(caseRecordRepository).save(caseRecordCaptor.capture());
@@ -95,8 +100,8 @@ class CaseRecordServiceTest {
                 "test case",
                 "test description",
                 "OPEN",
-                "owner-id",
-                "assigned-id",
+                123L,
+                456L,
                 "OPEN",
                 null
         );
@@ -118,18 +123,18 @@ class CaseRecordServiceTest {
                 "test case",
                 "test description",
                 "OPEN",
-                "missing-owner",
-                "assigned-id",
+                123L,
+                456L,
                 "OPEN",
                 null
         );
 
         when(registryRepository.findById(1L)).thenReturn(Optional.of(registry));
-        when(userRepository.findById("missing-owner")).thenReturn(Optional.empty());
+        when(userRepository.findById(123L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> caseRecordService.createCaseRecord(requestDto))
                 .isInstanceOf(UserNotFoundException.class)
-                .hasMessage("user not found: missing-owner");
+                .hasMessage("user not found: 123");
     }
 
     @Test
@@ -137,16 +142,23 @@ class CaseRecordServiceTest {
     void shouldRetrySequenceCreationWhenFirstInsertCollidesAndThenSucceed() {
         Registry registry = new Registry("Kommunstyrelsen", "KS");
 
-        UserEntity owner = new UserEntity(Bytes.random(), "owner@example.com", "Owner");
-        UserEntity assignedUser = new UserEntity(Bytes.random(), "assigned@example.com", "Assigned");
+        UserEntity owner = new UserEntity();
+        owner.setId(1L);
+        owner.setUsername("owner@example.com");
+        owner.setDisplayName("Owner");
+
+        UserEntity assignedUser = new UserEntity();
+        assignedUser.setId(2L);
+        assignedUser.setUsername("assigned@example.com");
+        assignedUser.setDisplayName("Assigned");
 
         CaseRecordRequestDto requestDto = new CaseRecordRequestDto(
                 1L,
                 "test case",
                 "test description",
                 "OPEN",
-                owner.getIdAsString(),
-                assignedUser.getIdAsString(),
+                owner.getId(),
+                assignedUser.getId(),
                 "OPEN",
                 LocalDateTime.of(2026, 4, 9, 10, 0)
         );
@@ -154,8 +166,8 @@ class CaseRecordServiceTest {
         CaseNumberSequence existingSequenceAfterRetry = new CaseNumberSequence(registry, 2026, 0L);
 
         when(registryRepository.findById(1L)).thenReturn(Optional.of(registry));
-        when(userRepository.findById(owner.getIdAsString())).thenReturn(Optional.of(owner));
-        when(userRepository.findById(assignedUser.getIdAsString())).thenReturn(Optional.of(assignedUser));
+        when(userRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
+        when(userRepository.findById(assignedUser.getId())).thenReturn(Optional.of(assignedUser));
 
         when(caseNumberSequenceRepository.findWithLockByRegistryAndYear(any(), any()))
                 .thenReturn(Optional.empty())
@@ -194,23 +206,30 @@ class CaseRecordServiceTest {
     void shouldThrowIllegalStateExceptionAfterMaxRetryAttempts() {
         Registry registry = new Registry("Kommunstyrelsen", "KS");
 
-        UserEntity owner = new UserEntity(Bytes.random(), "owner@example.com", "Owner");
-        UserEntity assignedUser = new UserEntity(Bytes.random(), "assigned@example.com", "Assigned");
+        UserEntity owner = new UserEntity();
+        owner.setId(1L);
+        owner.setUsername("owner@example.com");
+        owner.setDisplayName("Owner");
+
+        UserEntity assignedUser = new UserEntity();
+        assignedUser.setId(2L);
+        assignedUser.setUsername("assigned@example.com");
+        assignedUser.setDisplayName("Assigned");
 
         CaseRecordRequestDto requestDto = new CaseRecordRequestDto(
                 1L,
                 "test case",
                 "test description",
                 "OPEN",
-                owner.getIdAsString(),
-                assignedUser.getIdAsString(),
+                owner.getId(),
+                assignedUser.getId(),
                 "OPEN",
                 LocalDateTime.of(2026, 4, 9, 10, 0)
         );
 
         when(registryRepository.findById(1L)).thenReturn(Optional.of(registry));
-        when(userRepository.findById(owner.getIdAsString())).thenReturn(Optional.of(owner));
-        when(userRepository.findById(assignedUser.getIdAsString())).thenReturn(Optional.of(assignedUser));
+        when(userRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
+        when(userRepository.findById(assignedUser.getId())).thenReturn(Optional.of(assignedUser));
 
         when(caseNumberSequenceRepository.findWithLockByRegistryAndYear(any(), any()))
                 .thenReturn(Optional.empty());

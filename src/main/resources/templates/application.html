@@ -29,7 +29,31 @@
                         <p>Du har ett tillstånd och vill ansöka om att förlänga det.</p>
                     </div>
                 </li>
+                <li th:each="application : ${applications}">
+
+                    <a th:href="@{/admin/applications/{id}(id=${application.id})}"
+                       target="_blank">
+
+                        <strong th:text="${application.title}"></strong>
+                        -
+                        <span th:text="${application.status}"></span>
+
+                    </a>
+
+                </li>
+
             </ul>
+            <form th:action="@{/application}" method="post">
+
+                <label>Titel</label>
+                <input type="text" name="title" required>
+
+                <label>Beskrivning</label>
+                <textarea name="description" required></textarea>
+
+                <button type="submit">Ansök</button>
+
+            </form>
         </div>
     </div>
 </section>

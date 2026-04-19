@@ -1,0 +1,27 @@
+<div th:fragment="content">
+
+    <h2>Användare</h2>
+
+    <div id="alert-area"></div>
+
+
+    <div class="admin-controls">
+
+
+        <button
+                th:attr="hx-get=@{/admin/users(page=0, sort='displayName', direction=${direction == 'asc' ? 'desc' : 'asc'}, search=${search})}"
+                hx-target="#content-area"
+                hx-swap="innerHTML">
+            Sortera namn
+        </button>
+
+
+        <button
+                th:attr="hx-get=@{/admin/users(page=0, sort='email', direction=${direction == 'asc' ? 'desc' : 'asc'}, search=${search})}"
+                hx-target="#content-area"
+                hx-swap="innerHTML">
+            Sortera email
+        </button>
+    </div>
+
+    </div>

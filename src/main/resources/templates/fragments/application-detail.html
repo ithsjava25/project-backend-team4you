@@ -1,0 +1,17 @@
+<section>
+
+    <h2 th:text="${application.title}"></h2>
+
+    <p>
+        Status:
+        <span th:text="${application.status}"></span>
+    </p>
+
+    <p th:text="${application.description}"></p>
+
+    <p>
+        Skapad:
+        <span th:text="${#temporals.format(application.createdAt, 'dd MMM yyyy HH:mm')}"></span>
+    </p>
+
+</section>

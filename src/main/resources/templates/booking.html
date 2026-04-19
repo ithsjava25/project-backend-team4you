@@ -54,6 +54,8 @@
         Visa fler
     </button>
 
+    <span th:text="${#temporals.format(booking.bookingTime, 'dd MMM yyyy HH:mm')}"></span>
+
 </section>
 
 </body>

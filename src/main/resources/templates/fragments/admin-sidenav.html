@@ -45,24 +45,8 @@
                 </form>
             </li>
 
+
         </ul>
-        <div class="sorting">
-
-            <button
-                    th:attr="hx-get=@{/admin/users(page=0, sort='displayName', direction=${direction == 'asc' ? 'desc' : 'asc'})}"
-                    hx-target="#content-area"
-                    hx-swap="innerHTML">
-                Sortera namn
-            </button>
-
-            <button
-                    th:attr="hx-get=@{/admin/users(page=0, sort='email', direction=${direction == 'asc' ? 'desc' : 'asc'})}"
-                    hx-target="#content-area"
-                    hx-swap="innerHTML">
-                Sortera email
-            </button>
-
-        </div>
 
     </div>
 

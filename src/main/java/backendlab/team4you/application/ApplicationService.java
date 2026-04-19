@@ -1,17 +1,24 @@
 package backendlab.team4you.application;
 
 
+import backendlab.team4you.user.UserEntity;
+import backendlab.team4you.user.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
 public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
+    private final UserRepository userRepository;
 
-    public ApplicationService(ApplicationRepository applicationRepository) {
+
+    public ApplicationService(ApplicationRepository applicationRepository, UserRepository userRepository) {
         this.applicationRepository = applicationRepository;
+        this.userRepository = userRepository;
     }
 
     public void delete(Long id) {
@@ -31,6 +38,36 @@ public class ApplicationService {
         return applicationRepository.findAll();
     }
 
+    public void extendApplication(Long id, String username) {
+
+        ApplicationEntity app = applicationRepository.findById(id)
+                .orElseThrow();
+
+        if (!app.getOwner().getUsername().equals(username)) {
+            throw new IllegalStateException("Du får inte förlänga denna ansökan");
+        }
+
+        app.setUpdatedAt(ZonedDateTime.now(ZoneId.of("Europe/Stockholm")));
+        app.setStatus(ApplicationStatus.EXTENDED);
+
+        applicationRepository.save(app);
+    }
+
+    public void createApplication(ApplicationForm form, String username){
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow();
+
+        ApplicationEntity app = new ApplicationEntity();
+        app.setTitle(form.getTitle());
+        app.setDescription(form.getDescription());
+
+        app.setOwner(user);
+        app.setStatus(ApplicationStatus.PENDING);
+
+        app.setCreatedAt(ZonedDateTime.now(ZoneId.of("Europe/Stockholm")));
+
+        applicationRepository.save(app);
+    }
 
 }
 

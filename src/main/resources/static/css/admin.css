@@ -18,7 +18,13 @@ li{
     list-style: none;
     margin:10px;
     padding:10px;
+    cursor: pointer;
 }
+
+li:hover{
+    background: #aeb37d;
+}
+
 
 
 
@@ -84,4 +90,47 @@ li{
 .pagination button.active {
     background: #6017a8;
     color: white;
+}
+.admin-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.admin-controls input {
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    border: 5px solid #ddd;
+    border-top: 5px solid #6017a8;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 999;
+}
+
+.hidden {
+    display: none;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.admin-layout {
+    display: flex;
+}
+
+#content-area {
+    flex: 1;
+    padding: 20px;
 }
