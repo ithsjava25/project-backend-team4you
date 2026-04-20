@@ -6,6 +6,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class RegistryService {
@@ -47,5 +49,16 @@ public class RegistryService {
             }
             throw e;
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<RegistryResponseDto> findAll() {
+        return registryRepository.findAll().stream()
+                .map(registry -> new RegistryResponseDto(
+                        registry.getId(),
+                        registry.getName(),
+                        registry.getCode()
+                ))
+                .toList();
     }
 }

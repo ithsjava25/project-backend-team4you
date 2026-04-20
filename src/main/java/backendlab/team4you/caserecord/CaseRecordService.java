@@ -1,5 +1,6 @@
 package backendlab.team4you.caserecord;
 
+import backendlab.team4you.exceptions.CaseRecordNotFoundException;
 import backendlab.team4you.exceptions.RegistryNotFoundException;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import backendlab.team4you.registry.Registry;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Transactional
@@ -121,5 +123,23 @@ public class CaseRecordService {
                 caseRecord.getUpdatedAt(),
                 caseRecord.getClosedAt()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<CaseRecordResponseDto> findByRegistryId(Long registryId) {
+        Registry registry = registryRepository.findById(registryId)
+                .orElseThrow(() -> new RegistryNotFoundException("registry not found: " + registryId));
+
+        return caseRecordRepository.findByRegistryIdOrderByCreatedAtDesc(registry.getId()).stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public CaseRecordResponseDto findById(Long caseRecordId) {
+        CaseRecord caseRecord = caseRecordRepository.findById(caseRecordId)
+                .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
+
+        return toResponseDto(caseRecord);
     }
 }
