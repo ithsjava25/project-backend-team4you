@@ -2,6 +2,7 @@ package backendlab.team4you.casefile.ui;
 
 import backendlab.team4you.casefile.CaseFileService;
 import backendlab.team4you.caserecord.CaseRecordService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,10 @@ public class CaseManagementViewController {
     }
 
     @GetMapping
-    public String page() {
+    public String page(HttpServletRequest request) {
+        if ("true".equals(request.getHeader("HX-Request"))) {
+            return "fragments/case-management/page :: content";
+        }
         return "dashboard/case-management";
     }
 
