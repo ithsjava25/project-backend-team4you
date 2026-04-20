@@ -190,4 +190,14 @@ public class UserService {
     public UserEntity findByUsername(String disPlayName) {
         return userRepository.findByDisplayName(disPlayName);
     }
+
+    @Transactional
+    public UserEntity getCurrentUser(Principal principal) {
+        if (principal == null || principal.getName() == null || principal.getName().isBlank()) {
+            throw new UserNotFoundException("No authenticated user found");
+        }
+
+        return userRepository.findByName(principal.getName().trim())
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + principal.getName()));
+    }
 }

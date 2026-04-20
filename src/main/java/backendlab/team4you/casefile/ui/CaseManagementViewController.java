@@ -9,13 +9,15 @@ import backendlab.team4you.exceptions.RegistryNotFoundException;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import backendlab.team4you.registry.RegistryRequestDto;
 import backendlab.team4you.registry.RegistryService;
+import backendlab.team4you.user.UserEntity;
+import backendlab.team4you.user.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/dashboard/case-management")
@@ -24,15 +26,18 @@ public class CaseManagementViewController {
     private final RegistryService registryService;
     private final CaseRecordService caseRecordService;
     private final CaseFileService caseFileService;
+    private final UserService userService;
 
     public CaseManagementViewController(
             RegistryService registryService,
             CaseRecordService caseRecordService,
-            CaseFileService caseFileService
+            CaseFileService caseFileService,
+            UserService userService
     ) {
         this.registryService = registryService;
         this.caseRecordService = caseRecordService;
         this.caseFileService = caseFileService;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -60,15 +65,15 @@ public class CaseManagementViewController {
                  | IllegalArgumentException exception) {
             model.addAttribute("errorMessage", exception.getMessage());
         }
+
         model.addAttribute("registries", registryService.findAll());
         return "fragments/case-management/registry-list :: registryList";
     }
 
     @GetMapping("/registries/{registryId}/case-records")
-    public String caseRecords(@PathVariable Long registryId, Model model) {
-        model.addAttribute("registryId", registryId);
-        model.addAttribute("registryName", registryService.findById(registryId).name());
-        model.addAttribute("caseRecords", caseRecordService.findByRegistryId(registryId));
+    public String caseRecords(@PathVariable Long registryId, Model model, Principal principal) {
+        UserEntity currentUser = userService.getCurrentUser(principal);
+        populateCaseRecordPanelModel(registryId, model, currentUser);
         return "fragments/case-management/case-record-list :: caseRecordList";
     }
 
@@ -78,19 +83,21 @@ public class CaseManagementViewController {
             @RequestParam String title,
             @RequestParam(required = false) String description,
             @RequestParam String status,
-            @RequestParam String ownerUserId,
-            @RequestParam String assignedUserId,
+            @RequestParam(required = false) String assignedUserId,
             @RequestParam String confidentialityLevel,
-            Model model
+            Model model,
+            Principal principal
     ) {
+        UserEntity currentUser = userService.getCurrentUser(principal);
+
         try {
             CaseRecordRequestDto requestDto = new CaseRecordRequestDto(
                     registryId,
                     title,
                     description,
                     status,
-                    ownerUserId,
-                    assignedUserId,
+                    currentUser.getId().toBase64UrlString(),
+                    normalizeAssignedUserId(assignedUserId),
                     confidentialityLevel,
                     null
             );
@@ -101,9 +108,7 @@ public class CaseManagementViewController {
             model.addAttribute("errorMessage", exception.getMessage());
         }
 
-        model.addAttribute("registryId", registryId);
-        model.addAttribute("registryName", registryService.findById(registryId).name());
-        model.addAttribute("caseRecords", caseRecordService.findByRegistryId(registryId));
+        populateCaseRecordPanelModel(registryId, model, currentUser);
         return "fragments/case-management/case-record-list :: caseRecordList";
     }
 
@@ -143,5 +148,43 @@ public class CaseManagementViewController {
         model.addAttribute("files", caseFileService.listFiles(caseId));
         model.addAttribute("caseRecordId", caseId);
         return "fragments/case-management/case-file-list :: caseFileList";
+    }
+
+    private void populateCaseRecordPanelModel(Long registryId, Model model, UserEntity currentUser) {
+        model.addAttribute("registryId", registryId);
+        model.addAttribute("registryName", registryService.findById(registryId).name());
+        model.addAttribute("caseRecords", caseRecordService.findByRegistryId(registryId));
+        model.addAttribute("currentUserDisplayName", buildDisplayName(currentUser));
+        model.addAttribute("assignableUsers", userService.findAll().stream()
+                .map(user -> new AssignableUserOption(
+                        user.getId().toBase64UrlString(),
+                        buildDisplayName(user)
+                ))
+                .toList());
+    }
+
+    private String normalizeAssignedUserId(String assignedUserId) {
+        if (assignedUserId == null || assignedUserId.isBlank()) {
+            return null;
+        }
+        return assignedUserId;
+    }
+
+    private String buildDisplayName(UserEntity user) {
+        String firstName = user.getFirstName() != null ? user.getFirstName().trim() : "";
+        String lastName = user.getLastName() != null ? user.getLastName().trim() : "";
+
+        String fullName = (firstName + " " + lastName).trim();
+        if (!fullName.isBlank()) {
+            return fullName;
+        }
+
+        if (user.getDisplayName() != null && !user.getDisplayName().isBlank()) {
+            return user.getDisplayName();
+        }
+
+        return user.getName();
+    }
+    private record AssignableUserOption(String id, String displayName) {
     }
 }

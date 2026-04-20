@@ -30,22 +30,37 @@
 
             <div class="form-group">
                 <label for="case-status">status</label>
-                <input id="case-status" type="text" name="status" value="OPEN" required>
+                <select id="case-status" name="status" required>
+                    <option value="OPEN">öppen</option>
+                    <option value="CLOSED">stängd</option>
+                </select>
             </div>
 
             <div class="form-group">
-                <label for="owner-user-id">owner user id</label>
-                <input id="owner-user-id" type="text" name="ownerUserId" required>
+                <label>ägare</label>
+                <input type="text" th:value="${currentUserDisplayName}" disabled>
+                <small class="form-help">sätts automatiskt till inloggad användare</small>
             </div>
 
             <div class="form-group">
-                <label for="assigned-user-id">assigned user id</label>
-                <input id="assigned-user-id" type="text" name="assignedUserId" required>
+                <label for="assigned-user-id">tilldela till</label>
+                <select id="assigned-user-id" name="assignedUserId">
+                    <option value="">ej tilldelad</option>
+                    <option th:each="user : ${assignableUsers}"
+                            th:value="${user.id}"
+                            th:text="${user.displayName}">
+                        användare
+                    </option>
+                </select>
             </div>
 
             <div class="form-group">
                 <label for="confidentiality-level">sekretessnivå</label>
-                <input id="confidentiality-level" type="text" name="confidentialityLevel" value="OPEN" required>
+                <select id="confidentiality-level" name="confidentialityLevel" required>
+                    <option value="OPEN">öppen</option>
+                    <option value="RESTRICTED">begränsad</option>
+                    <option value="CONFIDENTIAL">konfidentiell</option>
+                </select>
             </div>
 
             <button type="submit" class="btn-primary">skapa ärende</button>
