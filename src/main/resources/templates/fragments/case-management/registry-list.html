@@ -1,35 +1,37 @@
 <div th:fragment="registryList">
-    <div class="case-panel">
-        <h2>Registries</h2>
+    <h2>Registries</h2>
 
-        <form
-                hx-post="/dashboard/case-management/registries"
-                hx-target="#registry-panel"
-                hx-swap="innerHTML">
-            <div class="form-group">
-                <label for="registry-name">Namn</label>
-                <input id="registry-name" type="text" name="name" required>
-            </div>
+    <p th:if="${successMessage}" th:text="${successMessage}" class="success-message"></p>
+    <p th:if="${errorMessage}" th:text="${errorMessage}" class="error-message"></p>
 
-            <div class="form-group">
-                <label for="registry-code">Kod</label>
-                <input id="registry-code" type="text" name="code" required>
-            </div>
+    <form hx-post="/dashboard/case-management/registries"
+          hx-target="#registry-panel"
+          hx-swap="innerHTML">
+        <div class="form-group">
+            <label for="registry-name">Namn</label>
+            <input id="registry-name" type="text" name="name" required>
+        </div>
 
-            <button type="submit" class="btn-primary">Skapa registry</button>
-        </form>
+        <div class="form-group">
+            <label for="registry-code">Kod</label>
+            <input id="registry-code" type="text" name="code" required>
+        </div>
 
-        <ul>
-            <li th:each="registry : ${registries}">
-                <button
-                        class="btn-primary"
-                        hx-get="@{/dashboard/case-management/registries/{id}/case-records(id=${registry.id})}"
-                        hx-target="#case-record-panel"
-                        hx-swap="innerHTML">
-                    <span th:text="${registry.name}">Registry</span>
-                    (<span th:text="${registry.code}">RG</span>)
-                </button>
-            </li>
-        </ul>
-    </div>
+        <button type="submit" class="btn-primary">Skapa registry</button>
+    </form>
+
+    <hr>
+
+    <ul class="registry-list">
+        <li th:each="registry : ${registries}">
+            <button type="button"
+                    class="btn-primary"
+                    th:attr="hx-get=@{/dashboard/case-management/registries/{id}/case-records(id=${registry.id})}"
+                    hx-target="#case-record-panel"
+                    hx-swap="innerHTML">
+                <span th:text="${registry.name}">Registry</span>
+                (<span th:text="${registry.code}">RG</span>)
+            </button>
+        </li>
+    </ul>
 </div>

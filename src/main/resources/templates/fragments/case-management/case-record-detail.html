@@ -1,0 +1,17 @@
+<div th:fragment="caseRecordDetail">
+    <h2 th:text="${caseRecord.caseNumber}">KS26-1</h2>
+
+    <p><strong>Titel:</strong> <span th:text="${caseRecord.title}">Titel</span></p>
+    <p><strong>Status:</strong> <span th:text="${caseRecord.status}">OPEN</span></p>
+    <p><strong>Registry:</strong> <span th:text="${caseRecord.registryCode}">RG</span></p>
+    <p><strong>Owner:</strong> <span th:text="${caseRecord.ownerUserId}">owner</span></p>
+    <p><strong>Assigned:</strong> <span th:text="${caseRecord.assignedUserId}">assigned</span></p>
+    <p><strong>Sekretess:</strong> <span th:text="${caseRecord.confidentialityLevel}">OPEN</span></p>
+
+    <div id="case-file-panel"
+         th:attr="hx-get=@{/dashboard/case-management/case-records/{id}/files(id=${caseRecordId})}"
+         hx-trigger="load"
+         hx-swap="innerHTML">
+        <p>Laddar filer...</p>
+    </div>
+</div>

@@ -16,3 +16,40 @@
 .case-panel h2 {
     margin-bottom: 12px;
 }
+
+.case-management-wrapper {
+    display: grid;
+    grid-template-columns: 300px 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+.case-panel {
+    background: #f8f8f8;
+    border-radius: 12px;
+    padding: 20px;
+    min-height: 70vh;
+}
+
+.success-message {
+    color: green;
+    margin-bottom: 10px;
+}
+
+.error-message {
+    color: red;
+    margin-bottom: 10px;
+}
+
+.registry-list,
+.case-record-list,
+.case-file-list {
+    margin-top: 15px;
+    padding-left: 0;
+}
+
+.registry-list li,
+.case-record-list li,
+.case-file-list li {
+    margin-bottom: 10px;
+}

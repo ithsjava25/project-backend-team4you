@@ -1,0 +1,58 @@
+<div th:fragment="caseRecordList">
+    <h2>Ärenden</h2>
+
+    <p th:if="${successMessage}" th:text="${successMessage}" class="success-message"></p>
+    <p th:if="${errorMessage}" th:text="${errorMessage}" class="error-message"></p>
+
+    <form th:attr="hx-post=@{/dashboard/case-management/registries/{id}/case-records(id=${registryId})}"
+          hx-target="#case-record-panel"
+          hx-swap="innerHTML">
+        <div class="form-group">
+            <label for="case-title">Titel</label>
+            <input id="case-title" type="text" name="title" required>
+        </div>
+
+        <div class="form-group">
+            <label for="case-description">Beskrivning</label>
+            <textarea id="case-description" name="description"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="case-status">Status</label>
+            <input id="case-status" type="text" name="status" value="OPEN" required>
+        </div>
+
+        <div class="form-group">
+            <label for="owner-user-id">Owner user id</label>
+            <input id="owner-user-id" type="text" name="ownerUserId" required>
+        </div>
+
+        <div class="form-group">
+            <label for="assigned-user-id">Assigned user id</label>
+            <input id="assigned-user-id" type="text" name="assignedUserId" required>
+        </div>
+
+        <div class="form-group">
+            <label for="confidentiality-level">Sekretessnivå</label>
+            <input id="confidentiality-level" type="text" name="confidentialityLevel" value="OPEN" required>
+        </div>
+
+        <button type="submit" class="btn-primary">Skapa ärende</button>
+    </form>
+
+    <hr>
+
+    <ul class="case-record-list">
+        <li th:each="caseRecord : ${caseRecords}">
+            <button type="button"
+                    class="btn-primary"
+                    th:attr="hx-get=@{/dashboard/case-management/case-records/{id}(id=${caseRecord.id})}"
+                    hx-target="#case-detail-panel"
+                    hx-swap="innerHTML">
+                <span th:text="${caseRecord.caseNumber}">KS26-1</span>
+                -
+                <span th:text="${caseRecord.title}">Titel</span>
+            </button>
+        </li>
+    </ul>
+</div>
