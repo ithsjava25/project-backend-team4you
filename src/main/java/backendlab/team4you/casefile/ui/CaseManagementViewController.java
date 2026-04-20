@@ -2,12 +2,13 @@ package backendlab.team4you.casefile.ui;
 
 import backendlab.team4you.casefile.CaseFileService;
 import backendlab.team4you.caserecord.CaseRecordService;
+import backendlab.team4you.exceptions.DuplicateRegistryCodeException;
+import backendlab.team4you.exceptions.DuplicateRegistryNameException;
+import backendlab.team4you.registry.RegistryRequestDto;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import backendlab.team4you.registry.RegistryService;
 
@@ -62,5 +63,20 @@ public class CaseManagementViewController {
         model.addAttribute("files", caseFileService.listFiles(caseId));
         model.addAttribute("caseRecordId", caseId);
         return "fragments/case-management/case-file-list :: caseFileList";
+    }
+
+    @PostMapping("/registries")
+    public String createRegistry(@RequestParam String name,
+                                 @RequestParam String code,
+                                 Model model) {
+        try {
+            registryService.createRegistry(new RegistryRequestDto(name, code));
+            model.addAttribute("successMessage", "Registry skapad");
+        } catch (DuplicateRegistryNameException | DuplicateRegistryCodeException ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+        }
+
+        model.addAttribute("registries", registryService.findAll());
+        return "fragments/case-management/registry-list :: registryList";
     }
 }
