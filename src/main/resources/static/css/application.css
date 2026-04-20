@@ -1,18 +1,6 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
 
-body {
 
-    background-color: #f0f2f5;
-    font-family: Poppins, sans-serif;
-    color: #333;
-    line-height: 1.6;
-}
-
-.container {
+.application-container {
     max-width: 800px;
     margin: 40px auto;
     padding: 0 20px;
@@ -30,7 +18,7 @@ body {
     text-align: left;
 }
 
-h2 {
+.application-h1 {
     font-size: 1.4rem;
     margin-bottom: 15px;
     display: flex;
@@ -57,4 +45,35 @@ h2 {
     cursor: pointer;
 }
 
-{}
+.application-list {
+    list-style: none;
+    padding: 0;
+}
+
+.application-item {
+    margin-bottom: 15px;
+}
+
+.application-card {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.actions a {
+    text-decoration: none;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.status-cancelled {
+    color: red;
+    font-weight: bold;
+}

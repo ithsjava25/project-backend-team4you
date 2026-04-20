@@ -1,5 +1,7 @@
 package backendlab.team4you.booking;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +21,14 @@ public class BookingController {
     }
 
 
-    @GetMapping("/booking/application")
-    public String bookingApplication() {
-        return "fragments/booking-application :: content";
-    }
+       @GetMapping("/booking/application")
+    public String bookingApplication(           @RequestHeader(value = "HX-Request", required = false) String htmx
+    ) {
+        if (htmx != null) {
+            return "fragments/booking-application :: content";
+       }
+       return "booking-application";
+   }
 
     @GetMapping("/booking/search")
     public String search(
@@ -86,5 +92,29 @@ public class BookingController {
         return "booking";
     }
 
+    @PostMapping("/booking/{id}/cancel")
+    public String cancelBooking(
+            @PathVariable Long id,
+            Model model,
+            @AuthenticationPrincipal UserDetails user,
+            @RequestHeader(value = "HX-Request", required = false) String htmx
+    ) {
+
+        BookingEntity booking = bookingService.findById(id);
+
+
+
+
+        bookingService.cancel(id);
+
+        model.addAttribute("booking", booking);
+
+        if (htmx != null) {
+            return "fragments/booking-cancelled :: content";
+        }
+
+        return "booking-cancelled";
+    }
 
 }
+

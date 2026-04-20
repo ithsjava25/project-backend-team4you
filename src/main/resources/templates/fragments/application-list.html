@@ -1,0 +1,9 @@
+<button
+        th:attr="hx-post=@{/application/{id}/cancel(id=${app.id})}"
+        hx-target="#content-area"
+        hx-swap="innerHTML"
+        hx-confirm="Är du säker på att du vill avboka?">
+
+    Avboka
+
+</button>

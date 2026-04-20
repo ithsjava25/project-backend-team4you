@@ -2,59 +2,42 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="https://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
-    <head>
-    <title>Ansökningar</title>
-    <link th:href="@{/css/booking.css}" rel="stylesheet">
-        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    </head>
+
 <body>
 
-<section layout:fragment="content" class="card">
+<section layout:fragment="content" class="booking-container">
 
-    <h2><i class="fa-regular fa-calendar"></i> Boka tid</h2>
+    <h2>Boka tid</h2>
 
-    <section class="section-booking">
-        <a
-                hx-get="/booking/application"
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-                th:href="@{/booking/application}"
-                class="btn-highlight"
-        >
-            Ärende
+
+    <div class="section-booking">
+
+        <a hx-get="/booking/application"
+           hx-target="#content-area"
+           hx-swap="innerHTML"
+           class="btn-highlight">
+
+            Boka tid
+
         </a>
 
-        <h2>Boka tid till ditt medborgarskapsärende</h2>
-        <p>Välj detta alternativ om du blivit ombedd att boka tid</p>
-    </section>
-
-    <section class="section-calling">
-        <a
-                hx-get="/booking/search"
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-                th:href="@{/booking/search}"
-        >
-            <h2>Sök uppmaning till bokning</h2>
-            <p>Har du fått ett brev? Sök här</p>
-        </a>
-    </section>
-
-    <h2>Mina bokningar</h2>
-
-    <div id="booking-list">
-        <div th:replace="fragments/booking-list :: list"></div>
     </div>
 
-    <button
-            hx-get="/bookings?page=1"
+
+    <h3>Mina bokningar</h3>
+
+
+
+
+    <button hx-get="/booking?page=1"
             hx-target="#booking-list"
-            hx-swap="beforeend"
-    >
+            hx-swap="beforeend">
         Visa fler
     </button>
 
-    <span th:text="${#temporals.format(booking.bookingTime, 'dd MMM yyyy HH:mm')}"></span>
+    <div id="booking-list">
+        <div th:replace="~{fragments/booking-list :: list}"></div>
+    </div>
 
 </section>
 

@@ -24,7 +24,7 @@
         <nav>
             <ul class="side-nav">
                 <li>
-                    <a class="a-dashboard" hx-get="/dashboard/home" hx-target="#content-area" th:href="@{/dashboard}">
+                    <a class="a-dashboard" hx-get="/dashboard" hx-target="#content-area" th:href="@{/dashboard}">
                         <i class="fa-solid fa-house"></i>
                         <span>Dashboard Hem</span>
                     </a>
@@ -76,7 +76,10 @@
     </aside>
 
 
-    <main id="content-area" layout:fragment="content">
+    <main id="content-area"
+          hx-get="/dashboard/home"
+          hx-trigger="load"
+          hx-swap="innerHTML">
     </main>
 
 </div>

@@ -13,14 +13,13 @@
 
             </a>
 
-        </li>
             <strong th:text="${booking.id}"></strong>
             <span th:text="${booking.status}"></span>
 
             <span th:text="${#temporals.format(booking.bookingTime, 'dd MMM yyyy HH:mm')}"></span>
 
             <button
-                    th:attr="hx-post=@{/admin/bookings(id=${booking})}"
+                    th:attr="hx-post=@{/admin/bookings(id=${booking.id})}"
                     hx-target="closest li"
                     hx-swap="outerHTML"
                     hx-confirm="Är du säker?">
@@ -30,9 +29,6 @@
 
     </ul>
 
-    <div th:replace="fragments/pagination :: pagination('/admin/users')"></div>
-
-
-
+    <div th:replace="~{fragments/pagination :: pagination('/admin/bookings')}"></div>
 
 </div>

@@ -1,0 +1,21 @@
+<div th:fragment="content">
+
+    <h2>Ansökan avbruten</h2>
+
+    <p>
+        Titel:
+        <strong th:text="${application.title}"></strong>
+    </p>
+
+    <p>
+        Status:
+        <span>Avbruten</span>
+    </p>
+
+    <button hx-get="/application"
+            hx-target="#content-area"
+            hx-swap="innerHTML">
+        Tillbaka
+    </button>
+
+</div>

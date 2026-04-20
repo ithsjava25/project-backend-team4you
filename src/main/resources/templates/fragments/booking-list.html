@@ -1,5 +1,18 @@
 <div th:fragment="list">
-    <div th:each="booking : ${bookings}">
-        <p th:text="${booking}"></p>
+    <div th:each="booking : ${bookings}" class="booking-card">
+
+        <p>
+            <span th:text="${#temporals.format(booking.bookingTime, 'dd MMM yyyy HH:mm')}"></span>
+        </p>
+
+        <button
+                th:attr="hx-post=@{/booking/{id}/cancel(id=${booking.id})}"
+                hx-target="#content-area"
+                hx-swap="innerHTML">
+
+            Avboka
+
+        </button>
+
     </div>
 </div>

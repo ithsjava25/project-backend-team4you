@@ -1,0 +1,46 @@
+<section layout:fragment="content" th:fragment="content" xmlns:layout="">
+    <div class="application-container-apply">
+
+        <div class="form-container-apply">
+            <h2 class="form-title-apply">Skapa Ny Ansökan</h2>
+
+            <form class="form-apply"
+                    hx-post="/application"
+                  hx-target="#content-area"
+                  hx-swap="innerHTML">
+
+
+
+                <div class="form-group-apply">
+                    <label for="title">Titel på ärendet</label>
+                    <input type="text"
+                           id="title"
+                           name="title"
+                           class="form-control-input"
+                           placeholder="Ex: Ledighetsansökan"
+                           required>
+                </div>
+
+                <div class="form-group-apply">
+                    <label class="label-apply" for="description">Beskrivning</label>
+                    <textarea id="description"
+                              name="description"
+                              class="form-control"
+                              placeholder="Beskriv ditt ärende här..."
+                              required></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit-apply">
+                    Skicka in ansökan
+                </button>
+
+            </form>
+
+            <button class="btn-submit-apply" hx-get="/application"
+                    hx-target="#content-area"
+                    style="margin-top: 1rem; background: none; border: none; color: #64748b; cursor: pointer; text-decoration: underline; font-size: 0.9rem;">
+                Avbryt och gå tillbaka
+            </button>
+        </div>
+    </div>
+</section>

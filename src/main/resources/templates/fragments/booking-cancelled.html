@@ -1,10 +1,16 @@
 <div th:fragment="content">
 
-    <p>Bokningen har avbokats</p>
+    <h2>Bokning avbokad</h2>
 
     <p>
         Tid:
         <span th:text="${#temporals.format(booking.bookingTime, 'dd MMM yyyy HH:mm')}"></span>
     </p>
+
+    <button hx-get="/booking"
+            hx-target="#content-area"
+            hx-swap="innerHTML">
+        Tillbaka
+    </button>
 
 </div>

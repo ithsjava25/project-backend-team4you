@@ -3,7 +3,6 @@ package backendlab.team4you.booking;
 import jakarta.persistence.*;
 
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -32,7 +31,7 @@ public class BookingEntity {
     
 
     @Enumerated(EnumType.STRING)
-    private BookingEnum status;
+    private BookingStatus status;
 
     public BookingEntity() {}
 
@@ -93,11 +92,11 @@ public class BookingEntity {
 
 
 
-    public BookingEnum getStatus() {
+    public BookingStatus getStatus() {
         return status;
     }
 
-    public void setStatus(BookingEnum status) {
+    public void setStatus(BookingStatus status) {
         this.status = status;
     }
 

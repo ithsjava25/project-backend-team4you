@@ -19,7 +19,7 @@ public class BookingService {
         BookingEntity booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        booking.setStatus(BookingEnum.CANCELLED);
+        booking.setStatus(BookingStatus.CANCELLED);
     }
 
     @Transactional
@@ -41,5 +41,14 @@ public class BookingService {
     public void deleteBooking(Long id, String username) {
         BookingEntity booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
+    }
+
+    public void cancel(Long id) {
+        BookingEntity booking = bookingRepository.findById(id)
+                .orElseThrow();
+
+        booking.setStatus(BookingStatus.CANCELLED);
+
+        bookingRepository.save(booking);
     }
 }

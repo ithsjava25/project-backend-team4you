@@ -1,10 +1,10 @@
-.container {
+.booking-container {
     max-width: 800px;
     margin: 40px auto;
     padding: 0 20px;
 }
 
-.card {
+.booking-card {
     background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -27,4 +27,21 @@
     border: 1px solid purple;
 }
 
-{}
+.booking-container {
+    max-width: 800px;
+    margin: 40px auto;
+}
+
+.section-booking {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.booking-card {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 6px;
+}
