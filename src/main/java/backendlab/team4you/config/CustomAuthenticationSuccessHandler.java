@@ -33,9 +33,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String username = authentication.getName();
         var userEntity = userService.findByName(username);
 
-        boolean isWebAuthn = authentication instanceof WebAuthnAuthenticationRequestToken;
-
-        if (userEntity != null && !isWebAuthn){
+        if (userEntity != null){
             var credentials = userCredentialRepository.findByUserId(userEntity.getId());
 
             if (!credentials.isEmpty()){
