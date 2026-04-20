@@ -53,8 +53,8 @@ public class CaseManagementViewController {
             Model model
     ) {
         try {
-            registryService.createRegistry(new RegistryRequestDto(name, code));
-            model.addAttribute("successMessage", "Registry skapad.");
+            registryService.createRegistry(new RegistryRequestDto(name.trim(), code.trim()));
+            model.addAttribute("successMessage", "registry skapad.");
         } catch (DuplicateRegistryNameException
                  | DuplicateRegistryCodeException
                  | IllegalArgumentException exception) {
@@ -67,6 +67,7 @@ public class CaseManagementViewController {
     @GetMapping("/registries/{registryId}/case-records")
     public String caseRecords(@PathVariable Long registryId, Model model) {
         model.addAttribute("registryId", registryId);
+        model.addAttribute("registryName", registryService.findById(registryId).name());
         model.addAttribute("caseRecords", caseRecordService.findByRegistryId(registryId));
         return "fragments/case-management/case-record-list :: caseRecordList";
     }
@@ -95,12 +96,13 @@ public class CaseManagementViewController {
             );
 
             caseRecordService.createCaseRecord(requestDto);
-            model.addAttribute("successMessage", "Ärende skapat.");
+            model.addAttribute("successMessage", "ärende skapat.");
         } catch (RegistryNotFoundException | UserNotFoundException | IllegalArgumentException exception) {
             model.addAttribute("errorMessage", exception.getMessage());
         }
 
         model.addAttribute("registryId", registryId);
+        model.addAttribute("registryName", registryService.findById(registryId).name());
         model.addAttribute("caseRecords", caseRecordService.findByRegistryId(registryId));
         return "fragments/case-management/case-record-list :: caseRecordList";
     }

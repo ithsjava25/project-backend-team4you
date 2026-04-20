@@ -2,6 +2,7 @@ package backendlab.team4you.registry;
 
 import backendlab.team4you.exceptions.DuplicateRegistryCodeException;
 import backendlab.team4you.exceptions.DuplicateRegistryNameException;
+import backendlab.team4you.exceptions.RegistryNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,5 +61,17 @@ public class RegistryService {
                         registry.getCode()
                 ))
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public RegistryResponseDto findById(Long registryId) {
+        Registry registry = registryRepository.findById(registryId)
+                .orElseThrow(() -> new RegistryNotFoundException("registry not found: " + registryId));
+
+        return new RegistryResponseDto(
+                registry.getId(),
+                registry.getName(),
+                registry.getCode()
+        );
     }
 }

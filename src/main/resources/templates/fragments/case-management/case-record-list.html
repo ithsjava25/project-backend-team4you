@@ -1,58 +1,75 @@
 <div th:fragment="caseRecordList">
-    <h2>Ärenden</h2>
+    <div class="case-record-panel-content">
+        <h2 class="case-record-heading">
+            Ärenden för
+            <span class="case-record-heading-name" th:text="${registryName}">registry</span>
+        </h2>
 
-    <p th:if="${successMessage}" th:text="${successMessage}" class="success-message"></p>
-    <p th:if="${errorMessage}" th:text="${errorMessage}" class="error-message"></p>
+        <p th:if="${successMessage}"
+           th:text="${successMessage}"
+           class="feedback-message success-message"></p>
 
-    <form th:attr="hx-post=@{/dashboard/case-management/registries/{id}/case-records(id=${registryId})}"
-          hx-target="#case-record-panel"
-          hx-swap="innerHTML">
-        <div class="form-group">
-            <label for="case-title">Titel</label>
-            <input id="case-title" type="text" name="title" required>
-        </div>
+        <p th:if="${errorMessage}"
+           th:text="${errorMessage}"
+           class="feedback-message error-message"></p>
 
-        <div class="form-group">
-            <label for="case-description">Beskrivning</label>
-            <textarea id="case-description" name="description"></textarea>
-        </div>
+        <h3 class="form-section-title">nytt ärende</h3>
 
-        <div class="form-group">
-            <label for="case-status">Status</label>
-            <input id="case-status" type="text" name="status" value="OPEN" required>
-        </div>
+        <form th:attr="hx-post=@{/dashboard/case-management/registries/{id}/case-records(id=${registryId})}"
+              hx-target="#case-record-panel"
+              hx-swap="innerHTML">
+            <div class="form-group">
+                <label for="case-title">titel</label>
+                <input id="case-title" type="text" name="title" required>
+            </div>
 
-        <div class="form-group">
-            <label for="owner-user-id">Owner user id</label>
-            <input id="owner-user-id" type="text" name="ownerUserId" required>
-        </div>
+            <div class="form-group">
+                <label for="case-description">beskrivning</label>
+                <textarea id="case-description" name="description"></textarea>
+            </div>
 
-        <div class="form-group">
-            <label for="assigned-user-id">Assigned user id</label>
-            <input id="assigned-user-id" type="text" name="assignedUserId" required>
-        </div>
+            <div class="form-group">
+                <label for="case-status">status</label>
+                <input id="case-status" type="text" name="status" value="OPEN" required>
+            </div>
 
-        <div class="form-group">
-            <label for="confidentiality-level">Sekretessnivå</label>
-            <input id="confidentiality-level" type="text" name="confidentialityLevel" value="OPEN" required>
-        </div>
+            <div class="form-group">
+                <label for="owner-user-id">owner user id</label>
+                <input id="owner-user-id" type="text" name="ownerUserId" required>
+            </div>
 
-        <button type="submit" class="btn-primary">Skapa ärende</button>
-    </form>
+            <div class="form-group">
+                <label for="assigned-user-id">assigned user id</label>
+                <input id="assigned-user-id" type="text" name="assignedUserId" required>
+            </div>
 
-    <hr>
+            <div class="form-group">
+                <label for="confidentiality-level">sekretessnivå</label>
+                <input id="confidentiality-level" type="text" name="confidentialityLevel" value="OPEN" required>
+            </div>
 
-    <ul class="case-record-list">
-        <li th:each="caseRecord : ${caseRecords}">
-            <button type="button"
-                    class="btn-primary"
-                    th:attr="hx-get=@{/dashboard/case-management/case-records/{id}(id=${caseRecord.id})}"
-                    hx-target="#case-detail-panel"
-                    hx-swap="innerHTML">
-                <span th:text="${caseRecord.caseNumber}">KS26-1</span>
-                -
-                <span th:text="${caseRecord.title}">Titel</span>
-            </button>
-        </li>
-    </ul>
+            <button type="submit" class="btn-primary">skapa ärende</button>
+        </form>
+
+        <hr class="section-divider">
+
+        <h3 class="form-section-title">befintliga ärenden</h3>
+
+        <ul class="case-record-list">
+            <li th:if="${#lists.isEmpty(caseRecords)}" class="empty-state">
+                inga ärenden ännu
+            </li>
+
+            <li th:each="caseRecord : ${caseRecords}">
+                <button type="button"
+                        class="case-record-button"
+                        th:attr="hx-get=@{/dashboard/case-management/case-records/{id}(id=${caseRecord.id})}"
+                        hx-target="#case-detail-panel"
+                        hx-swap="innerHTML">
+                    <span class="case-record-number" th:text="${caseRecord.caseNumber}">KS26-1</span>
+                    <span class="case-record-title" th:text="${caseRecord.title}">titel</span>
+                </button>
+            </li>
+        </ul>
+    </div>
 </div>
