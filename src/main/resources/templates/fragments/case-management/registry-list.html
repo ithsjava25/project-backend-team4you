@@ -1,0 +1,17 @@
+<div th:fragment="registryList">
+    <div class="case-panel">
+        <h2>Registries</h2>
+
+        <ul>
+            <li th:each="registry : ${registries}">
+                <button
+                        class="btn-primary"
+                        hx-get="@{/dashboard/case-management/registries/{id}/case-records(id=${registry.id})}"
+                        hx-target="#case-record-panel"
+                        hx-swap="innerHTML">
+                    <span th:text="${registry.name}">Registry name</span>
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>
