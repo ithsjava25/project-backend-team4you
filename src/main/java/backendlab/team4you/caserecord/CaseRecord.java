@@ -180,4 +180,12 @@ public class CaseRecord {
     public void setId(long l) {
         this.id = l;
     }
+
+    public void setAssignedUser(UserEntity assignedUser) {
+        this.assignedUser = assignedUser;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

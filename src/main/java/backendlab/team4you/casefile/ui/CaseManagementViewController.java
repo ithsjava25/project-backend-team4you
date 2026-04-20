@@ -3,10 +3,7 @@ package backendlab.team4you.casefile.ui;
 import backendlab.team4you.casefile.CaseFileService;
 import backendlab.team4you.caserecord.CaseRecordRequestDto;
 import backendlab.team4you.caserecord.CaseRecordService;
-import backendlab.team4you.exceptions.DuplicateRegistryCodeException;
-import backendlab.team4you.exceptions.DuplicateRegistryNameException;
-import backendlab.team4you.exceptions.RegistryNotFoundException;
-import backendlab.team4you.exceptions.UserNotFoundException;
+import backendlab.team4you.exceptions.*;
 import backendlab.team4you.registry.RegistryRequestDto;
 import backendlab.team4you.registry.RegistryService;
 import backendlab.team4you.user.UserEntity;
@@ -116,6 +113,13 @@ public class CaseManagementViewController {
     public String caseRecordDetail(@PathVariable Long caseId, Model model) {
         model.addAttribute("caseRecord", caseRecordService.findById(caseId));
         model.addAttribute("caseRecordId", caseId);
+        model.addAttribute("assignableUsers", userService.findAll().stream()
+                .map(user -> new AssignableUserOption(
+                        user.getId().toBase64UrlString(),
+                        buildDisplayName(user)
+                ))
+                .toList());
+
         return "fragments/case-management/case-record-detail :: caseRecordDetail";
     }
 
@@ -186,5 +190,31 @@ public class CaseManagementViewController {
         return user.getName();
     }
     private record AssignableUserOption(String id, String displayName) {
+    }
+
+    @PostMapping("/case-records/{caseId}/update")
+    public String updateCaseRecord(
+            @PathVariable Long caseId,
+            @RequestParam String status,
+            @RequestParam(required = false) String assignedUserId,
+            Model model
+    ) {
+        try {
+            caseRecordService.updateCaseRecord(caseId, status, normalizeAssignedUserId(assignedUserId));
+            model.addAttribute("successMessage", "ärendet uppdaterades.");
+        } catch (CaseRecordNotFoundException | UserNotFoundException | IllegalArgumentException exception) {
+            model.addAttribute("errorMessage", exception.getMessage());
+        }
+
+        model.addAttribute("caseRecord", caseRecordService.findById(caseId));
+        model.addAttribute("caseRecordId", caseId);
+        model.addAttribute("assignableUsers", userService.findAll().stream()
+                .map(user -> new AssignableUserOption(
+                        user.getId().toBase64UrlString(),
+                        buildDisplayName(user)
+                ))
+                .toList());
+
+        return "fragments/case-management/case-record-detail :: caseRecordDetail";
     }
 }

@@ -41,8 +41,11 @@ public class CaseRecordService {
         UserEntity owner = userRepository.findById(requestDto.ownerUserId())
                 .orElseThrow(() -> new UserNotFoundException("user not found: " + requestDto.ownerUserId()));
 
-        UserEntity assignedUser = userRepository.findById(requestDto.assignedUserId())
-                .orElseThrow(() -> new UserNotFoundException("user not found: " + requestDto.assignedUserId()));
+        UserEntity assignedUser = null;
+        if (requestDto.assignedUserId() != null && !requestDto.assignedUserId().isBlank()) {
+            assignedUser = userRepository.findById(requestDto.assignedUserId())
+                    .orElseThrow(() -> new UserNotFoundException("user not found: " + requestDto.assignedUserId()));
+        }
 
         CaseRecord caseRecord = new CaseRecord(
                 registry,
@@ -116,7 +119,7 @@ public class CaseRecordService {
                 caseRecord.getDescription(),
                 caseRecord.getStatus(),
                 caseRecord.getOwner().getIdAsString(),
-                caseRecord.getAssignedUser().getIdAsString(),
+                caseRecord.getAssignedUser() != null ? caseRecord.getAssignedUser().getIdAsString() : null,
                 caseRecord.getConfidentialityLevel(),
                 caseRecord.getOpenedAt(),
                 caseRecord.getCreatedAt(),
@@ -141,5 +144,38 @@ public class CaseRecordService {
                 .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
 
         return toResponseDto(caseRecord);
+    }
+
+    public CaseRecordResponseDto updateCaseRecord(Long caseRecordId, String status, String assignedUserId) {
+        CaseRecord caseRecord = caseRecordRepository.findById(caseRecordId)
+                .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
+
+        caseRecord.setStatus(normalizeStatus(status));
+
+        if (assignedUserId == null || assignedUserId.isBlank()) {
+            caseRecord.setAssignedUser(null);
+        } else {
+            UserEntity assignedUser = userRepository.findById(assignedUserId)
+                    .orElseThrow(() -> new UserNotFoundException("user not found: " + assignedUserId));
+            caseRecord.setAssignedUser(assignedUser);
+        }
+
+        CaseRecord savedCaseRecord = caseRecordRepository.save(caseRecord);
+        return toResponseDto(savedCaseRecord);
+    }
+
+    private String normalizeStatus(String status) {
+        if (status == null || status.isBlank()) {
+            throw new IllegalArgumentException("status is required");
+        }
+
+        String normalizedStatus = status.trim().toUpperCase();
+
+        if (!normalizedStatus.equals("OPEN")
+                && !normalizedStatus.equals("CLOSED")) {
+            throw new IllegalArgumentException("invalid status: " + status);
+        }
+
+        return normalizedStatus;
     }
 }
