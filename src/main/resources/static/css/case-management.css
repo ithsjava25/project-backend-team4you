@@ -1,0 +1,18 @@
+.case-management-wrapper {
+    display: grid;
+    grid-template-columns: 260px 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+    color: var(--color-text);
+}
+
+.case-panel {
+    background: var(--color-surface);
+    border-radius: 16px;
+    padding: 16px;
+    min-height: 70vh;
+}
+
+.case-panel h2 {
+    margin-bottom: 12px;
+}
