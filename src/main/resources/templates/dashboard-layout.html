@@ -55,6 +55,15 @@
                         <span>Min Profil</span>
                     </a>
                 </li>
+                <li sec:authorize="hasRole('ADMIN') or hasRole('USER')">
+                    <a class="a-dashboard"
+                       hx-get="/dashboard/case-management"
+                       hx-target="#content-area"
+                       th:href="@{/dashboard/case-management}">
+                        <i class="fa-solid fa-folder-open"></i>
+                        <span>Ärenden</span>
+                    </a>
+                </li>
                 <li sec:authorize="hasRole('USER')">
                     <a  class="a-dashboard" hx-get="/user/my-bookings" hx-target="#content-area" th:href="@{/user/my-bookings}">
                         <i class="fa-solid fa-calendar-check"></i>
