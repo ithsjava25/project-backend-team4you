@@ -1,5 +1,5 @@
 <div id="case-detail-panel" th:fragment="caseRecordDetail">
-    <div class="case-detail-panel-content">
+    <div class="case-detail-panel-content" th:if="${caseRecord != null}">
         <h2 th:text="${caseRecord.caseNumber}">KS26-1</h2>
 
         <p>
@@ -82,5 +82,17 @@
              hx-swap="innerHTML">
             <p>laddar filer...</p>
         </div>
+    </div>
+
+    <div class="case-detail-panel-content" th:if="${caseRecord == null}">
+        <h2>ärende</h2>
+
+        <p th:if="${errorMessage}"
+           th:text="${errorMessage}"
+           class="feedback-message error-message"></p>
+
+        <p th:unless="${errorMessage}">
+            Ärendet kunde inte laddas.
+        </p>
     </div>
 </div>
