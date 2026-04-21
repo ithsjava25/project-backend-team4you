@@ -1,4 +1,4 @@
-<div th:fragment="caseRecordDetail">
+<div id="case-detail-panel" th:fragment="caseRecordDetail">
     <div class="case-detail-panel-content">
         <h2 th:text="${caseRecord.caseNumber}">KS26-1</h2>
 
@@ -36,9 +36,11 @@
 
         <h3 class="form-section-title">uppdatera ärende</h3>
 
-        <form th:attr="hx-post=@{/dashboard/case-management/case-records/{id}/update(id=${caseRecordId})}"
+        <form th:action="@{/dashboard/case-management/case-records/{id}/update(id=${caseRecordId})}"
+              method="post"
+              th:attr="hx-post=@{/dashboard/case-management/case-records/{id}/update(id=${caseRecordId})}"
               hx-target="#case-detail-panel"
-              hx-swap="innerHTML">
+              hx-swap="outerHTML">
 
             <div class="form-group">
                 <label for="update-case-status">status</label>

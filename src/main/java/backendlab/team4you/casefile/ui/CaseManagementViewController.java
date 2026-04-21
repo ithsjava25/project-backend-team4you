@@ -1,19 +1,20 @@
 package backendlab.team4you.casefile.ui;
 
-import backendlab.team4you.exceptions.DuplicateRegistryCodeException;
-import backendlab.team4you.exceptions.DuplicateRegistryNameException;
-import backendlab.team4you.registry.RegistryRequestDto;
-import backendlab.team4you.registry.RegistryService;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/dashboard/case-management")
+@RequestMapping("/dashboard")
 public class CaseManagementViewController {
 
-    @GetMapping
-    public String page() {
+    @GetMapping("/case-management")
+    public String caseManagementFragment() {
         return "fragments/case-management/page :: content";
+    }
+
+    @GetMapping("/case-management-page")
+    public String caseManagementPage() {
+        return "dashboard/case-management";
     }
 }

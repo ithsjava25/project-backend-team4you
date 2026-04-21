@@ -5,8 +5,6 @@ import backendlab.team4you.exceptions.DuplicateEmailException;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import jakarta.transaction.Transactional;
 
-import org.jspecify.annotations.Nullable;
-
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,13 +14,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.stereotype.Service;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-
-
 import java.security.Principal;
 
 import org.springframework.web.server.ResponseStatusException;
-
 
 import java.security.SecureRandom;
 
@@ -31,8 +25,6 @@ import java.util.List;
 
 @Service
 public class UserService {
-
-
 
     UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -45,7 +37,6 @@ public class UserService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
 
     @Transactional
     public void save(UserEntity userEntity){
@@ -73,7 +64,6 @@ public class UserService {
     public UserEntity update(UserEntity userEntity){
         return userRepository.save(userEntity);
     }
-
 
     public void registerUser(UserRegistrationDTO dto) {
 
@@ -136,7 +126,6 @@ public class UserService {
         userEntity.setLastName(lastName);
 
         //Every user that register themselves will automatically get the role USER assigned
-        String assignedRole = "USER";
         userEntity.setRole(UserRole.USER);
 
         try {

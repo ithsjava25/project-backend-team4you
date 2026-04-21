@@ -4,18 +4,6 @@
       layout:decorate="~{dashboard-layout}">
 
 <section layout:fragment="content">
-    <div class="case-management-wrapper">
-        <aside id="registry-panel">
-            <p>Laddar registries...</p>
-        </aside>
-
-        <section id="case-record-panel">
-            <p>Välj en registry</p>
-        </section>
-
-        <section id="case-detail-panel">
-            <p>Välj ett ärende</p>
-        </section>
-    </div>
+    <div th:replace="~{fragments/case-management/page :: content}"></div>
 </section>
 </html>

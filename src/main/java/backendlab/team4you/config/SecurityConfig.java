@@ -44,7 +44,7 @@ public class SecurityConfig {
 
                                 .requestMatchers("/webauthn/**").hasAnyRole("USER", ADMIN)
                                 .requestMatchers("/admin/**").hasRole(ADMIN)
-                                .requestMatchers("/home", "/profile/**").hasRole("USER")
+                                .requestMatchers("/home", "/profile/**").hasAnyRole("USER", ADMIN)
                                 .requestMatchers("/add-passkey", "/webauthn/register/**").hasAnyRole("USER", ADMIN)
 
                                 .anyRequest().authenticated()
