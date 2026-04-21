@@ -6,6 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CaseFileRepository extends JpaRepository<CaseFile, Long> {
-    List<CaseFile> findByCaseRecordId(Long caseRecordId);
+    List<CaseFile> findByCaseRecordIdOrderByUploadedAtDesc(Long caseRecordId);
     Optional<CaseFile> findByIdAndCaseRecordId(Long id, Long caseRecordId);
 }
