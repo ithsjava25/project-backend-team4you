@@ -3,6 +3,7 @@ package backendlab.team4you.casefile;
 import backendlab.team4you.casefile.access.CaseFileAccessService;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
+import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.exceptions.CaseFileNotFoundException;
 import backendlab.team4you.exceptions.CaseRecordNotFoundException;
 import backendlab.team4you.exceptions.FileStorageConfigurationException;
@@ -54,12 +55,12 @@ public class CaseFileService {
     public CaseFile uploadFile(
             Long caseRecordId,
             MultipartFile file,
-            FileConfidentialityLevel confidentialityLevel,
+            ConfidentialityLevel confidentialityLevel,
             UserEntity actor
     ) throws IOException {
 
-        FileConfidentialityLevel effectiveConfidentialityLevel =
-                confidentialityLevel != null ? confidentialityLevel : FileConfidentialityLevel.OPEN;
+        ConfidentialityLevel effectiveConfidentialityLevel =
+                confidentialityLevel != null ? confidentialityLevel : ConfidentialityLevel.OPEN;
 
         if (!caseFileAccessService.canUploadFile(actor, caseRecordId, effectiveConfidentialityLevel)) {
             throw new AccessDeniedException("Du har inte behörighet att ladda upp denna fil.");
@@ -128,7 +129,7 @@ public class CaseFileService {
         return caseFileRepository.findByCaseRecordIdOrderByDocumentNumberAsc(caseRecordId).stream()
                 .map(file -> {
                     boolean canView = caseFileAccessService.canViewFile(viewer, file);
-                    boolean confidential = file.getConfidentialityLevel() == FileConfidentialityLevel.CONFIDENTIAL;
+                    boolean confidential = file.getConfidentialityLevel() == ConfidentialityLevel.CONFIDENTIAL;
 
                     String displayName = (!confidential || canView)
                             ? file.getOriginalFilename()

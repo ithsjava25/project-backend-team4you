@@ -146,11 +146,11 @@ public class CaseRecordService {
         return toResponseDto(caseRecord);
     }
 
-    public CaseRecordResponseDto updateCaseRecord(Long caseRecordId, String status, String assignedUserId) {
+    public CaseRecordResponseDto updateCaseRecord(Long caseRecordId, CaseStatus status, String assignedUserId) {
         CaseRecord caseRecord = caseRecordRepository.findById(caseRecordId)
                 .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
 
-        caseRecord.setStatus(normalizeStatus(status));
+        caseRecord.setStatus(status);
 
         if (assignedUserId == null || assignedUserId.isBlank()) {
             caseRecord.setAssignedUser(null);

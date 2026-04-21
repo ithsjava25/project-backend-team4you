@@ -1,7 +1,7 @@
 package backendlab.team4you.casefile.access;
 
 import backendlab.team4you.casefile.CaseFile;
-import backendlab.team4you.casefile.FileConfidentialityLevel;
+import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserRole;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ public class CaseFileAccessService {
     }
 
     public boolean canViewFile(UserEntity user, CaseFile caseFile) {
-        if (caseFile.getConfidentialityLevel() == FileConfidentialityLevel.OPEN) {
+        if (caseFile.getConfidentialityLevel() == ConfidentialityLevel.OPEN) {
             return true;
         }
 
@@ -43,7 +43,7 @@ public class CaseFileAccessService {
         return hasConfidentialFileAccess(user, caseFile);
     }
 
-    public boolean canUploadFile(UserEntity user, Long caseRecordId, FileConfidentialityLevel confidentialityLevel) {
+    public boolean canUploadFile(UserEntity user, Long caseRecordId, ConfidentialityLevel confidentialityLevel) {
         if (user == null) {
             return false;
         }
@@ -52,10 +52,10 @@ public class CaseFileAccessService {
             return true;
         }
 
-        FileConfidentialityLevel effectiveLevel =
-                confidentialityLevel != null ? confidentialityLevel : FileConfidentialityLevel.OPEN;
+        ConfidentialityLevel effectiveLevel =
+                confidentialityLevel != null ? confidentialityLevel : ConfidentialityLevel.OPEN;
 
-        if (effectiveLevel == FileConfidentialityLevel.OPEN) {
+        if (effectiveLevel == ConfidentialityLevel.OPEN) {
             return true;
         }
 

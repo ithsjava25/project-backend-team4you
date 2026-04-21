@@ -1,5 +1,7 @@
 package backendlab.team4you.casefile;
 
+import backendlab.team4you.common.ConfidentialityLevel;
+
 import java.time.LocalDateTime;
 
 public record CaseFileResponseDto(
@@ -10,7 +12,7 @@ public record CaseFileResponseDto(
         LocalDateTime uploadedAt,
         int documentNumber,
         String documentReference,
-        FileConfidentialityLevel confidentialityLevel
+        ConfidentialityLevel confidentialityLevel
 ) {
     public static CaseFileResponseDto from(CaseFile caseFile) {
         return new CaseFileResponseDto(

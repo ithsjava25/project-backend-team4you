@@ -1,6 +1,7 @@
 package backendlab.team4you.casefile;
 
 import backendlab.team4you.caserecord.CaseRecord;
+import backendlab.team4you.common.ConfidentialityLevel;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -49,7 +50,7 @@ public class CaseFile {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "confidentiality_level", nullable = false, length = 50)
-    private FileConfidentialityLevel confidentialityLevel;
+    private ConfidentialityLevel confidentialityLevel;
 
     public String getS3Key() {
         return s3Key;
@@ -123,15 +124,15 @@ public class CaseFile {
         this.documentReference = documentReference;
     }
 
-    public FileConfidentialityLevel getConfidentialityLevel() {
+    public ConfidentialityLevel getConfidentialityLevel() {
         return confidentialityLevel;
     }
 
-    public void setConfidentialityLevel(FileConfidentialityLevel confidentialityLevel) {
+    public void setConfidentialityLevel(ConfidentialityLevel confidentialityLevel) {
         this.confidentialityLevel = confidentialityLevel;
     }
 
     public boolean isConfidential() {
-        return confidentialityLevel == FileConfidentialityLevel.CONFIDENTIAL;
+        return confidentialityLevel == ConfidentialityLevel.CONFIDENTIAL;
     }
 }

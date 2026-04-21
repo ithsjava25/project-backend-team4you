@@ -1,7 +1,7 @@
 package backendlab.team4you.casefile.ui;
 
 import backendlab.team4you.casefile.CaseFileService;
-import backendlab.team4you.casefile.FileConfidentialityLevel;
+import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.exceptions.*;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
@@ -37,7 +37,7 @@ public class CaseFileViewController {
     public String uploadCaseFile(
             @PathVariable Long caseId,
             @RequestParam("file") MultipartFile file,
-            @RequestParam("confidentialityLevel") FileConfidentialityLevel confidentialityLevel,
+            @RequestParam("confidentialityLevel") ConfidentialityLevel confidentialityLevel,
             Model model,
             Principal principal
     ) {

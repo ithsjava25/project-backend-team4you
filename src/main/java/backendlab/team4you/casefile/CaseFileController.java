@@ -1,5 +1,6 @@
 package backendlab.team4you.casefile;
 
+import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
 import org.springframework.http.ContentDisposition;
@@ -32,7 +33,7 @@ public class CaseFileController {
     public ResponseEntity<CaseFileResponseDto> uploadFile(
             @PathVariable Long caseRecordId,
             @RequestParam("file") MultipartFile file,
-            @RequestParam("confidentialityLevel") FileConfidentialityLevel confidentialityLevel,
+            @RequestParam("confidentialityLevel") ConfidentialityLevel confidentialityLevel,
             Principal principal
     ) throws IOException {
         UserEntity currentUser = userService.getCurrentUser(principal);

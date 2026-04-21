@@ -3,6 +3,7 @@ package backendlab.team4you.casefile;
 import backendlab.team4you.casefile.access.CaseFileAccessService;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
+import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.exceptions.*;
 import backendlab.team4you.s3.S3Service;
 import backendlab.team4you.user.UserEntity;
@@ -68,7 +69,7 @@ class CaseFileServiceTest {
         when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CaseFile result = caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN);
+        CaseFile result = caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN);
 
         assertThat(result).isNotNull();
         assertThat(result.getCaseRecord()).isEqualTo(caseRecord);
@@ -100,7 +101,7 @@ class CaseFileServiceTest {
 
         when(caseRecordRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> caseFileService.uploadFile(99L, file,FileConfidentialityLevel.OPEN))
+        assertThatThrownBy(() -> caseFileService.uploadFile(99L, file, ConfidentialityLevel.OPEN))
                 .isInstanceOf(CaseRecordNotFoundException.class)
                 .hasMessage("Case record not found: 99");
 
@@ -116,7 +117,7 @@ class CaseFileServiceTest {
         when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
         when(file.getOriginalFilename()).thenReturn(" ");
 
-        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN))
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN))
                 .isInstanceOf(InvalidFileNameException.class)
                 .hasMessage("Filnamn måste anges.");
 
@@ -137,7 +138,7 @@ class CaseFileServiceTest {
         when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CaseFile result = caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN);
+        CaseFile result = caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN);
 
         assertThat(result.getContentType()).isEqualTo("application/octet-stream");
 
@@ -260,7 +261,7 @@ class CaseFileServiceTest {
         when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN);
+        caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN);
 
         ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(s3Service).uploadFileIfAbsent(keyCaptor.capture(), any(byte[].class), eq("application/pdf"));
@@ -285,7 +286,7 @@ class CaseFileServiceTest {
         when(caseFileRepository.saveAndFlush(any(CaseFile.class)))
                 .thenThrow(new DataIntegrityViolationException("database failure"));
 
-        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN))
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("database failure");
 
@@ -321,7 +322,7 @@ class CaseFileServiceTest {
                 .when(s3Service)
                 .deleteFile(anyString());
 
-        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN))
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("database failure");
 
@@ -346,7 +347,7 @@ class CaseFileServiceTest {
                 .when(s3Service)
                 .uploadFileIfAbsent(anyString(), any(byte[].class), eq("application/pdf"));
 
-        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN))
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN))
                 .isInstanceOf(FileKeyConflictException.class)
                 .hasMessageContaining("A file with the same name already exists.");
 
@@ -386,7 +387,7 @@ class CaseFileServiceTest {
                 new byte[6 * 1024 * 1024]
         );
 
-        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN))
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN))
                 .isInstanceOf(FileTooLargeException.class)
                 .hasMessageContaining("Filen är för stor.");
     }
@@ -401,7 +402,7 @@ class CaseFileServiceTest {
                 new byte[6 * 1024 * 1024]
         );
 
-        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN))
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN))
                 .isInstanceOf(FileTooLargeException.class)
                 .hasMessageContaining("Filen är för stor.");
 
@@ -424,7 +425,7 @@ class CaseFileServiceTest {
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CaseFile result = caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN);
+        CaseFile result = caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN);
 
         assertThat(result.getDocumentNumber()).isEqualTo(1);
         assertThat(result.getDocumentReference()).isEqualTo("KS26-1-1");
@@ -450,7 +451,7 @@ class CaseFileServiceTest {
                 .thenReturn(Optional.of(existingFile));
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CaseFile result = caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN);
+        CaseFile result = caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN);
 
         assertThat(result.getDocumentNumber()).isEqualTo(2);
         assertThat(result.getDocumentReference()).isEqualTo("KS26-1-2");
@@ -469,7 +470,7 @@ class CaseFileServiceTest {
         confidentialFile.setDocumentNumber(1);
         confidentialFile.setDocumentReference("KS26-1-1");
         confidentialFile.setOriginalFilename("hemligt-avtal.pdf");
-        confidentialFile.setConfidentialityLevel(FileConfidentialityLevel.CONFIDENTIAL);
+        confidentialFile.setConfidentialityLevel(ConfidentialityLevel.CONFIDENTIAL);
 
         when(caseRecordRepository.existsById(1L)).thenReturn(true);
         when(caseFileRepository.findByCaseRecordIdOrderByDocumentNumberAsc(1L))
@@ -498,7 +499,7 @@ class CaseFileServiceTest {
         confidentialFile.setDocumentNumber(1);
         confidentialFile.setDocumentReference("KS26-1-1");
         confidentialFile.setOriginalFilename("hemligt-avtal.pdf");
-        confidentialFile.setConfidentialityLevel(FileConfidentialityLevel.CONFIDENTIAL);
+        confidentialFile.setConfidentialityLevel(ConfidentialityLevel.CONFIDENTIAL);
 
         when(caseRecordRepository.existsById(1L)).thenReturn(true);
         when(caseFileRepository.findByCaseRecordIdOrderByDocumentNumberAsc(1L))
@@ -526,7 +527,7 @@ class CaseFileServiceTest {
         openFile.setDocumentNumber(1);
         openFile.setDocumentReference("KS26-1-1");
         openFile.setOriginalFilename("offentlig.pdf");
-        openFile.setConfidentialityLevel(FileConfidentialityLevel.OPEN);
+        openFile.setConfidentialityLevel(ConfidentialityLevel.OPEN);
 
         when(caseRecordRepository.existsById(1L)).thenReturn(true);
         when(caseFileRepository.findByCaseRecordIdOrderByDocumentNumberAsc(1L))

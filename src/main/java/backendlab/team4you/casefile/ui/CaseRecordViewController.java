@@ -2,6 +2,8 @@ package backendlab.team4you.casefile.ui;
 
 import backendlab.team4you.caserecord.CaseRecordRequestDto;
 import backendlab.team4you.caserecord.CaseRecordService;
+import backendlab.team4you.caserecord.CaseStatus;
+import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.exceptions.CaseRecordNotFoundException;
 import backendlab.team4you.exceptions.RegistryNotFoundException;
 import backendlab.team4you.exceptions.UserNotFoundException;
@@ -48,9 +50,9 @@ public class CaseRecordViewController {
             @PathVariable Long registryId,
             @RequestParam String title,
             @RequestParam(required = false) String description,
-            @RequestParam String status,
+            @RequestParam CaseStatus status,
             @RequestParam(required = false) String assignedUserId,
-            @RequestParam String confidentialityLevel,
+            @RequestParam ConfidentialityLevel confidentialityLevel,
             Model model,
             Principal principal
     ) {
@@ -102,7 +104,7 @@ public class CaseRecordViewController {
     @PostMapping("/case-records/{caseId}/update")
     public String updateCaseRecord(
             @PathVariable Long caseId,
-            @RequestParam String status,
+            @RequestParam CaseStatus status,
             @RequestParam(required = false) String assignedUserId,
             Model model
     ) {

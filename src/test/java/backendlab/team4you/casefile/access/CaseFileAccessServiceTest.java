@@ -1,7 +1,7 @@
 package backendlab.team4you.casefile.access;
 
 import backendlab.team4you.casefile.CaseFile;
-import backendlab.team4you.casefile.FileConfidentialityLevel;
+import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserRole;
@@ -36,11 +36,11 @@ class CaseFileAccessServiceTest {
 
         openFile = new CaseFile();
         openFile.setCaseRecord(caseRecord);
-        openFile.setConfidentialityLevel(FileConfidentialityLevel.OPEN);
+        openFile.setConfidentialityLevel(ConfidentialityLevel.OPEN);
 
         confidentialFile = new CaseFile();
         confidentialFile.setCaseRecord(caseRecord);
-        confidentialFile.setConfidentialityLevel(FileConfidentialityLevel.CONFIDENTIAL);
+        confidentialFile.setConfidentialityLevel(ConfidentialityLevel.CONFIDENTIAL);
     }
 
     @Test

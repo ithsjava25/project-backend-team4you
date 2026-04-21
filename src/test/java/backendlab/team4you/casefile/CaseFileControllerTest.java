@@ -1,6 +1,7 @@
 package backendlab.team4you.casefile;
 
 import backendlab.team4you.casefile.access.CaseFileAccessService;
+import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.exceptions.*;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserRole;
@@ -13,7 +14,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -65,7 +65,7 @@ class CaseFileControllerTest {
                 "hello".getBytes()
         );
 
-        when(caseFileService.uploadFile(eq(1L), any(), eq(FileConfidentialityLevel.OPEN)))
+        when(caseFileService.uploadFile(eq(1L), any(), eq(ConfidentialityLevel.OPEN)))
                 .thenReturn(savedFile);
 
         mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 1L)
@@ -89,7 +89,7 @@ class CaseFileControllerTest {
                 "hello".getBytes()
         );
 
-        when(caseFileService.uploadFile(eq(99L), any(), eq(FileConfidentialityLevel.OPEN)))
+        when(caseFileService.uploadFile(eq(99L), any(), eq(ConfidentialityLevel.OPEN)))
                 .thenThrow(new CaseRecordNotFoundException(99L));
 
         mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 99L)
@@ -110,7 +110,7 @@ class CaseFileControllerTest {
                 "hello".getBytes()
         );
 
-        when(caseFileService.uploadFile(eq(1L), any(), eq(FileConfidentialityLevel.OPEN)))
+        when(caseFileService.uploadFile(eq(1L), any(), eq(ConfidentialityLevel.OPEN)))
                 .thenThrow(new InvalidFileNameException("Filnamn måste anges."));
 
         mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 1L)
@@ -180,7 +180,7 @@ class CaseFileControllerTest {
         caseFile.setOriginalFilename("document.pdf");
         caseFile.setContentType("application/pdf");
         caseFile.setS3Key("cases/1/uuid-document.pdf");
-        caseFile.setConfidentialityLevel(FileConfidentialityLevel.OPEN);
+        caseFile.setConfidentialityLevel(ConfidentialityLevel.OPEN);
 
         UserEntity user = new UserEntity();
         user.setName("dev");
@@ -252,7 +252,7 @@ class CaseFileControllerTest {
                 "hello".getBytes()
         );
 
-        when(caseFileService.uploadFile(eq(1L), any(), eq(FileConfidentialityLevel.OPEN)))
+        when(caseFileService.uploadFile(eq(1L), any(), eq(ConfidentialityLevel.OPEN)))
                 .thenThrow(new FileKeyConflictException("cases/1/conflict-key"));
 
         mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 1L)
@@ -274,7 +274,7 @@ class CaseFileControllerTest {
                 "hello".getBytes()
         );
 
-        when(caseFileService.uploadFile(eq(1L), any(), eq(FileConfidentialityLevel.OPEN)))
+        when(caseFileService.uploadFile(eq(1L), any(), eq(ConfidentialityLevel.OPEN)))
                 .thenThrow(new FileTooLargeException((long) (5 * 1024 * 1024)));
 
         mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 1L)
@@ -292,7 +292,7 @@ class CaseFileControllerTest {
         caseFile.setId(100L);
         caseFile.setOriginalFilename("secret.pdf");
         caseFile.setContentType("application/pdf");
-        caseFile.setConfidentialityLevel(FileConfidentialityLevel.CONFIDENTIAL);
+        caseFile.setConfidentialityLevel(ConfidentialityLevel.CONFIDENTIAL);
 
         UserEntity user = new UserEntity();
         user.setName("dev");
@@ -319,7 +319,7 @@ class CaseFileControllerTest {
         caseFile.setOriginalFilename("secret.pdf");
         caseFile.setContentType("application/pdf");
         caseFile.setS3Key("cases/1/secret.pdf");
-        caseFile.setConfidentialityLevel(FileConfidentialityLevel.CONFIDENTIAL);
+        caseFile.setConfidentialityLevel(ConfidentialityLevel.CONFIDENTIAL);
 
         UserEntity admin = new UserEntity();
         admin.setName("dev");
