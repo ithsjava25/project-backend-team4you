@@ -135,7 +135,7 @@ public class UserService {
         userEntity.setLastName(lastName);
 
         //Every user that register themselves will automatically get the role USER assigned
-        String assignedRole = "USER";
+        String assignedRole = "ROLE_USER";
         userEntity.setRole(assignedRole);
 
         try {
@@ -185,7 +185,7 @@ public class UserService {
         return userRepository.findAll(PageRequest.of(page, size));
     }
     public Page<UserEntity> getAdmins(int page, int size) {
-        return userRepository.findByRole("ADMIN", PageRequest.of(page, size));
+        return userRepository.findByRole("ROLE_ADMIN", PageRequest.of(page, size));
     }
     public UserEntity findByUsername(String disPlayName) {
         return userRepository.findByDisplayName(disPlayName);
