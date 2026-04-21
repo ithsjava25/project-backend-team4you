@@ -42,6 +42,15 @@ class ApplicationServiceTest {
     }
 
     @Test
+    void delete_shouldDeleteApplication() {
+        doNothing().when(applicationRepository).deleteById(1L);
+
+        applicationService.delete(1L);
+
+        verify(applicationRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
     void findById_shouldReturnApplication_whenExists() {
         when(applicationRepository.findById(1L)).thenReturn(Optional.of(application));
 
@@ -58,5 +67,15 @@ class ApplicationServiceTest {
         ApplicationEntity result = applicationService.findById(99L);
 
         assertNull(result);
+    }
+
+    @Test
+    void getAll_shouldReturnAllApplications() {
+        when(applicationRepository.findAll()).thenReturn(List.of(application));
+
+        List<ApplicationEntity> result = applicationService.getAll();
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
     }
 }
