@@ -2,6 +2,7 @@ package backendlab.team4you.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,11 +17,13 @@ import org.springframework.security.web.webauthn.management.UserCredentialReposi
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.config.annotation.web.configurers.WebAuthnConfigurer;
 
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    private static final String ADMIN = "ADMIN";
+    private static final String LOGIN = "/login";
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -32,28 +35,28 @@ public class SecurityConfig {
                         authorizeHttp -> authorizeHttp
                                 // Public endpoints
                                 .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-                                .requestMatchers( "/","/login", "/login/webauthn", "/signup", "/error").permitAll()
+                                .requestMatchers( "/", LOGIN, "/login/webauthn", "/signup", "/error").permitAll()
 
                                 .requestMatchers("/webauthn/authenticate/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/files/upload").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.GET, "/api/files/download/**").hasRole("ADMIN")
-                                .requestMatchers(HttpMethod.DELETE, "/api/files/delete/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/files/upload").hasAnyRole("USER", ADMIN)
+                                .requestMatchers(HttpMethod.GET, "/api/files/download/**").hasRole(ADMIN)
+                                .requestMatchers(HttpMethod.DELETE, "/api/files/delete/**").hasRole(ADMIN)
 
-                                .requestMatchers("/webauthn/**").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/webauthn/**").hasAnyRole("USER", ADMIN)
+                                .requestMatchers("/admin/**").hasRole(ADMIN)
                                 .requestMatchers("/home", "/profile/**").hasRole("USER")
-                                .requestMatchers("/add-passkey", "/webauthn/register/**").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers("/add-passkey", "/webauthn/register/**").hasAnyRole("USER", ADMIN)
 
                                 .anyRequest().authenticated()
                 )
                 .webAuthn( passkeys -> passkeys
-                        .rpId("localhost") //identity of the website
+                        .rpId("localhost")
                         .allowedOrigins("http://localhost:8080")
                         .rpName("Passkey team4you")
                 )
                 .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
+                        .loginPage(LOGIN)
+                        .loginProcessingUrl(LOGIN)
                         .successHandler(successHandler)
                         .permitAll()
                 )
