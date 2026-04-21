@@ -2,10 +2,7 @@ package backendlab.team4you.casefile;
 
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
-import backendlab.team4you.exceptions.CaseFileNotFoundException;
-import backendlab.team4you.exceptions.CaseRecordNotFoundException;
-import backendlab.team4you.exceptions.FileKeyConflictException;
-import backendlab.team4you.exceptions.InvalidFileNameException;
+import backendlab.team4you.exceptions.*;
 import backendlab.team4you.s3.S3Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -115,7 +112,7 @@ class CaseFileServiceTest {
 
         assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
                 .isInstanceOf(InvalidFileNameException.class)
-                .hasMessage("Filename must not be blank");
+                .hasMessage("Filnamn måste anges.");
 
         verify(s3Service, never()).uploadFileIfAbsent(anyString(), any(), anyString());
         verify(caseFileRepository, never()).saveAndFlush(any());
@@ -157,7 +154,7 @@ class CaseFileServiceTest {
         file2.setOriginalFilename("b.pdf");
 
         when(caseRecordRepository.existsById(1L)).thenReturn(true);
-        when(caseFileRepository.findByCaseRecordId(1L)).thenReturn(List.of(file1, file2));
+        when(caseFileRepository.findByCaseRecordIdOrderByDocumentNumberAsc(1L)).thenReturn(List.of(file1, file2));
 
         List<CaseFile> result = caseFileService.listFiles(1L);
 
@@ -166,7 +163,7 @@ class CaseFileServiceTest {
                 .containsExactly("a.pdf", "b.pdf");
 
         verify(caseRecordRepository).existsById(1L);
-        verify(caseFileRepository).findByCaseRecordId(1L);
+        verify(caseFileRepository).findByCaseRecordIdOrderByDocumentNumberAsc(1L);
     }
 
     @Test
@@ -178,7 +175,7 @@ class CaseFileServiceTest {
                 .isInstanceOf(CaseRecordNotFoundException.class)
                 .hasMessage("Case record not found: 1");
 
-        verify(caseFileRepository, never()).findByCaseRecordId(anyLong());
+        verify(caseFileRepository, never()).findByCaseRecordIdOrderByDocumentNumberAsc(anyLong());
     }
 
     @Test
@@ -374,7 +371,7 @@ class CaseFileServiceTest {
     }
 
     @Test
-    @DisplayName("uploadFile should throw IllegalArgumentException when file is too large")
+    @DisplayName("uploadFile should throw FileTooLargeException when file is too large")
     void uploadFile_shouldThrowIllegalArgumentException_whenFileTooLarge() {
         MockMultipartFile file = new MockMultipartFile(
                 "file",
@@ -384,8 +381,8 @@ class CaseFileServiceTest {
         );
 
         assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("maximum size");
+                .isInstanceOf(FileTooLargeException.class)
+                .hasMessageContaining("Filen är för stor.");
     }
 
     @Test
@@ -399,10 +396,58 @@ class CaseFileServiceTest {
         );
 
         assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("maximum size");
+                .isInstanceOf(FileTooLargeException.class)
+                .hasMessageContaining("Filen är för stor.");
 
         verifyNoInteractions(caseRecordRepository, caseFileRepository, s3Service);
+    }
+
+    @Test
+    @DisplayName("uploadFile should assign document number 1 and correct reference for first file in case")
+    void uploadFile_shouldAssignDocumentNumber1AndReference_forFirstFileInCase() throws IOException {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "test.pdf",
+                "application/pdf",
+                "hello".getBytes()
+        );
+
+        caseRecord.setCaseNumber("KS26-1");
+
+        when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
+        when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
+        when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        CaseFile result = caseFileService.uploadFile(1L, file);
+
+        assertThat(result.getDocumentNumber()).isEqualTo(1);
+        assertThat(result.getDocumentReference()).isEqualTo("KS26-1-1");
+    }
+
+    @Test
+    @DisplayName("uploadFile should assign next document number and reference for subsequent file")
+    void uploadFile_shouldAssignNextDocumentNumberAndReference_forSubsequentFile() throws IOException {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "test.pdf",
+                "application/pdf",
+                "hello".getBytes()
+        );
+
+        caseRecord.setCaseNumber("KS26-1");
+
+        CaseFile existingFile = new CaseFile();
+        existingFile.setDocumentNumber(1);
+
+        when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
+        when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L))
+                .thenReturn(Optional.of(existingFile));
+        when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        CaseFile result = caseFileService.uploadFile(1L, file);
+
+        assertThat(result.getDocumentNumber()).isEqualTo(2);
+        assertThat(result.getDocumentReference()).isEqualTo("KS26-1-2");
     }
 
 }

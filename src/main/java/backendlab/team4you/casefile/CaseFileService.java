@@ -99,7 +99,7 @@ public class CaseFileService {
     @Transactional(readOnly = true)
     public List<CaseFile> listFiles(Long caseRecordId) {
         ensureCaseRecordExists(caseRecordId);
-        return caseFileRepository.findByCaseRecordIdOrderByUploadedAtDesc(caseRecordId);
+        return caseFileRepository.findByCaseRecordIdOrderByDocumentNumberAsc(caseRecordId);
     }
 
     @Transactional(readOnly = true)
