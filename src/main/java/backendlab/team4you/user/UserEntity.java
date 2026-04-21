@@ -143,9 +143,8 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getRole() {
-
-        return role.name();
+    public UserRole getRole() {
+        return role;
     }
 
     public void setRole(String role) {

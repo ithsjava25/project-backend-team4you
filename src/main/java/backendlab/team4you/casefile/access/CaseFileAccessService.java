@@ -35,6 +35,6 @@ public class CaseFileAccessService {
     }
 
     private boolean isAdmin(UserEntity user) {
-        return UserRole.ADMIN.name().equals(user.getRole());
+        return user.getRole() == UserRole.ADMIN;
     }
 }

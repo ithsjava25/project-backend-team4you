@@ -75,11 +75,14 @@ public class SecurityConfig {
             if (user == null) {
                 throw new UsernameNotFoundException("User not found: " + username);
             }
+            if (user.getRole() == null) {
+                throw new UsernameNotFoundException("User has no role assigned: " + username);
+            }
 
             return User.builder()
                     .username(user.getName())
                     .password(user.getPasswordHash())
-                    .roles(user.getRole())
+                    .roles(user.getRole().name())
                     .accountLocked(false)
                     .build();
         };
