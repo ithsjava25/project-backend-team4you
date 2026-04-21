@@ -50,4 +50,13 @@ class ApplicationServiceTest {
         assertNotNull(result);
         assertEquals(1L, result.getId());
     }
+
+    @Test
+    void findById_shouldReturnNull_whenNotFound() {
+        when(applicationRepository.findById(99L)).thenReturn(Optional.empty());
+
+        ApplicationEntity result = applicationService.findById(99L);
+
+        assertNull(result);
+    }
 }
