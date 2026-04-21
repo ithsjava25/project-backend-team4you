@@ -55,7 +55,7 @@ class CaseFileControllerTest {
                 "hello".getBytes()
         );
 
-        when(caseFileService.uploadFile(eq(1L), any())).thenReturn(savedFile);
+        when(caseFileService.uploadFile(eq(1L), any(),FileConfidentialityLevel.OPEN)).thenReturn(savedFile);
 
         mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 1L)
                         .file(multipartFile))
@@ -78,7 +78,7 @@ class CaseFileControllerTest {
                 "hello".getBytes()
         );
 
-        when(caseFileService.uploadFile(eq(99L), any()))
+        when(caseFileService.uploadFile(eq(99L), any(),FileConfidentialityLevel.OPEN))
                 .thenThrow(new CaseRecordNotFoundException(99L));
 
         mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 99L)
@@ -99,7 +99,7 @@ class CaseFileControllerTest {
                 "hello".getBytes()
         );
 
-        when(caseFileService.uploadFile(eq(1L), any()))
+        when(caseFileService.uploadFile(eq(1L), any(),FileConfidentialityLevel.OPEN))
                 .thenThrow(new InvalidFileNameException("Filename must not be blank"));
 
         mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 1L)
@@ -225,7 +225,7 @@ class CaseFileControllerTest {
                 "hello".getBytes()
         );
 
-        when(caseFileService.uploadFile(eq(1L), any()))
+        when(caseFileService.uploadFile(eq(1L), any(),FileConfidentialityLevel.OPEN))
                 .thenThrow(new FileKeyConflictException("cases/1/conflict-key"));
 
         mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 1L)
@@ -247,7 +247,7 @@ class CaseFileControllerTest {
                 "hello".getBytes()
         );
 
-        when(caseFileService.uploadFile(eq(1L), any()))
+        when(caseFileService.uploadFile(eq(1L), any(),FileConfidentialityLevel.OPEN))
                 .thenThrow(new FileTooLargeException((long) (5 * 1024 * 1024)));
 
         mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 1L)

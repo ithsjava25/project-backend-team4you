@@ -97,9 +97,10 @@ public class UserService {
         user.setEmail(cleanEmail);
         user.setPhoneNumber(dto.phoneNumber());
 
-
         String hashedPw = passwordEncoder.encode(dto.password());
         user.setPasswordHash(hashedPw);
+
+        user.setRole(UserRole.USER);
 
 
         userRepository.save(user);
@@ -136,7 +137,7 @@ public class UserService {
 
         //Every user that register themselves will automatically get the role USER assigned
         String assignedRole = "USER";
-        userEntity.setRole(assignedRole);
+        userEntity.setRole(UserRole.USER);
 
         try {
             return userRepository.save(userEntity);
@@ -185,7 +186,7 @@ public class UserService {
         return userRepository.findAll(PageRequest.of(page, size));
     }
     public Page<UserEntity> getAdmins(int page, int size) {
-        return userRepository.findByRole("ADMIN", PageRequest.of(page, size));
+        return userRepository.findByRole(UserRole.ADMIN, PageRequest.of(page, size));
     }
     public UserEntity findByUsername(String disPlayName) {
         return userRepository.findByDisplayName(disPlayName);

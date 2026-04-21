@@ -2,6 +2,7 @@ package backendlab.team4you;
 
 import backendlab.team4you.user.UserRepository;
 import backendlab.team4you.user.UserEntity;
+import backendlab.team4you.user.UserRole;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -30,7 +31,7 @@ public class Team4youApplication {
 				);
 
 				devUser.setPasswordHash(encoder.encode("123456"));
-				devUser.setRole("USER");
+				devUser.setRole(UserRole.ADMIN);
 				devUser.setEmail("dev@gmail.com");
 
 				repository.save(devUser);

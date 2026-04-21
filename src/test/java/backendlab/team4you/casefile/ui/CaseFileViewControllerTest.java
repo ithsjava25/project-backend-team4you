@@ -1,6 +1,7 @@
 package backendlab.team4you.casefile.ui;
 
 import backendlab.team4you.casefile.CaseFileService;
+import backendlab.team4you.casefile.FileConfidentialityLevel;
 import backendlab.team4you.exceptions.InvalidFileNameException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,7 +61,7 @@ class CaseFileViewControllerTest {
                 "hello".getBytes()
         );
 
-        when(caseFileService.uploadFile(eq(1L), any()))
+        when(caseFileService.uploadFile(eq(1L), any(), FileConfidentialityLevel.OPEN))
                 .thenThrow(new InvalidFileNameException("Filnamn måste anges."));
         when(caseFileService.listFiles(1L)).thenReturn(List.of());
 

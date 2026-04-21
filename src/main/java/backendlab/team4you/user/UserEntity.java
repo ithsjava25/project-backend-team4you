@@ -147,9 +147,8 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
         return role;
     }
 
-    public void setRole(String role) {
-
-        this.role = UserRole.valueOf(role);
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 
      public String getIdAsString() {

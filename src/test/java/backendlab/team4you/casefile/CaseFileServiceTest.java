@@ -62,7 +62,7 @@ class CaseFileServiceTest {
         when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CaseFile result = caseFileService.uploadFile(1L, file);
+        CaseFile result = caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN);
 
         assertThat(result).isNotNull();
         assertThat(result.getCaseRecord()).isEqualTo(caseRecord);
@@ -94,7 +94,7 @@ class CaseFileServiceTest {
 
         when(caseRecordRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> caseFileService.uploadFile(99L, file))
+        assertThatThrownBy(() -> caseFileService.uploadFile(99L, file,FileConfidentialityLevel.OPEN))
                 .isInstanceOf(CaseRecordNotFoundException.class)
                 .hasMessage("Case record not found: 99");
 
@@ -110,7 +110,7 @@ class CaseFileServiceTest {
         when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
         when(file.getOriginalFilename()).thenReturn(" ");
 
-        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN))
                 .isInstanceOf(InvalidFileNameException.class)
                 .hasMessage("Filnamn måste anges.");
 
@@ -131,7 +131,7 @@ class CaseFileServiceTest {
         when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CaseFile result = caseFileService.uploadFile(1L, file);
+        CaseFile result = caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN);
 
         assertThat(result.getContentType()).isEqualTo("application/octet-stream");
 
@@ -254,7 +254,7 @@ class CaseFileServiceTest {
         when(caseRecordRepository.findById(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        caseFileService.uploadFile(1L, file);
+        caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN);
 
         ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(s3Service).uploadFileIfAbsent(keyCaptor.capture(), any(byte[].class), eq("application/pdf"));
@@ -279,7 +279,7 @@ class CaseFileServiceTest {
         when(caseFileRepository.saveAndFlush(any(CaseFile.class)))
                 .thenThrow(new DataIntegrityViolationException("database failure"));
 
-        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("database failure");
 
@@ -315,7 +315,7 @@ class CaseFileServiceTest {
                 .when(s3Service)
                 .deleteFile(anyString());
 
-        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("database failure");
 
@@ -340,7 +340,7 @@ class CaseFileServiceTest {
                 .when(s3Service)
                 .uploadFileIfAbsent(anyString(), any(byte[].class), eq("application/pdf"));
 
-        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN))
                 .isInstanceOf(FileKeyConflictException.class)
                 .hasMessageContaining("A file with the same name already exists.");
 
@@ -380,7 +380,7 @@ class CaseFileServiceTest {
                 new byte[6 * 1024 * 1024]
         );
 
-        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN))
                 .isInstanceOf(FileTooLargeException.class)
                 .hasMessageContaining("Filen är för stor.");
     }
@@ -395,7 +395,7 @@ class CaseFileServiceTest {
                 new byte[6 * 1024 * 1024]
         );
 
-        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file))
+        assertThatThrownBy(() -> caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN))
                 .isInstanceOf(FileTooLargeException.class)
                 .hasMessageContaining("Filen är för stor.");
 
@@ -418,7 +418,7 @@ class CaseFileServiceTest {
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CaseFile result = caseFileService.uploadFile(1L, file);
+        CaseFile result = caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN);
 
         assertThat(result.getDocumentNumber()).isEqualTo(1);
         assertThat(result.getDocumentReference()).isEqualTo("KS26-1-1");
@@ -444,10 +444,9 @@ class CaseFileServiceTest {
                 .thenReturn(Optional.of(existingFile));
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CaseFile result = caseFileService.uploadFile(1L, file);
+        CaseFile result = caseFileService.uploadFile(1L, file,FileConfidentialityLevel.OPEN);
 
         assertThat(result.getDocumentNumber()).isEqualTo(2);
         assertThat(result.getDocumentReference()).isEqualTo("KS26-1-2");
     }
-
 }
