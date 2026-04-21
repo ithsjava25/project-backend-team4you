@@ -1,9 +1,12 @@
 package backendlab.team4you.casefile;
 
+import backendlab.team4you.casefile.access.CaseFileAccessService;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
 import backendlab.team4you.exceptions.*;
 import backendlab.team4you.s3.S3Service;
+import backendlab.team4you.user.UserEntity;
+import backendlab.team4you.user.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -40,6 +43,9 @@ class CaseFileServiceTest {
 
     @InjectMocks
     private CaseFileService caseFileService;
+
+    @Mock
+    private CaseFileAccessService caseFileAccessService;
 
     private CaseRecord caseRecord;
 
@@ -448,5 +454,90 @@ class CaseFileServiceTest {
 
         assertThat(result.getDocumentNumber()).isEqualTo(2);
         assertThat(result.getDocumentReference()).isEqualTo("KS26-1-2");
+    }
+
+    @Test
+    @DisplayName("listFileItemsForViewer should hide confidential filename for unauthorized user")
+    void listFileItemsForViewer_shouldHideConfidentialFilename_forUnauthorizedUser() {
+        UserEntity viewer = new UserEntity();
+        viewer.setRole(UserRole.USER);
+        viewer.setId(org.springframework.security.web.webauthn.api.Bytes.fromBase64("dXNlcjE"));
+
+        CaseFile confidentialFile = new CaseFile();
+        confidentialFile.setId(100L);
+        confidentialFile.setCaseRecord(caseRecord);
+        confidentialFile.setDocumentNumber(1);
+        confidentialFile.setDocumentReference("KS26-1-1");
+        confidentialFile.setOriginalFilename("hemligt-avtal.pdf");
+        confidentialFile.setConfidentialityLevel(FileConfidentialityLevel.CONFIDENTIAL);
+
+        when(caseRecordRepository.existsById(1L)).thenReturn(true);
+        when(caseFileRepository.findByCaseRecordIdOrderByDocumentNumberAsc(1L))
+                .thenReturn(List.of(confidentialFile));
+        when(caseFileAccessService.canViewFile(viewer, confidentialFile)).thenReturn(false);
+
+        List<CaseFileListItemDto> result = caseFileService.listFileItemsForViewer(1L, viewer);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).displayName()).isEqualTo("Sekretess");
+        assertThat(result.get(0).canDownload()).isFalse();
+        assertThat(result.get(0).confidential()).isTrue();
+        assertThat(result.get(0).documentReference()).isEqualTo("KS26-1-1");
+    }
+
+    @Test
+    @DisplayName("listFileItemsForViewer should show confidential filename for authorized user")
+    void listFileItemsForViewer_shouldShowConfidentialFilename_forAuthorizedUser() {
+        UserEntity admin = new UserEntity();
+        admin.setRole(UserRole.ADMIN);
+        admin.setId(org.springframework.security.web.webauthn.api.Bytes.fromBase64("YWRtaW4"));
+
+        CaseFile confidentialFile = new CaseFile();
+        confidentialFile.setId(100L);
+        confidentialFile.setCaseRecord(caseRecord);
+        confidentialFile.setDocumentNumber(1);
+        confidentialFile.setDocumentReference("KS26-1-1");
+        confidentialFile.setOriginalFilename("hemligt-avtal.pdf");
+        confidentialFile.setConfidentialityLevel(FileConfidentialityLevel.CONFIDENTIAL);
+
+        when(caseRecordRepository.existsById(1L)).thenReturn(true);
+        when(caseFileRepository.findByCaseRecordIdOrderByDocumentNumberAsc(1L))
+                .thenReturn(List.of(confidentialFile));
+        when(caseFileAccessService.canViewFile(admin, confidentialFile)).thenReturn(true);
+
+        List<CaseFileListItemDto> result = caseFileService.listFileItemsForViewer(1L, admin);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).displayName()).isEqualTo("hemligt-avtal.pdf");
+        assertThat(result.get(0).canDownload()).isTrue();
+        assertThat(result.get(0).confidential()).isTrue();
+    }
+
+    @Test
+    @DisplayName("listFileItemsForViewer should show open file normally")
+    void listFileItemsForViewer_shouldShowOpenFileNormally() {
+        UserEntity viewer = new UserEntity();
+        viewer.setRole(UserRole.USER);
+        viewer.setId(org.springframework.security.web.webauthn.api.Bytes.fromBase64("dXNlcjM"));
+
+        CaseFile openFile = new CaseFile();
+        openFile.setId(101L);
+        openFile.setCaseRecord(caseRecord);
+        openFile.setDocumentNumber(1);
+        openFile.setDocumentReference("KS26-1-1");
+        openFile.setOriginalFilename("offentlig.pdf");
+        openFile.setConfidentialityLevel(FileConfidentialityLevel.OPEN);
+
+        when(caseRecordRepository.existsById(1L)).thenReturn(true);
+        when(caseFileRepository.findByCaseRecordIdOrderByDocumentNumberAsc(1L))
+                .thenReturn(List.of(openFile));
+        when(caseFileAccessService.canViewFile(viewer, openFile)).thenReturn(true);
+
+        List<CaseFileListItemDto> result = caseFileService.listFileItemsForViewer(1L, viewer);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).displayName()).isEqualTo("offentlig.pdf");
+        assertThat(result.get(0).canDownload()).isTrue();
+        assertThat(result.get(0).confidential()).isFalse();
     }
 }
