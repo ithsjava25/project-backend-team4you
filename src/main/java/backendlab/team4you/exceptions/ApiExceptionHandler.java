@@ -202,4 +202,15 @@ public class ApiExceptionHandler {
                         LocalDateTime.now()
                 ));
     }
+
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ErrorResponseDto> handleAccessDenied(org.springframework.security.access.AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponseDto(
+                        HttpStatus.FORBIDDEN.value(),
+                        "forbidden",
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
 }

@@ -9,7 +9,8 @@ public record CaseFileResponseDto(
         long size,
         LocalDateTime uploadedAt,
         int documentNumber,
-        String documentReference
+        String documentReference,
+        FileConfidentialityLevel confidentialityLevel
 ) {
     public static CaseFileResponseDto from(CaseFile caseFile) {
         return new CaseFileResponseDto(
@@ -19,7 +20,8 @@ public record CaseFileResponseDto(
                 caseFile.getSize(),
                 caseFile.getUploadedAt(),
                 caseFile.getDocumentNumber(),
-                caseFile.getDocumentReference()
+                caseFile.getDocumentReference(),
+                caseFile.getConfidentialityLevel()
         );
     }
 }
