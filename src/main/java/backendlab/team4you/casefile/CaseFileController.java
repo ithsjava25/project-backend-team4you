@@ -1,13 +1,11 @@
 package backendlab.team4you.casefile;
 
-import backendlab.team4you.casefile.access.CaseFileAccessService;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
@@ -23,14 +21,10 @@ import java.util.List;
 public class CaseFileController {
 
     private final CaseFileService caseFileService;
-    private final CaseFileAccessService caseFileAccessService;
     private final UserService userService;
 
-    public CaseFileController(CaseFileService caseFileService,
-                              CaseFileAccessService caseFileAccessService,
-                              UserService userService) {
+    public CaseFileController(CaseFileService caseFileService, UserService userService) {
         this.caseFileService = caseFileService;
-        this.caseFileAccessService = caseFileAccessService;
         this.userService = userService;
     }
 
@@ -38,9 +32,11 @@ public class CaseFileController {
     public ResponseEntity<CaseFileResponseDto> uploadFile(
             @PathVariable Long caseRecordId,
             @RequestParam("file") MultipartFile file,
-            @RequestParam("confidentialityLevel") FileConfidentialityLevel confidentialityLevel
+            @RequestParam("confidentialityLevel") FileConfidentialityLevel confidentialityLevel,
+            Principal principal
     ) throws IOException {
-        CaseFile savedFile = caseFileService.uploadFile(caseRecordId, file, confidentialityLevel);
+        UserEntity currentUser = userService.getCurrentUser(principal);
+        CaseFile savedFile = caseFileService.uploadFile(caseRecordId, file, confidentialityLevel, currentUser);
         return ResponseEntity.ok(CaseFileResponseDto.from(savedFile));
     }
 
@@ -60,11 +56,7 @@ public class CaseFileController {
             Principal principal
     ) {
         UserEntity currentUser = userService.getCurrentUser(principal);
-        CaseFile caseFile = caseFileService.getCaseFile(caseRecordId, fileId);
-
-        if (!caseFileAccessService.canViewFile(currentUser, caseFile)) {
-            throw new AccessDeniedException("Du har inte behörighet att öppna denna fil.");
-        }
+        CaseFile caseFile = caseFileService.getCaseFileForViewer(caseRecordId, fileId, currentUser);
 
         MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
         if (caseFile.getContentType() != null && !caseFile.getContentType().isBlank()) {
@@ -72,7 +64,7 @@ public class CaseFileController {
         }
 
         StreamingResponseBody body = outputStream -> {
-            try (InputStream stream = caseFileService.downloadFile(caseRecordId, fileId)) {
+            try (InputStream stream = caseFileService.downloadFile(caseRecordId, fileId, currentUser)) {
                 stream.transferTo(outputStream);
             }
         };
@@ -92,9 +84,11 @@ public class CaseFileController {
     @DeleteMapping("/{fileId}")
     public ResponseEntity<Void> deleteFile(
             @PathVariable Long caseRecordId,
-            @PathVariable Long fileId
+            @PathVariable Long fileId,
+            Principal principal
     ) {
-        caseFileService.deleteFile(caseRecordId, fileId);
+        UserEntity currentUser = userService.getCurrentUser(principal);
+        caseFileService.deleteFile(caseRecordId, fileId, currentUser);
         return ResponseEntity.noContent().build();
     }
 }

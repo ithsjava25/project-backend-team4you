@@ -28,6 +28,44 @@ public class CaseFileAccessService {
             return true;
         }
 
+        return hasConfidentialFileAccess(user, caseFile);
+    }
+
+    public boolean canDeleteFile(UserEntity user, CaseFile caseFile) {
+        if (user == null) {
+            return false;
+        }
+
+        if (isAdmin(user)) {
+            return true;
+        }
+
+        return hasConfidentialFileAccess(user, caseFile);
+    }
+
+    public boolean canUploadFile(UserEntity user, Long caseRecordId, FileConfidentialityLevel confidentialityLevel) {
+        if (user == null) {
+            return false;
+        }
+
+        if (isAdmin(user)) {
+            return true;
+        }
+
+        FileConfidentialityLevel effectiveLevel =
+                confidentialityLevel != null ? confidentialityLevel : FileConfidentialityLevel.OPEN;
+
+        if (effectiveLevel == FileConfidentialityLevel.OPEN) {
+            return true;
+        }
+
+        return caseFileAccessRepository.existsByCaseRecordIdAndUserIdAndCanViewConfidentialFilesTrue(
+                caseRecordId,
+                user.getIdAsString()
+        );
+    }
+
+    private boolean hasConfidentialFileAccess(UserEntity user, CaseFile caseFile) {
         return caseFileAccessRepository.existsByCaseRecordIdAndUserIdAndCanViewConfidentialFilesTrue(
                 caseFile.getCaseRecord().getId(),
                 user.getIdAsString()

@@ -43,7 +43,7 @@ public class CaseFileViewController {
         UserEntity currentUser = userService.getCurrentUser(principal);
 
         try {
-            caseFileService.uploadFile(caseId, file, confidentialityLevel);
+            caseFileService.uploadFile(caseId, file, confidentialityLevel, currentUser);
             model.addAttribute("successMessage", "Filen laddades upp.");
         } catch (Exception ex) {
             model.addAttribute("errorMessage", ex.getMessage());
@@ -64,7 +64,7 @@ public class CaseFileViewController {
         UserEntity currentUser = userService.getCurrentUser(principal);
 
         try {
-            caseFileService.deleteFile(caseId, fileId);
+            caseFileService.deleteFile(caseId, fileId, currentUser);
             model.addAttribute("successMessage", "Filen togs bort.");
         } catch (Exception ex) {
             model.addAttribute("errorMessage", ex.getMessage());

@@ -5,20 +5,21 @@ import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
 import backendlab.team4you.exceptions.CaseFileNotFoundException;
 import backendlab.team4you.exceptions.CaseRecordNotFoundException;
-import backendlab.team4you.exceptions.InvalidFileNameException;
-import backendlab.team4you.exceptions.FileTooLargeException;
 import backendlab.team4you.exceptions.FileStorageConfigurationException;
-import backendlab.team4you.user.UserEntity;
-import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
+import backendlab.team4you.exceptions.FileTooLargeException;
+import backendlab.team4you.exceptions.InvalidFileNameException;
 import backendlab.team4you.s3.S3Service;
+import backendlab.team4you.user.UserEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +43,7 @@ public class CaseFileService {
             CaseFileRepository caseFileRepository,
             CaseFileAccessService caseFileAccessService,
             S3Service s3Service
-    )  {
+    ) {
         this.caseRecordRepository = caseRecordRepository;
         this.caseFileRepository = caseFileRepository;
         this.caseFileAccessService = caseFileAccessService;
@@ -53,10 +54,16 @@ public class CaseFileService {
     public CaseFile uploadFile(
             Long caseRecordId,
             MultipartFile file,
-            FileConfidentialityLevel confidentialityLevel) throws IOException {
+            FileConfidentialityLevel confidentialityLevel,
+            UserEntity actor
+    ) throws IOException {
 
         FileConfidentialityLevel effectiveConfidentialityLevel =
                 confidentialityLevel != null ? confidentialityLevel : FileConfidentialityLevel.OPEN;
+
+        if (!caseFileAccessService.canUploadFile(actor, caseRecordId, effectiveConfidentialityLevel)) {
+            throw new AccessDeniedException("Du har inte behörighet att ladda upp denna fil.");
+        }
 
         if (file.getSize() > MAX_FILE_SIZE_BYTES) {
             throw new FileTooLargeException(MAX_FILE_SIZE_BYTES);
@@ -147,14 +154,29 @@ public class CaseFileService {
     }
 
     @Transactional(readOnly = true)
-    public InputStream downloadFile(Long caseRecordId, Long fileId) {
+    public CaseFile getCaseFileForViewer(Long caseRecordId, Long fileId, UserEntity viewer) {
         CaseFile caseFile = getCaseFile(caseRecordId, fileId);
+
+        if (!caseFileAccessService.canViewFile(viewer, caseFile)) {
+            throw new AccessDeniedException("Du har inte behörighet att öppna denna fil.");
+        }
+
+        return caseFile;
+    }
+
+    @Transactional(readOnly = true)
+    public InputStream downloadFile(Long caseRecordId, Long fileId, UserEntity viewer) {
+        CaseFile caseFile = getCaseFileForViewer(caseRecordId, fileId, viewer);
         return s3Service.downloadFile(caseFile.getS3Key());
     }
 
     @Transactional
-    public void deleteFile(Long caseRecordId, Long fileId) {
+    public void deleteFile(Long caseRecordId, Long fileId, UserEntity actor) {
         CaseFile caseFile = getCaseFile(caseRecordId, fileId);
+
+        if (!caseFileAccessService.canDeleteFile(actor, caseFile)) {
+            throw new AccessDeniedException("Du har inte behörighet att radera denna fil.");
+        }
 
         String s3Key = caseFile.getS3Key();
         caseFileRepository.delete(caseFile);
@@ -171,7 +193,7 @@ public class CaseFileService {
             return MediaType.APPLICATION_OCTET_STREAM_VALUE;
         }
         try {
-                return MediaType.parseMediaType(contentType).toString();
+            return MediaType.parseMediaType(contentType).toString();
         } catch (InvalidMediaTypeException exception) {
             return MediaType.APPLICATION_OCTET_STREAM_VALUE;
         }
@@ -204,7 +226,10 @@ public class CaseFileService {
         }
 
         if (originalException instanceof DataIntegrityViolationException) {
-            log.warn("Data integrity violation while persisting CaseFile (possible duplicate s3_key or invalid FK/NULL). Attempted cleanup for key={}", s3Key);
+            log.warn(
+                    "Data integrity violation while persisting CaseFile (possible duplicate s3_key or invalid FK/NULL). Attempted cleanup for key={}",
+                    s3Key
+            );
         }
     }
 
