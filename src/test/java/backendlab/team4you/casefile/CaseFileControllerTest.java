@@ -1,16 +1,22 @@
 package backendlab.team4you.casefile;
 
+import backendlab.team4you.casefile.access.CaseFileAccessService;
 import backendlab.team4you.exceptions.*;
+import backendlab.team4you.user.UserEntity;
+import backendlab.team4you.user.UserRole;
+import backendlab.team4you.user.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
@@ -21,9 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = CaseFileController.class)
@@ -35,6 +39,12 @@ class CaseFileControllerTest {
 
     @MockitoBean
     private CaseFileService caseFileService;
+
+    @MockitoBean
+    private CaseFileAccessService caseFileAccessService;
+
+    @MockitoBean
+    private UserService userService;
 
     @Test
     @DisplayName("uploadFile should return ok and response body when upload succeeds")
@@ -55,10 +65,11 @@ class CaseFileControllerTest {
                 "hello".getBytes()
         );
 
-        when(caseFileService.uploadFile(eq(1L), any(),FileConfidentialityLevel.OPEN)).thenReturn(savedFile);
+        when(caseFileService.uploadFile(eq(1L), any(), eq(FileConfidentialityLevel.OPEN)))
+                .thenReturn(savedFile);
 
         mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 1L)
-                        .file(multipartFile))
+                        .file(multipartFile).param("confidentialityLevel", "OPEN"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(10))
                 .andExpect(jsonPath("$.originalFilename").value("test.pdf"))
@@ -78,11 +89,11 @@ class CaseFileControllerTest {
                 "hello".getBytes()
         );
 
-        when(caseFileService.uploadFile(eq(99L), any(),FileConfidentialityLevel.OPEN))
+        when(caseFileService.uploadFile(eq(99L), any(), eq(FileConfidentialityLevel.OPEN)))
                 .thenThrow(new CaseRecordNotFoundException(99L));
 
         mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 99L)
-                        .file(multipartFile))
+                        .file(multipartFile).param("confidentialityLevel", "OPEN"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.error").value("not found"))
@@ -99,15 +110,15 @@ class CaseFileControllerTest {
                 "hello".getBytes()
         );
 
-        when(caseFileService.uploadFile(eq(1L), any(),FileConfidentialityLevel.OPEN))
-                .thenThrow(new InvalidFileNameException("Filename must not be blank"));
+        when(caseFileService.uploadFile(eq(1L), any(), eq(FileConfidentialityLevel.OPEN)))
+                .thenThrow(new InvalidFileNameException("Filnamn måste anges."));
 
         mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 1L)
-                        .file(multipartFile))
+                        .file(multipartFile).param("confidentialityLevel", "OPEN"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("bad request"))
-                .andExpect(jsonPath("$.message").value("Filename must not be blank"));
+                .andExpect(jsonPath("$.message").value("Filnamn måste anges."));
     }
 
     @Test
@@ -169,12 +180,21 @@ class CaseFileControllerTest {
         caseFile.setOriginalFilename("document.pdf");
         caseFile.setContentType("application/pdf");
         caseFile.setS3Key("cases/1/uuid-document.pdf");
+        caseFile.setConfidentialityLevel(FileConfidentialityLevel.OPEN);
 
+        UserEntity user = new UserEntity();
+        user.setName("dev");
+        user.setRole(UserRole.USER);
+        user.setId(new Bytes("dev".getBytes()));
+
+        when(userService.getCurrentUser(any())).thenReturn(user);
         when(caseFileService.getCaseFile(1L, 100L)).thenReturn(caseFile);
+        when(caseFileAccessService.canViewFile(user, caseFile)).thenReturn(true);
         when(caseFileService.downloadFile(1L, 100L))
                 .thenReturn(new ByteArrayInputStream("hello".getBytes()));
 
-        mockMvc.perform(get("/api/cases/{caseRecordId}/files/{fileId}", 1L, 100L))
+        mockMvc.perform(get("/api/cases/{caseRecordId}/files/{fileId}", 1L, 100L)
+                        .principal(() -> "dev"))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, containsString("attachment")))
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, containsString("document.pdf")))
@@ -185,10 +205,17 @@ class CaseFileControllerTest {
     @Test
     @DisplayName("downloadFile should return not found when file does not exist")
     void downloadFile_shouldReturnNotFound_whenFileDoesNotExist() throws Exception {
+        UserEntity user = new UserEntity();
+        user.setName("dev");
+        user.setRole(UserRole.USER);
+        user.setId(new Bytes("dev".getBytes()));
+
+        when(userService.getCurrentUser(any())).thenReturn(user);
         when(caseFileService.getCaseFile(1L, 999L))
                 .thenThrow(new CaseFileNotFoundException(1L, 999L));
 
-        mockMvc.perform(get("/api/cases/{caseRecordId}/files/{fileId}", 1L, 999L))
+        mockMvc.perform(get("/api/cases/{caseRecordId}/files/{fileId}", 1L, 999L)
+                        .principal(() -> "dev"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.message")
@@ -225,11 +252,11 @@ class CaseFileControllerTest {
                 "hello".getBytes()
         );
 
-        when(caseFileService.uploadFile(eq(1L), any(),FileConfidentialityLevel.OPEN))
+        when(caseFileService.uploadFile(eq(1L), any(), eq(FileConfidentialityLevel.OPEN)))
                 .thenThrow(new FileKeyConflictException("cases/1/conflict-key"));
 
         mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 1L)
-                        .file(multipartFile))
+                        .file(multipartFile).param("confidentialityLevel", "OPEN"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.status").value(409))
                 .andExpect(jsonPath("$.error").value("conflict"))
@@ -247,15 +274,74 @@ class CaseFileControllerTest {
                 "hello".getBytes()
         );
 
-        when(caseFileService.uploadFile(eq(1L), any(),FileConfidentialityLevel.OPEN))
+        when(caseFileService.uploadFile(eq(1L), any(), eq(FileConfidentialityLevel.OPEN)))
                 .thenThrow(new FileTooLargeException((long) (5 * 1024 * 1024)));
 
         mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 1L)
-                        .file(multipartFile))
+                        .file(multipartFile).param("confidentialityLevel", "OPEN"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("bad request"))
                 .andExpect(jsonPath("$.message").value("Filen är för stor. Maxstorlek är 5 MB."));
     }
 
+    @Test
+    @DisplayName("downloadFile should return forbidden when user lacks access to confidential file")
+    void downloadFile_shouldReturnForbidden_whenUserLacksAccessToConfidentialFile() throws Exception {
+        CaseFile caseFile = new CaseFile();
+        caseFile.setId(100L);
+        caseFile.setOriginalFilename("secret.pdf");
+        caseFile.setContentType("application/pdf");
+        caseFile.setConfidentialityLevel(FileConfidentialityLevel.CONFIDENTIAL);
+
+        UserEntity user = new UserEntity();
+        user.setName("dev");
+        user.setRole(UserRole.USER);
+        user.setId(org.springframework.security.web.webauthn.api.Bytes.fromBase64("ZGV2"));
+
+        when(userService.getCurrentUser(any())).thenReturn(user);
+        when(caseFileService.getCaseFile(1L, 100L)).thenReturn(caseFile);
+        when(caseFileAccessService.canViewFile(user, caseFile)).thenReturn(false);
+
+        mockMvc.perform(get("/api/cases/{caseRecordId}/files/{fileId}", 1L, 100L)
+                        .principal(() -> "dev"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.status").value(403))
+                .andExpect(jsonPath("$.error").value("forbidden"))
+                .andExpect(jsonPath("$.message").value("Du har inte behörighet att öppna denna fil."));
+    }
+
+    @Test
+    @DisplayName("downloadFile should return file when user has access to confidential file")
+    void downloadFile_shouldReturnFile_whenUserHasAccessToConfidentialFile() throws Exception {
+        CaseFile caseFile = new CaseFile();
+        caseFile.setId(100L);
+        caseFile.setOriginalFilename("secret.pdf");
+        caseFile.setContentType("application/pdf");
+        caseFile.setS3Key("cases/1/secret.pdf");
+        caseFile.setConfidentialityLevel(FileConfidentialityLevel.CONFIDENTIAL);
+
+        UserEntity admin = new UserEntity();
+        admin.setName("dev");
+        admin.setRole(UserRole.ADMIN);
+        admin.setId(new Bytes("dev".getBytes()));
+
+        when(userService.getCurrentUser(any())).thenReturn(admin);
+        when(caseFileService.getCaseFile(1L, 100L)).thenReturn(caseFile);
+        when(caseFileAccessService.canViewFile(admin, caseFile)).thenReturn(true);
+        when(caseFileService.downloadFile(1L, 100L))
+                .thenReturn(new ByteArrayInputStream("hello".getBytes()));
+
+        MvcResult mvcResult = mockMvc.perform(get("/api/cases/{caseRecordId}/files/{fileId}", 1L, 100L)
+                        .principal(() -> "dev"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, containsString("attachment")))
+                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, containsString("secret.pdf")))
+                .andExpect(content().contentType("application/pdf"))
+                .andExpect(content().bytes("hello".getBytes()));
+    }
 }
