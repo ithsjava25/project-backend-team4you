@@ -47,6 +47,10 @@ public class CaseFile {
     @Column(name = "document_reference", nullable = false)
     private String documentReference;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "confidentiality_level", nullable = false, length = 50)
+    private FileConfidentialityLevel confidentialityLevel;
+
     public String getS3Key() {
         return s3Key;
     }
@@ -117,5 +121,17 @@ public class CaseFile {
 
     public void setDocumentReference(String documentReference) {
         this.documentReference = documentReference;
+    }
+
+    public FileConfidentialityLevel getConfidentialityLevel() {
+        return confidentialityLevel;
+    }
+
+    public void setConfidentialityLevel(FileConfidentialityLevel confidentialityLevel) {
+        this.confidentialityLevel = confidentialityLevel;
+    }
+
+    public boolean isConfidential() {
+        return confidentialityLevel == FileConfidentialityLevel.CONFIDENTIAL;
     }
 }
