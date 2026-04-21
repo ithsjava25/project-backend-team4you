@@ -1,4 +1,4 @@
-package backendlab.team4you.casefile;
+package backendlab.team4you.casefile.access;
 
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.user.UserEntity;
