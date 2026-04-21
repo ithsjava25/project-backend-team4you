@@ -1,6 +1,7 @@
-<div th:fragment="caseFileList">
+<div th:fragment="caseFileList" class="case-file-panel">
 
     <h3>Filer</h3>
+
     <p th:if="${successMessage}"
        th:text="${successMessage}"
        class="feedback-message success-message"></p>
@@ -9,7 +10,25 @@
        th:text="${errorMessage}"
        class="feedback-message error-message"></p>
 
+    <form th:action="@{/dashboard/case-management/case-records/{caseId}/files(caseId=${caseRecordId})}"
+          th:attr="hx-post=@{/dashboard/case-management/case-records/{caseId}/files(caseId=${caseRecordId})}"
+          method="post"
+          enctype="multipart/form-data"
+          hx-encoding="multipart/form-data"
+          hx-target="closest .case-file-panel"
+          hx-swap="outerHTML">
+
+        <div class="form-group">
+            <label for="case-file-upload">Ladda upp fil</label>
+            <input id="case-file-upload" type="file" name="file" required>
+        </div>
+
+        <button type="submit">Ladda upp</button>
+    </form>
+
     <ul class="case-file-list">
+        <li th:if="${#lists.isEmpty(files)}">Inga filer uppladdade ännu.</li>
+
         <li th:each="file : ${files}">
             <span th:text="${file.originalFilename}">document.pdf</span>
 
@@ -17,23 +36,12 @@
                 Ladda ner
             </a>
 
-            <button th:attr="hx-delete=@{/dashboard/case-management/case-records/{caseId}/files/{fileId}(caseId=${caseRecordId}, fileId=${file.id})}"
-                    hx-target="#case-file-panel"
-                    hx-swap="innerHTML">
+            <button type="button"
+                    th:attr="hx-delete=@{/dashboard/case-management/case-records/{caseId}/files/{fileId}(caseId=${caseRecordId}, fileId=${file.id})}"
+                    hx-target="closest .case-file-panel"
+                    hx-swap="outerHTML">
                 Ta bort
             </button>
         </li>
     </ul>
-
-    <form th:attr="hx-post=@{/dashboard/case-management/case-records/{caseId}/files(caseId=${caseRecordId})}"
-          hx-encoding="multipart/form-data"
-          hx-target="#case-file-panel"
-          hx-swap="innerHTML">
-        <div class="form-group">
-            <label for="case-file-upload">Ladda upp fil</label>
-            <input id="case-file-upload" type="file" name="file" required>
-        </div>
-
-        <button type="submit" class="btn-primary">Ladda upp</button>
-    </form>
 </div>
