@@ -62,10 +62,10 @@ public class CaseFileService {
             throw new FileTooLargeException(MAX_FILE_SIZE_BYTES);
         }
 
-        CaseRecord caseRecord = caseRecordRepository.findById(caseRecordId)
+        CaseRecord caseRecord = caseRecordRepository.findByIdWithLock(caseRecordId)
                 .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
 
-        int nextDocumentNumber = allocateNextDocumentNumber(caseRecordId);
+        int nextDocumentNumber = allocateNextDocumentNumber(caseRecord.getId());
         String documentReference = caseRecord.getCaseNumber() + "-" + nextDocumentNumber;
 
         String originalFilename = file.getOriginalFilename();
