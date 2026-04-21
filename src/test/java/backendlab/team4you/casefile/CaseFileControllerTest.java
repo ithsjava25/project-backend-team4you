@@ -45,6 +45,8 @@ class CaseFileControllerTest {
         savedFile.setContentType("application/pdf");
         savedFile.setSize(123L);
         savedFile.setUploadedAt(LocalDateTime.of(2026, 4, 16, 12, 0));
+        savedFile.setDocumentNumber(1);
+        savedFile.setDocumentReference("KS26-1-1");
 
         MockMultipartFile multipartFile = new MockMultipartFile(
                 "file",
@@ -61,7 +63,9 @@ class CaseFileControllerTest {
                 .andExpect(jsonPath("$.id").value(10))
                 .andExpect(jsonPath("$.originalFilename").value("test.pdf"))
                 .andExpect(jsonPath("$.contentType").value("application/pdf"))
-                .andExpect(jsonPath("$.size").value(123));
+                .andExpect(jsonPath("$.size").value(123))
+                .andExpect(jsonPath("$.documentNumber").value(1))
+                .andExpect(jsonPath("$.documentReference").value("KS26-1-1"));
     }
 
     @Test
@@ -115,6 +119,8 @@ class CaseFileControllerTest {
         file1.setContentType("application/pdf");
         file1.setSize(100L);
         file1.setUploadedAt(LocalDateTime.of(2026, 4, 16, 12, 0));
+        file1.setDocumentNumber(1);
+        file1.setDocumentReference("KS26-1-1");
 
         CaseFile file2 = new CaseFile();
         file2.setId(11L);
@@ -122,7 +128,8 @@ class CaseFileControllerTest {
         file2.setContentType("text/plain");
         file2.setSize(200L);
         file2.setUploadedAt(LocalDateTime.of(2026, 4, 16, 12, 5));
-
+        file2.setDocumentNumber(2);
+        file2.setDocumentReference("KS26-1-2");
         when(caseFileService.listFiles(1L)).thenReturn(List.of(file1, file2));
 
         mockMvc.perform(get("/api/cases/{caseRecordId}/files", 1L))
@@ -132,10 +139,14 @@ class CaseFileControllerTest {
                 .andExpect(jsonPath("$[0].originalFilename").value("a.pdf"))
                 .andExpect(jsonPath("$[0].contentType").value("application/pdf"))
                 .andExpect(jsonPath("$[0].size").value(100))
+                .andExpect(jsonPath("$[0].documentNumber").value(1))
+                .andExpect(jsonPath("$[0].documentReference").value("KS26-1-1"))
                 .andExpect(jsonPath("$[1].id").value(11))
                 .andExpect(jsonPath("$[1].originalFilename").value("b.txt"))
                 .andExpect(jsonPath("$[1].contentType").value("text/plain"))
-                .andExpect(jsonPath("$[1].size").value(200));
+                .andExpect(jsonPath("$[1].size").value(200))
+                .andExpect(jsonPath("$[1].documentNumber").value(2))
+                .andExpect(jsonPath("$[1].documentReference").value("KS26-1-2"));
     }
 
     @Test
@@ -224,6 +235,27 @@ class CaseFileControllerTest {
                 .andExpect(jsonPath("$.error").value("conflict"))
                 .andExpect(jsonPath("$.message")
                         .value("A file with the same name already exists."));
+    }
+
+    @Test
+    @DisplayName("uploadFile should return bad request when file is too large")
+    void uploadFile_shouldReturnBadRequest_whenFileIsTooLarge() throws Exception {
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file",
+                "big.pdf",
+                "application/pdf",
+                "hello".getBytes()
+        );
+
+        when(caseFileService.uploadFile(eq(1L), any()))
+                .thenThrow(new FileTooLargeException((long) (5 * 1024 * 1024)));
+
+        mockMvc.perform(multipart("/api/cases/{caseRecordId}/files", 1L)
+                        .file(multipartFile))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("bad request"))
+                .andExpect(jsonPath("$.message").value("Filen är för stor. Maxstorlek är 5 MB."));
     }
 
 }
