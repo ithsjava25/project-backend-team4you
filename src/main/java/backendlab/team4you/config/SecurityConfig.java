@@ -34,10 +34,12 @@ public class SecurityConfig {
                                 .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                                 .requestMatchers( "/","/login", "/login/webauthn", "/signup", "/error").permitAll()
 
-                                .requestMatchers("/api/files/**", "/webauthn/authenticate/**").permitAll()
+                                .requestMatchers("/webauthn/authenticate/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/files/upload").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/files/download/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/api/files/delete/**").hasRole("ADMIN")
 
                                 .requestMatchers("/webauthn/**").hasAnyRole("USER", "ADMIN")
-
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/home", "/profile/**").hasRole("USER")
                                 .requestMatchers("/add-passkey", "/webauthn/register/**").hasAnyRole("USER", "ADMIN")
