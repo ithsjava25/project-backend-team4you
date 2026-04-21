@@ -23,20 +23,15 @@ public class UserController {
 
     }
 
-
-
     @GetMapping("/")
     public String homepage(){
         return "home";
     }
 
-
-
-
-
-
-
-
+    @GetMapping("/home")
+    public String userHome() {
+        return "home";
+    }
 
     @DeleteMapping("/account")
     public String deleteAccount(Principal principal) {

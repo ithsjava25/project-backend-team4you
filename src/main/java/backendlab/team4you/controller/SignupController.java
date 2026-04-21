@@ -3,8 +3,6 @@ package backendlab.team4you.controller;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
 
-import backendlab.team4you.user.UserRepository;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,13 +34,9 @@ public class SignupController {
         this.userService = userService;
     }
 
-    @GetMapping("/webauthn-check")
-    public String showWebAuthnCheck(){
-        return "webauthn-check";
-    }
-    @GetMapping("/dashboard")
-    public String dashboard() {
-        return "dashboard";
+    @GetMapping("/login/webauthn")
+    public String webauthnCheck() {
+        return "check";
     }
 
     @GetMapping("/signup")
@@ -64,7 +58,7 @@ public class SignupController {
         );
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                userEntity.getName(), null, List.of(new SimpleGrantedAuthority("ROLE_" + userEntity.getRole())));
+                userEntity.getName(), null, List.of(new SimpleGrantedAuthority(userEntity.getRole())));
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(auth);

@@ -15,7 +15,7 @@ import org.springframework.security.web.webauthn.management.UserCredentialReposi
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.config.annotation.web.configurers.WebAuthnConfigurer;
 
 @Configuration
 public class SecurityConfig {
@@ -25,23 +25,20 @@ public class SecurityConfig {
                                             CustomAuthenticationSuccessHandler successHandler) throws Exception {
 
         return http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/webauthn/**", "/api/files/**"))
                 .authorizeHttpRequests(
                         authorizeHttp -> authorizeHttp
                                 // Public endpoints
                                 .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
                                 .requestMatchers( "/","/login", "/login/webauthn", "/signup", "/error").permitAll()
-                                .requestMatchers("/webauthn/authenticate/**").permitAll()
-                                .requestMatchers("/api/files/**").permitAll()
 
+                                .requestMatchers("/api/files/**", "/webauthn/authenticate/**").permitAll()
 
-//                                .requestMatchers("/profile", "/logout").authenticated()
-                                .requestMatchers("/webauthn-check").authenticated()
+                                .requestMatchers("/webauthn/**").hasAnyRole("USER", "ADMIN")
 
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .requestMatchers("/dashboard", "/profile/**").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers("/add-passkey").hasAnyRole("USER", "ADMIN")
-                                .requestMatchers("/webauthn/register/**").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers("/home", "/profile/**").hasRole("USER")
+                                .requestMatchers("/add-passkey", "/webauthn/register/**").hasAnyRole("USER", "ADMIN")
 
                                 .anyRequest().authenticated()
                 )
@@ -52,8 +49,10 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .successHandler(successHandler))
-
+                        .loginProcessingUrl("/login")
+                        .successHandler(successHandler)
+                        .permitAll()
+                )
                 .logout(logout -> logout.logoutSuccessUrl("/").permitAll())
                 .build();
     }
@@ -79,7 +78,7 @@ public class SecurityConfig {
             return User.builder()
                     .username(user.getName())
                     .password(user.getPasswordHash())
-                    .roles(user.getRole())
+                    .authorities(user.getRole())
                     .accountLocked(false)
                     .build();
         };

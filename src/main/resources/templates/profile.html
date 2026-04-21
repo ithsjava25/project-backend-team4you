@@ -19,6 +19,17 @@
             Hej <span sec:authentication="name"></span> 👋
         </div>
 
+        <div style="margin-top: 20px;">
+            <ul style="list-style: none; padding: 0;">
+                <li>
+                    <a th:href="@{/webauthn/register}" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-key"></i>
+                        <span>Add Passkeys</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
         <hr>
 
         <div class="danger-zone">
