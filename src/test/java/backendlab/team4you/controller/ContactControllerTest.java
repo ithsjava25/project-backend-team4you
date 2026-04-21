@@ -36,4 +36,15 @@ class ContactControllerTest {
                         .param("message", "Hello"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void receiveMessage_shouldReturnForm_whenValidationFails() throws Exception {
+        mockMvc.perform(post("/contact/send")
+                        .param("firstName", "")
+                        .param("lastName", "")
+                        .param("email", "")
+                        .param("phone", "")
+                        .param("message", ""))
+                .andExpect(status().isOk());
+    }
 }
