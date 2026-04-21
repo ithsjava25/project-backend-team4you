@@ -2,7 +2,6 @@ package backendlab.team4you;
 
 import backendlab.team4you.user.UserRepository;
 import backendlab.team4you.user.UserEntity;
-import backendlab.team4you.user.UserRole;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,23 +25,27 @@ public class Team4youApplication {
 
 				UserEntity devAdmin = new UserEntity(
 						Bytes.fromBase64("YWRtaW4="),
-						"dev",
-						"admin"
+						"dev",           // name (username)
+						"admin"      // displayName
 				);
+
 				devAdmin.setPasswordHash(encoder.encode("123456"));
-				devAdmin.setRole(UserRole.ADMIN);
+				devAdmin.setRole("ROLE_ADMIN");
 				devAdmin.setEmail("devadmin@gmail.com");
+
 				repository.save(devAdmin);
 				System.out.println("✅ Admin created");
 
 				UserEntity devUser = new UserEntity(
 						Bytes.fromBase64("dXNlcg=="),
-						"user",
-						"user"
+						"user",           // name (username)
+						"user"      // displayName
 				);
+
 				devUser.setPasswordHash(encoder.encode("1234"));
-				devUser.setRole(UserRole.USER);
+				devUser.setRole("ROLE_USER");
 				devUser.setEmail("devuser@gmail.com");
+
 				repository.save(devUser);
 				System.out.println("✅ User created");
 			}

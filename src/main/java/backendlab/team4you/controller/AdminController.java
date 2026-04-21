@@ -10,15 +10,12 @@ import backendlab.team4you.user.UserRepository;
 import backendlab.team4you.user.UserService;
 import groovy.util.logging.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,11 +25,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Scanner;
 
 
 @Slf4j
 @Controller
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     private final LogService logService = new LogService();
@@ -174,5 +171,3 @@ public class AdminController {
         return "fragments/alert :: success";
     }
 }
-
-
