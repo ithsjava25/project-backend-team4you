@@ -177,5 +177,29 @@ public class ApiExceptionHandler {
                 ));
     }
 
+    @ExceptionHandler(FileTooLargeException.class)
+    public ResponseEntity<ErrorResponseDto> handleFileTooLarge(FileTooLargeException ex) {
+        log.warn("File too large: {}", ex.getMessage());
 
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponseDto(
+                        HttpStatus.BAD_REQUEST.value(),
+                        "bad request",
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
+
+    @ExceptionHandler(FileStorageConfigurationException.class)
+    public ResponseEntity<ErrorResponseDto> handleFileStorageConfiguration(FileStorageConfigurationException ex) {
+        log.error("File storage configuration error", ex);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponseDto(
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        "internal server error",
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
 }

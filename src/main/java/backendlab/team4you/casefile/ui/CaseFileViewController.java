@@ -30,11 +30,16 @@ public class CaseFileViewController {
             @PathVariable Long caseId,
             @RequestParam("file") MultipartFile file,
             Model model
-    ) throws IOException {
-        caseFileService.uploadFile(caseId, file);
+    ) {
+        try {
+            caseFileService.uploadFile(caseId, file);
+            model.addAttribute("successMessage", "Filen laddades upp.");
+        } catch (Exception ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+        }
+
         model.addAttribute("files", caseFileService.listFiles(caseId));
         model.addAttribute("caseRecordId", caseId);
-        model.addAttribute("successMessage", "filen laddades upp.");
         return "fragments/case-management/case-file-list :: caseFileList";
     }
 
@@ -44,10 +49,15 @@ public class CaseFileViewController {
             @PathVariable Long fileId,
             Model model
     ) {
-        caseFileService.deleteFile(caseId, fileId);
+        try {
+            caseFileService.deleteFile(caseId, fileId);
+            model.addAttribute("successMessage", "Filen togs bort.");
+        } catch (Exception ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+        }
+
         model.addAttribute("files", caseFileService.listFiles(caseId));
         model.addAttribute("caseRecordId", caseId);
-        model.addAttribute("successMessage", "filen togs bort.");
         return "fragments/case-management/case-file-list :: caseFileList";
     }
 }

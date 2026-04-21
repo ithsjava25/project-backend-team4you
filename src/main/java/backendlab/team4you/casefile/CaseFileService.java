@@ -5,6 +5,9 @@ import backendlab.team4you.caserecord.CaseRecordRepository;
 import backendlab.team4you.exceptions.CaseFileNotFoundException;
 import backendlab.team4you.exceptions.CaseRecordNotFoundException;
 import backendlab.team4you.exceptions.InvalidFileNameException;
+import backendlab.team4you.exceptions.FileTooLargeException;
+import backendlab.team4you.exceptions.FileStorageConfigurationException;
+import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import backendlab.team4you.s3.S3Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +48,7 @@ public class CaseFileService {
     public CaseFile uploadFile(Long caseRecordId, MultipartFile file) throws IOException {
 
         if (file.getSize() > MAX_FILE_SIZE_BYTES) {
-            throw new IllegalArgumentException("File exceeds maximum size");
+            throw new FileTooLargeException(MAX_FILE_SIZE_BYTES);
         }
 
         CaseRecord caseRecord = caseRecordRepository.findById(caseRecordId)
@@ -53,7 +56,7 @@ public class CaseFileService {
 
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null || originalFilename.isBlank()) {
-            throw new InvalidFileNameException("Filename must not be blank");
+            throw new InvalidFileNameException("Filnamn måste anges.");
         }
 
         String contentType = normalizeContentType(file.getContentType());
@@ -75,6 +78,11 @@ public class CaseFileService {
 
             return caseFileRepository.saveAndFlush(caseFile);
 
+        } catch (NoSuchBucketException exception) {
+            throw new FileStorageConfigurationException(
+                    "Filuppladdning är inte korrekt konfigurerad: S3-bucket saknas.",
+                    exception
+            );
         } catch (RuntimeException | IOException exception) {
             if (uploadedToS3) {
                 cleanupUploadedObjectIfPossible(s3Key, exception);
