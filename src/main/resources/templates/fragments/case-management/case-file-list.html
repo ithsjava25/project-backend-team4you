@@ -1,5 +1,13 @@
 <div th:fragment="caseFileList">
+
     <h3>Filer</h3>
+    <p th:if="${successMessage}"
+       th:text="${successMessage}"
+       class="feedback-message success-message"></p>
+
+    <p th:if="${errorMessage}"
+       th:text="${errorMessage}"
+       class="feedback-message error-message"></p>
 
     <ul class="case-file-list">
         <li th:each="file : ${files}">

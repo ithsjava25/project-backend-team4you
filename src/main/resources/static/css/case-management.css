@@ -326,3 +326,21 @@ form {
     font-size: 0.85rem;
     color: var(--color-muted);
 }
+
+.feedback-message {
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 8px 0 12px;
+}
+
+.success-message {
+    color: #0f5132;
+    background: #d1e7dd;
+}
+
+.error-message {
+    color: #842029;
+    background: #f8d7da;
+}

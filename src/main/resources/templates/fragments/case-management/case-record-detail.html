@@ -1,13 +1,5 @@
 <div th:fragment="caseRecordDetail">
     <div class="case-detail-panel-content">
-        <p th:if="${successMessage}"
-           th:text="${successMessage}"
-           class="feedback-message success-message"></p>
-
-        <p th:if="${errorMessage}"
-           th:text="${errorMessage}"
-           class="feedback-message error-message"></p>
-
         <h2 th:text="${caseRecord.caseNumber}">KS26-1</h2>
 
         <p>
@@ -69,12 +61,18 @@
                 </select>
             </div>
 
+            <p th:if="${successMessage}"
+               th:text="${successMessage}"
+               class="feedback-message success-message"></p>
+
+            <p th:if="${errorMessage}"
+               th:text="${errorMessage}"
+               class="feedback-message error-message"></p>
+
             <button type="submit" class="btn-primary">spara ändringar</button>
         </form>
 
         <hr class="section-divider">
-
-        <h3>filer</h3>
 
         <div id="case-file-panel"
              th:attr="hx-get=@{/dashboard/case-management/case-records/{id}/files(id=${caseRecordId})}"
