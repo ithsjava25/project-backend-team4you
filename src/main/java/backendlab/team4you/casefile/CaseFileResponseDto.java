@@ -7,7 +7,9 @@ public record CaseFileResponseDto(
         String originalFilename,
         String contentType,
         long size,
-        LocalDateTime uploadedAt
+        LocalDateTime uploadedAt,
+        int documentNumber,
+        String documentReference
 ) {
     public static CaseFileResponseDto from(CaseFile caseFile) {
         return new CaseFileResponseDto(
@@ -15,7 +17,9 @@ public record CaseFileResponseDto(
                 caseFile.getOriginalFilename(),
                 caseFile.getContentType(),
                 caseFile.getSize(),
-                caseFile.getUploadedAt()
+                caseFile.getUploadedAt(),
+                caseFile.getDocumentNumber(),
+                caseFile.getDocumentReference()
         );
     }
 }

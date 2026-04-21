@@ -54,6 +54,9 @@ public class CaseFileService {
         CaseRecord caseRecord = caseRecordRepository.findById(caseRecordId)
                 .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
 
+        int nextDocumentNumber = allocateNextDocumentNumber(caseRecordId);
+        String documentReference = caseRecord.getCaseNumber() + "-" + nextDocumentNumber;
+
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null || originalFilename.isBlank()) {
             throw new InvalidFileNameException("Filnamn måste anges.");
@@ -75,6 +78,8 @@ public class CaseFileService {
             caseFile.setContentType(contentType);
             caseFile.setSize(file.getSize());
             caseFile.setUploadedAt(LocalDateTime.now());
+            caseFile.setDocumentNumber(nextDocumentNumber);
+            caseFile.setDocumentReference(documentReference);
 
             return caseFileRepository.saveAndFlush(caseFile);
 
@@ -163,5 +168,11 @@ public class CaseFileService {
         if (originalException instanceof DataIntegrityViolationException) {
             log.warn("Data integrity violation while persisting CaseFile (possible duplicate s3_key or invalid FK/NULL). Attempted cleanup for key={}", s3Key);
         }
+    }
+
+    private int allocateNextDocumentNumber(Long caseRecordId) {
+        return caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(caseRecordId)
+                .map(caseFile -> caseFile.getDocumentNumber() + 1)
+                .orElse(1);
     }
 }

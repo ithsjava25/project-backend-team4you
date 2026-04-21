@@ -30,11 +30,17 @@
         <li th:if="${#lists.isEmpty(files)}">Inga filer uppladdade ännu.</li>
 
         <li th:each="file : ${files}">
-            <span th:text="${file.originalFilename}">document.pdf</span>
+            <div class="case-file-info">
+        <span class="case-file-reference"
+              th:text="${file.documentReference}">KS26-1-1</span>
+                <span class="case-file-name"
+                      th:text="${file.originalFilename}">document.pdf</span>
+            </div>
 
             <a th:href="@{/api/cases/{caseId}/files/{fileId}(caseId=${caseRecordId}, fileId=${file.id})}">
                 Ladda ner
             </a>
+
 
             <button type="button"
                     th:attr="hx-delete=@{/dashboard/case-management/case-records/{caseId}/files/{fileId}(caseId=${caseRecordId}, fileId=${file.id})}"
