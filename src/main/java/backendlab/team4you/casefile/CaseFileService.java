@@ -1,5 +1,6 @@
 package backendlab.team4you.casefile;
 
+import backendlab.team4you.casefile.access.CaseFileAccessService;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
 import backendlab.team4you.exceptions.CaseFileNotFoundException;
@@ -7,6 +8,7 @@ import backendlab.team4you.exceptions.CaseRecordNotFoundException;
 import backendlab.team4you.exceptions.InvalidFileNameException;
 import backendlab.team4you.exceptions.FileTooLargeException;
 import backendlab.team4you.exceptions.FileStorageConfigurationException;
+import backendlab.team4you.user.UserEntity;
 import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import backendlab.team4you.s3.S3Service;
 import org.slf4j.Logger;
@@ -32,20 +34,29 @@ public class CaseFileService {
 
     private final CaseRecordRepository caseRecordRepository;
     private final CaseFileRepository caseFileRepository;
+    private final CaseFileAccessService caseFileAccessService;
     private final S3Service s3Service;
 
     public CaseFileService(
             CaseRecordRepository caseRecordRepository,
             CaseFileRepository caseFileRepository,
+            CaseFileAccessService caseFileAccessService,
             S3Service s3Service
     )  {
         this.caseRecordRepository = caseRecordRepository;
         this.caseFileRepository = caseFileRepository;
+        this.caseFileAccessService = caseFileAccessService;
         this.s3Service = s3Service;
     }
 
     @Transactional
-    public CaseFile uploadFile(Long caseRecordId, MultipartFile file) throws IOException {
+    public CaseFile uploadFile(
+            Long caseRecordId,
+            MultipartFile file,
+            FileConfidentialityLevel confidentialityLevel) throws IOException {
+
+        FileConfidentialityLevel effectiveConfidentialityLevel =
+                confidentialityLevel != null ? confidentialityLevel : FileConfidentialityLevel.OPEN;
 
         if (file.getSize() > MAX_FILE_SIZE_BYTES) {
             throw new FileTooLargeException(MAX_FILE_SIZE_BYTES);
@@ -80,6 +91,7 @@ public class CaseFileService {
             caseFile.setUploadedAt(LocalDateTime.now());
             caseFile.setDocumentNumber(nextDocumentNumber);
             caseFile.setDocumentReference(documentReference);
+            caseFile.setConfidentialityLevel(effectiveConfidentialityLevel);
 
             return caseFileRepository.saveAndFlush(caseFile);
 
@@ -97,9 +109,29 @@ public class CaseFileService {
     }
 
     @Transactional(readOnly = true)
-    public List<CaseFile> listFiles(Long caseRecordId) {
+    public List<CaseFileListItemDto> listFileItemsForViewer(Long caseRecordId, UserEntity viewer) {
         ensureCaseRecordExists(caseRecordId);
-        return caseFileRepository.findByCaseRecordIdOrderByDocumentNumberAsc(caseRecordId);
+
+        return caseFileRepository.findByCaseRecordIdOrderByDocumentNumberAsc(caseRecordId).stream()
+                .map(file -> {
+                    boolean canView = caseFileAccessService.canViewFile(viewer, file);
+                    boolean confidential = file.getConfidentialityLevel() == FileConfidentialityLevel.CONFIDENTIAL;
+
+                    String displayName = (!confidential || canView)
+                            ? file.getOriginalFilename()
+                            : "Sekretess";
+
+                    boolean canDownload = !confidential || canView;
+
+                    return new CaseFileListItemDto(
+                            file.getId(),
+                            file.getDocumentReference(),
+                            displayName,
+                            confidential,
+                            canDownload
+                    );
+                })
+                .toList();
     }
 
     @Transactional(readOnly = true)
