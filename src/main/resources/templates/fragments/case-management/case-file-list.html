@@ -63,6 +63,7 @@
 
                 <button type="button"
                         th:attr="hx-delete=@{/dashboard/case-management/case-records/{caseId}/files/{fileId}(caseId=${caseRecordId}, fileId=${file.id})}"
+                        th:hx-headers="${_csrf != null} ? '{&quot;' + ${_csrf.headerName} + '&quot;:&quot;' + ${_csrf.token} + '&quot;}' : null"
                         hx-target="closest .case-file-panel"
                         hx-swap="outerHTML">
                     Ta bort
