@@ -40,7 +40,7 @@ public class ContactController {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("contactForm", form);
-            return "fragments/contact-form :: form";
+            return "fragments/contact-fragments :: contact-form";
         }
 
         ContactMessage msg = new ContactMessage();
@@ -52,7 +52,7 @@ public class ContactController {
 
         contactRepository.save(msg);
 
-        return "fragments/contact-success :: message";
+        return "fragments/contact-fragments :: success-message";
     }
 
 
