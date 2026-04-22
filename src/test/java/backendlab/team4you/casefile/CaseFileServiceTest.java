@@ -484,6 +484,7 @@ class CaseFileServiceTest {
         verify(s3Service).deleteFile("cases/1/uuid-test.pdf");
     }
 
+    @Test
     @DisplayName("uploadFile should throw FileTooLargeException when file is too large")
     void uploadFile_shouldThrowFileTooLargeException_whenFileTooLarge() {
         MockMultipartFile file = new MockMultipartFile(
