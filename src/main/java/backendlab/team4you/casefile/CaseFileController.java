@@ -42,10 +42,14 @@ public class CaseFileController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CaseFileResponseDto>> listFiles(@PathVariable Long caseRecordId) {
-        List<CaseFileResponseDto> files = caseFileService.listFiles(caseRecordId).stream()
-                .map(CaseFileResponseDto::from)
-                .toList();
+    public ResponseEntity<List<CaseFileListItemDto>> listFiles(
+            @PathVariable Long caseRecordId,
+            Principal principal
+    ) {
+        UserEntity currentUser = userService.getCurrentUser(principal);
+
+        List<CaseFileListItemDto> files =
+                caseFileService.listFileItemsForViewer(caseRecordId, currentUser);
 
         return ResponseEntity.ok(files);
     }

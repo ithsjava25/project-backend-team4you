@@ -128,7 +128,7 @@ public class CaseRecordViewController {
         try {
             populateCaseRecordPanelModel(registryId, model, currentUser);
         } catch (RegistryNotFoundException exception) {
-            model.addAttribute("errorMessage", "Registriet kunde inte hittas.");
+            model.addAttribute("errorMessage", "Registret kunde inte hittas.");
             return buildMissingRegistryFragment(registryId, model, currentUser);
         } catch (Exception exception) {
             log.error("Unexpected error while reloading case record list for registryId={}", registryId, exception);
