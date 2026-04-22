@@ -18,6 +18,11 @@
         <form th:attr="hx-post=@{/dashboard/case-management/registries/{id}/case-records(id=${registryId})}"
               hx-target="#case-record-panel"
               hx-swap="innerHTML">
+
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}">
+
             <div class="form-group">
                 <label for="case-title">titel</label>
                 <input id="case-title" type="text" name="title" required>
