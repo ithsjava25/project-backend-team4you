@@ -37,6 +37,13 @@
             </li>
 
             <li>
+                <a th:href="@{/admin/meetings}" hx-get="/admin/meetings" hx-target="#content-area">
+                    <i class="fa-solid fa-gavel"></i>
+                    <span>Sammanträden</span>
+                </a>
+            </li>
+
+            <li>
                 <a th:href="@{/admin/logs}" hx-get="/admin/logs" hx-target="#content-area">
                     <i class="fa-solid fa-clipboard-list"></i>
                     <span>Systemlogg</span>
