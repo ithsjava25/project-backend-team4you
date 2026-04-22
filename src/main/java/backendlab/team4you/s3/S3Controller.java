@@ -3,6 +3,7 @@ package backendlab.team4you.s3;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +23,7 @@ public class S3Controller {
     }
 
     // POST /api/files/upload — upload a file
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
         String key = file.getOriginalFilename();
@@ -33,6 +35,7 @@ public class S3Controller {
     }
 
     // GET /api/files/download/{key} — download a file
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/download/{key}")
     public ResponseEntity<byte[]> downloadFile(@PathVariable String key) throws IOException {
         try (InputStream stream = s3Service.downloadFile(key)) {
@@ -45,6 +48,7 @@ public class S3Controller {
     }
 
     // DELETE /api/files/delete/{key} — delete a file
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{key}")
     public ResponseEntity<String> deleteFile(@PathVariable String key) {
         s3Service.deleteFile(key);

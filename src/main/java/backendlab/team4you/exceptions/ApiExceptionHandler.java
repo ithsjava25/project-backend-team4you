@@ -132,4 +132,50 @@ public class ApiExceptionHandler {
                 exception.getMessage()
         );
     }
+
+    @ExceptionHandler(InvalidFileNameException.class)
+    public ResponseEntity<ErrorResponseDto> handleInvalidFileName(InvalidFileNameException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponseDto(
+                        HttpStatus.BAD_REQUEST.value(),
+                        "bad request",
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
+
+    @ExceptionHandler(CaseRecordNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleCaseRecordNotFoundException(CaseRecordNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponseDto(
+                        HttpStatus.NOT_FOUND.value(),
+                        "not found",
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
+
+    @ExceptionHandler(CaseFileNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleCaseFileNotFoundException(CaseFileNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponseDto(
+                        HttpStatus.NOT_FOUND.value(),
+                        "not found",
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
+
+    @ExceptionHandler(FileKeyConflictException.class)
+    public ResponseEntity<ErrorResponseDto> handleFileKeyConflictException(FileKeyConflictException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponseDto(
+                        HttpStatus.CONFLICT.value(),
+                        "conflict",
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
+    }
+
+
 }
