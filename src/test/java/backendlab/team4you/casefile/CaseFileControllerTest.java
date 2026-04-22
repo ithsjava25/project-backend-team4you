@@ -1,12 +1,7 @@
 package backendlab.team4you.casefile;
 
 import backendlab.team4you.common.ConfidentialityLevel;
-import backendlab.team4you.exceptions.CaseFileNotFoundException;
-import backendlab.team4you.exceptions.CaseRecordNotFoundException;
-import backendlab.team4you.exceptions.FileKeyConflictException;
-import backendlab.team4you.exceptions.FileTooLargeException;
-import backendlab.team4you.exceptions.InvalidFileNameException;
-import backendlab.team4you.exceptions.ApiExceptionHandler;
+import backendlab.team4you.exceptions.*;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserRole;
 import backendlab.team4you.user.UserService;
@@ -39,7 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = CaseFileController.class)
-@Import(ApiExceptionHandler.class)
+@Import(GlobalRestExceptionHandler.class)
 class CaseFileControllerTest {
 
     @Autowired
@@ -308,8 +303,8 @@ class CaseFileControllerTest {
     }
 
     @Test
-    @DisplayName("uploadFile should return bad request when file is too large")
-    void uploadFile_shouldReturnBadRequest_whenFileIsTooLarge() throws Exception {
+    @DisplayName("uploadFile should return content too large when file is too large")
+    void uploadFile_shouldReturnContentTooLarge_whenFileIsTooLarge() throws Exception {
         UserEntity currentUser = mock(UserEntity.class);
 
         MockMultipartFile multipartFile = new MockMultipartFile(
@@ -332,6 +327,7 @@ class CaseFileControllerTest {
                 .andExpect(jsonPath("$.error").value("content too large"))
                 .andExpect(jsonPath("$.message").value("Filen är för stor. Maxstorlek är 5 MB."));
     }
+
 
     @Test
     @DisplayName("downloadFile should return forbidden when user lacks access to confidential file")

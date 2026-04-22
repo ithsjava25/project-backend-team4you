@@ -2,11 +2,13 @@ package backendlab.team4you;
 
 
 import backendlab.team4you.controller.UserController;
+import backendlab.team4you.exceptions.GlobalRestExceptionHandler;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import backendlab.team4you.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -17,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
+@Import(GlobalRestExceptionHandler.class)
 public class UserControllerTest {
 
 
