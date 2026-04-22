@@ -181,10 +181,10 @@ public class ApiExceptionHandler {
     public ResponseEntity<ErrorResponseDto> handleFileTooLarge(FileTooLargeException ex) {
         log.warn("File too large: {}", ex.getMessage());
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity.status(HttpStatus.CONTENT_TOO_LARGE)
                 .body(new ErrorResponseDto(
-                        HttpStatus.BAD_REQUEST.value(),
-                        "bad request",
+                        HttpStatus.CONTENT_TOO_LARGE.value(),
+                        "content too large",
                         ex.getMessage(),
                         LocalDateTime.now()
                 ));
