@@ -1,5 +1,7 @@
 package backendlab.team4you.controller;
 
+import backendlab.team4you.application.ApplicationService;
+import backendlab.team4you.booking.BookingService;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
 
@@ -28,11 +30,15 @@ public class SignupController {
 
     private final PublicKeyCredentialUserEntityRepository users;
     private final UserService userService;
+    private final ApplicationService applicationService;
+    private final BookingService bookingService;
 
     public SignupController(PublicKeyCredentialUserEntityRepository users,
-                            UserService userService) {
+                            UserService userService, ApplicationService applicationService, BookingService bookingService) {
         this.users = users;
         this.userService = userService;
+        this.applicationService = applicationService;
+        this.bookingService = bookingService;
     }
 
     @GetMapping("/webauthn-check")
@@ -40,23 +46,35 @@ public class SignupController {
         return "webauthn-check";
     }
 
+
     @GetMapping("/dashboard")
-    public String dashboardHome(
+    public String dashboard(
+            Model model,
             @AuthenticationPrincipal UserDetails user,
             @RequestHeader(value = "HX-Request", required = false) String htmx
     ) {
 
-        boolean isAdmin = user.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        String username = user.getUsername();
+
+        int activeCount = applicationService.getActiveByUsername(username).size();
+        int cancelledCount = applicationService.getCancelledByUsername(username).size();
+
+        model.addAttribute("activeCount",
+                applicationService.getActiveByUsername(username).size());
+
+        model.addAttribute("cancelledCount",
+                applicationService.getCancelledByUsername(username).size());
+
+        model.addAttribute("bookingCount",
+                bookingService.getByUsername(username).size());
 
         if (htmx != null) {
-            return isAdmin
-                    ? "admin/dashboard :: content"
-                    : "user/dashboard :: content";
+            return "dashboard :: content";
         }
 
         return "dashboard";
     }
+
 
     @GetMapping("/signup")
     String signup(org.springframework.security.web.csrf.CsrfToken token, Model model) {

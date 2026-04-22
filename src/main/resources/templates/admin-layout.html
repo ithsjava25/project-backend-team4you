@@ -7,6 +7,7 @@
 <head>
     <title>Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <link rel="stylesheet" th:href="@{/css/admin.css}">
     <link rel="stylesheet" th:href="@{/css/components/form.css}">
     <script>
@@ -18,19 +19,24 @@
             document.getElementById('loading-spinner').classList.add('hidden');
         });
     </script>
-
-
 </head>
 
 <body>
 
 <div id="loading-spinner" class="spinner hidden"></div>
 
+    <div class="admin-layout">
+
 <aside th:replace="~{fragments/admin-sidenav :: aside}"></aside>
 
-<main id="content-area" layout:fragment="content">
-
+<main id="content-area"
+      hx-get="/admin/content"
+      hx-trigger="load"
+      hx-swap="innerHTML">
 </main>
+
+</div>
+
 
 </body>
 </html>

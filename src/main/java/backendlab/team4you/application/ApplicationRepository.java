@@ -1,6 +1,7 @@
 package backendlab.team4you.application;
 
 import backendlab.team4you.user.UserEntity;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,6 +20,9 @@ public interface ApplicationRepository extends JpaRepository<ApplicationEntity, 
             Pageable pageable
     );
 
+    long countByStatus(ApplicationStatus status);
+
+
     Page<ApplicationEntity> findAll(Pageable pageable);
 
     Page<ApplicationEntity> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String email, Pageable pageable);
@@ -27,7 +31,11 @@ public interface ApplicationRepository extends JpaRepository<ApplicationEntity, 
 
     List<ApplicationEntity> findByOwner(UserEntity owner);
 
+
     List<ApplicationEntity> findByOwnerUsernameAndStatus(String username, ApplicationStatus status);
+
+
+    List<ApplicationEntity> findByOwnerUsernameAndStatusNot(String username, ApplicationStatus status);
 
 
 }

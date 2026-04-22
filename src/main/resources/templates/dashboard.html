@@ -1,9 +1,28 @@
 <!DOCTYPE html>
-<html layout:decorate="~{dashboard-layout}" xmlns:layout="http://www.w3.org/1999/xhtml" lang="">
+<html lang="sv"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{dashboard-layout}">
 
-<section layout:fragment="content">
+<body>
+
+<section layout:fragment="content" th:fragment="content">
     <h1>Dashboard</h1>
     <p>Välj något i menyn</p>
+
+    <div class="widget-card">
+        <h3>Mina ärenden</h3>
+        <p>Aktiva: <strong th:text="${activeCount}">0</strong></p>
+        <p>Avbrutna: <strong th:text="${cancelledCount}">0</strong></p>
+
+        <a hx-get="/application"
+           hx-target="#content-area"
+           hx-swap="innerHTML">
+            Visa alla
+        </a>
+    </div>
+
 </section>
 
+</body>
 </html>

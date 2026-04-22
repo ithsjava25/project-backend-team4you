@@ -106,5 +106,14 @@ public class ApplicationService {
 
         applicationRepository.save(app);
     }
+    public List<ApplicationEntity> getActiveByUsername(String username) {
+        return applicationRepository.findByOwnerUsernameAndStatusNot(
+                username, ApplicationStatus.CANCELLED);
+    }
+
+    public List<ApplicationEntity> getCancelledByUsername(String username) {
+        return applicationRepository.findByOwnerUsernameAndStatus(
+                username, ApplicationStatus.CANCELLED);
+    }
 }
 

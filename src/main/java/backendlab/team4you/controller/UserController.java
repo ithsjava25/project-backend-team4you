@@ -36,15 +36,6 @@ public class UserController {
 
 
 
-    @DeleteMapping("/account")
-    public String deleteAccount(Principal principal) {
-
-        String email = principal.getName();
-        userService.deleteByEmail(email);
-
-        return "fragments/account-deleted :: content";
-    }
-
     @GetMapping("/user/{id}")
     public ResponseEntity<UserEntity> getUserById(@PathVariable Long id) {
         UserEntity user = userService.findById(id);

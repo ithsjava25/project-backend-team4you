@@ -13,18 +13,11 @@
                 <p>Skapa nya ärenden eller hantera befintliga.</p>
             </header>
 
-            <span th:text="${app.status}"
-                  th:classappend="${app.status.name() == 'CANCELLED'} ? 'status-cancelled' : ''">
-            </span>
-
-
             <ul class="application-list">
 
                 <li th:if="${#lists.isEmpty(applications)}">
                     <p>Du har inga ärenden ännu.</p>
                 </li>
-
-
 
                 <li th:each="app : ${applications}" class="application-item">
 
@@ -34,7 +27,8 @@
 
                         <p>
                             Status:
-                            <span th:text="${app.status}"></span>
+                            <span th:text="${app.status}"
+                                  th:classappend="${app.status != null and app.status.name() == 'CANCELLED'} ? 'status-cancelled' : ''"></span>
                         </p>
 
                         <div class="actions">
@@ -75,8 +69,6 @@
 
         </div>
     </section>
-
-
 
 </main>
 </body>

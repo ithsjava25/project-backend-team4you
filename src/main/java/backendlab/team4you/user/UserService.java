@@ -192,4 +192,24 @@ public class UserService {
     public UserEntity findByUsername(String disPlayName) {
         return userRepository.findByDisplayName(disPlayName);
     }
+
+    public void deleteByUsername(String username) {
+        userRepository.deleteByUsername(username);
+    }
+
+    public boolean changePassword(String username, String oldPassword, String newPassword) {
+
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow();
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            return false;
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        userRepository.save(user);
+
+        return true;
+    }
 }

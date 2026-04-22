@@ -1,5 +1,6 @@
 package backendlab.team4you.booking;
 
+import backendlab.team4you.user.UserEntity;
 import jakarta.persistence.*;
 
 
@@ -11,6 +12,9 @@ public class BookingEntity {
 
     @Id
     private Long id;
+
+    @ManyToOne
+    private UserEntity owner;
 
     private String name;
 
@@ -36,6 +40,16 @@ public class BookingEntity {
     public BookingEntity() {}
 
 
+    public BookingEntity(UserEntity owner, String name, String email, String phone, String reference, ZonedDateTime createdAt, ZonedDateTime bookingTime, BookingStatus status) {
+        this.owner = owner;
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
+        this.reference = reference;
+        this.createdAt = createdAt;
+        this.bookingTime = bookingTime;
+        this.status = status;
+    }
 
 
     public Long getId() {

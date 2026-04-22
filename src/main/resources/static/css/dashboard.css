@@ -60,3 +60,33 @@ nav{
     cursor: pointer;
     transition: 0.2s;
 }
+
+.widget-card p {
+    margin: 5px 0;
+}
+
+.widget-card strong {
+    font-size: 1.3rem;
+}
+
+.widget-card p:nth-child(2) strong {
+    color: green;
+}
+
+.widget-card p:nth-child(3) strong {
+    color: red;
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    color: white;
+}
+
+.badge.active {
+    background: #22c55e;
+}
+
+.badge.cancelled {
+    background: #ef4444;
+}

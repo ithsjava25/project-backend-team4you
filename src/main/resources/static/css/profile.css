@@ -41,3 +41,16 @@ button{
     border-radius: 8px;
     cursor: pointer;
 }
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.widget-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+

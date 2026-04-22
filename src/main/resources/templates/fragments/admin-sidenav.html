@@ -35,6 +35,12 @@
                     <span>Systemlogg</span>
                 </a>
             </li>
+            <li>
+                <a th:href="@{/admin/content}" hx-get="/admin/content" hx-target="#content-area">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                    <span>Admin content</span>
+                </a>
+            </li>
 
             <li>
                 <form th:action="@{/logout}" method="post">

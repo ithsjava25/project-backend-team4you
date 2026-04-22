@@ -11,35 +11,67 @@
 </head>
 
 <body>
-    <section layout:fragment="content">
+<section layout:fragment="content">
 
     <h1>Min profil</h1>
-        <p>Inloggad som <span sec:authentication="name"></span></p>
-        <div sec:authorize="isAuthenticated()">
-            Hej <span sec:authentication="name"></span> 👋
-        </div>
 
-        <hr>
+    <p>Inloggad som <strong sec:authentication="name"></strong></p>
 
-        <div class="danger-zone">
+    <div class="dashboard-grid">
 
+        <div class="widget-card">
+            <h3>Mina ärenden</h3>
+            <p class="widget-value" th:text="${applicationCount}">0</p>
 
-            <button
-                    hx-delete="/account"
-                    hx-confirm="Är du säker på att du vill ta bort ditt konto?"
-                    hx-target="#content-area"
-                    hx-swap="innerHTML"
-                    class="btn-danger"
-            >
-                Ta bort konto
-            </button>
+            <a hx-get="/application"
+               hx-target="#content-area"
+               hx-swap="innerHTML">
+                Visa
+            </a>
         </div>
 
 
+        <div class="widget-card">
+            <h3>Mina bokningar</h3>
+            <p class="widget-value" th:text="${bookingCount}">0</p>
 
+            <a hx-get="/booking"
+               hx-target="#content-area"
+               hx-swap="innerHTML">
+                Visa
+            </a>
+        </div>
 
+    </div>
 
+    <hr>
+
+    <a hx-get="/profile/change-password"
+       hx-target="#content-area"
+       hx-swap="innerHTML">
+        Ändra lösenord
+    </a>
+
+    <div class="danger-zone">
+
+        <h3>Farlig zon</h3>
+
+        <button
+                hx-delete="/account"
+                hx-confirm="Är du säker?"
+                class="btn-danger">
+            Ta bort konto
+        </button>
+
+    </div>
 
 </section>
+
+
+
+
+
+
+
 </body>
 </html>

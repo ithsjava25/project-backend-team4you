@@ -4,6 +4,9 @@ package backendlab.team4you.booking;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.List;
+
 @Service
 public class BookingService {
 
@@ -51,4 +54,10 @@ public class BookingService {
 
         bookingRepository.save(booking);
     }
+
+    public List<BookingEntity> getByUsername(String username) {
+        return bookingRepository.findByOwnerUsername(username);
+    }
+
+
 }

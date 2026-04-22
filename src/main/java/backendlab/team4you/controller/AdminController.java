@@ -3,6 +3,7 @@ package backendlab.team4you.controller;
 import backendlab.team4you.application.ApplicationEntity;
 import backendlab.team4you.application.ApplicationRepository;
 import backendlab.team4you.application.ApplicationService;
+import backendlab.team4you.application.ApplicationStatus;
 import backendlab.team4you.booking.BookingEntity;
 import backendlab.team4you.booking.BookingRepository;
 import backendlab.team4you.booking.BookingService;
@@ -68,6 +69,7 @@ public class AdminController {
             @RequestParam(defaultValue = "displayName") String sort,
             @RequestParam(defaultValue = "asc") String direction,
             @RequestParam(required = false) String search
+
     ) {
 
         Page<LogEntity> logs = logRepository.findAll(
@@ -122,8 +124,16 @@ public class AdminController {
 
 
     @GetMapping("/admin")
-    public String admin(Authentication auth) {
-        System.out.println(auth.getAuthorities());
+    public String adminDashboard(Model model) {
+
+        model.addAttribute("userCount", userRepository.count());
+        model.addAttribute("applicationCount", applicationRepository.count());
+        model.addAttribute("bookingCount", bookingRepository.count());
+
+        model.addAttribute("pendingCount",
+                applicationRepository.countByStatus(ApplicationStatus.PENDING));
+
+
 
         return "admin";
     }
@@ -314,6 +324,16 @@ public class AdminController {
         BookingEntity booking = bookingRepository.findById(id).orElseThrow();
         model.addAttribute("booking", booking);
         return "admin/booking-detail";
+    }
+
+    @GetMapping("/admin/content")
+    public String adminContent(Model model) {
+
+        model.addAttribute("userCount", userRepository.count());
+        model.addAttribute("applicationCount", applicationRepository.count());
+        model.addAttribute("bookingCount", bookingRepository.count());
+
+        return "admin :: content";
     }
 
 }

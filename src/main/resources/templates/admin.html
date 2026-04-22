@@ -5,8 +5,51 @@
 
 <body>
 
-<section layout:fragment="content">
+<section layout:fragment="content" th:fragment="content">
     <h1>Admin Dashboard</h1>
+
+    <div class="dashboard-grid">
+
+        <div class="widget-card">
+            <h3>Användare</h3>
+            <p class="widget-value" th:text="${userCount}">0</p>
+
+            <a hx-get="/admin/users"
+               hx-target="#content-area"
+               hx-swap="innerHTML">
+                Hantera
+            </a>
+        </div>
+
+        <div class="widget-card">
+            <h3>Ärenden</h3>
+            <p class="widget-value" th:text="${applicationCount}">0</p>
+
+            <a hx-get="/admin/applications"
+               hx-target="#content-area"
+               hx-swap="innerHTML">
+                Visa
+            </a>
+        </div>
+
+        <div class="widget-card">
+            <h3>Bokningar</h3>
+            <p class="widget-value" th:text="${bookingCount}">0</p>
+
+            <a hx-get="/admin/bookings"
+               hx-target="#content-area"
+               hx-swap="innerHTML">
+                Visa
+            </a>
+        </div>
+
+        <div class="widget-card">
+            <h3>Väntande ärenden</h3>
+            <p class="widget-value" th:text="${pendingCount}">0</p>
+        </div>
+
+    </div>
+
 </section>
 
 </body>

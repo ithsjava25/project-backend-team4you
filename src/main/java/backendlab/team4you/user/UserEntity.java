@@ -87,6 +87,14 @@ public class UserEntity {
     public UserEntity() {
     }
 
+    public String getPassword() {
+        return passwordHash;
+    }
+
+    public void setPassword(String password) {
+        this.passwordHash = password;
+    }
+
 
 
     public String getPasswordHash() {
