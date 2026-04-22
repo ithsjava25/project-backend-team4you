@@ -45,8 +45,8 @@
             <div class="form-group">
                 <label for="update-case-status">status</label>
                 <select id="update-case-status" name="status" required>
-                    <option value="OPEN" th:selected="${caseRecord.status == 'OPEN'}">öppen</option>
-                    <option value="CLOSED" th:selected="${caseRecord.status == 'CLOSED'}">stängd</option>
+                    <option value="OPEN" th:selected="${caseRecord.status?.name() == 'OPEN'}">öppen</option>
+                    <option value="CLOSED" th:selected="${caseRecord.status?.name() == 'CLOSED'}">stängd</option>
                 </select>
             </div>
 
