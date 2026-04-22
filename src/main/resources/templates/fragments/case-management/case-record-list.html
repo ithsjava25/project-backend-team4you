@@ -41,11 +41,13 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label>ägare</label>
-                <input type="text" th:value="${currentUserDisplayName}" disabled>
-                <small class="form-help">sätts automatiskt till inloggad användare</small>
-            </div>
+            <label for="case-owner">ägare</label>
+            <input id="case-owner"
+                   type="text"
+                   th:value="${currentUserDisplayName}"
+                   readonly
+                   aria-describedby="case-owner-help">
+            <small id="case-owner-help" class="form-help">sätts automatiskt till inloggad användare</small>
 
             <div class="form-group">
                 <label for="assigned-user-id">tilldela till</label>
@@ -62,6 +64,7 @@
             <div class="form-group">
                 <label for="confidentiality-level">sekretessnivå</label>
                 <select id="confidentiality-level" name="confidentialityLevel" required>
+                    <option value="" selected disabled>välj sekretessnivå</option>
                     <option value="OPEN">öppen</option>
                     <option value="RESTRICTED">begränsad</option>
                     <option value="CONFIDENTIAL">konfidentiell</option>
