@@ -16,7 +16,7 @@ public record ContactFormDTO(
         String email,
 
         @NotBlank(message = "Phone number is required")
-        @Pattern(regexp = "^[0-9+\\s-]{7,15}$", message = "Phone number is invalid")
+        @Pattern(regexp = "^(?=.{7,20}$)(?=(?:\\D*\\d){7,15}\\D*$)\\+?[0-9][0-9\\s-]*[0-9]$", message = "Phone number is invalid")
         String phone,
 
         @NotBlank(message = "Message cannot be empty")
