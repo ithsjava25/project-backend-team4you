@@ -50,7 +50,7 @@ public class ContactController {
 
         contactRepository.save(msg);
 
-        return "fragments/contact-success :: message";
+        return "fragments/contact-fragments :: success-message";
     }
 
 
