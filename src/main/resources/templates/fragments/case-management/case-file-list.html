@@ -31,16 +31,16 @@
             </select>
         </div>
 
-        <button type="submit">Ladda upp</button>
+        <button type="submit" class="btn-primary">Ladda upp</button>
     </form>
 
     <ul class="case-file-list">
         <li th:if="${#lists.isEmpty(files)}">Inga filer uppladdade ännu.</li>
 
-        <li th:each="file : ${files}" class="case-file-item">
+        <li th:each="file : ${files}" class="case-file-item file-row">
             <div class="case-file-info">
-            <span class="case-file-reference"
-                  th:text="${file.documentReference}">KS26-1-1</span>
+        <span class="case-file-reference"
+              th:text="${file.documentReference}">KS26-1-1</span>
 
                 <span class="case-file-name"
                       th:text="${file.displayName}">dokument.pdf</span>
@@ -50,7 +50,7 @@
                       title="Sekretessbelagd fil">🔒</span>
             </div>
 
-            <div class="case-file-actions">
+            <div class="case-file-actions file-actions">
                 <a th:if="${file.canDownload}"
                    th:href="@{/api/cases/{caseId}/files/{fileId}(caseId=${caseRecordId}, fileId=${file.id})}">
                     Ladda ner
@@ -58,15 +58,16 @@
 
                 <span th:unless="${file.canDownload}"
                       class="case-file-restricted-text">
-                Ingen behörighet
-            </span>
+            Ingen behörighet
+        </span>
+
+                <button type="button"
+                        th:attr="hx-delete=@{/dashboard/case-management/case-records/{caseId}/files/{fileId}(caseId=${caseRecordId}, fileId=${file.id})}"
+                        hx-target="closest .case-file-panel"
+                        hx-swap="outerHTML">
+                    Ta bort
+                </button>
             </div>
-            <button type="button"
-                    th:attr="hx-delete=@{/dashboard/case-management/case-records/{caseId}/files/{fileId}(caseId=${caseRecordId}, fileId=${file.id})}"
-                    hx-target="closest .case-file-panel"
-                    hx-swap="outerHTML">
-                Ta bort
-            </button>
         </li>
     </ul>
 </div>

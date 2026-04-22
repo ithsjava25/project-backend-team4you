@@ -1,6 +1,6 @@
 <div th:fragment="registryList">
     <div class="registry-panel-content">
-        <h2>registries</h2>
+        <h2>Diarier</h2>
 
         <p th:if="${successMessage}"
            th:text="${successMessage}"
@@ -33,14 +33,14 @@
                        required>
             </div>
 
-            <button type="submit" class="btn-primary">skapa registry</button>
+            <button type="submit" class="btn-primary">skapa diarium</button>
         </form>
 
         <hr class="section-divider">
 
         <ul class="registry-list">
             <li th:if="${#lists.isEmpty(registries)}" class="empty-state">
-                inga registries ännu
+                inga diarium ännu
             </li>
 
             <li th:each="registry : ${registries}">
