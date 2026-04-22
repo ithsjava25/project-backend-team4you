@@ -2,7 +2,7 @@ package backendlab.team4you.user;
 
 public enum UserRole {
 
-    USER,
-    ADMIN,
+    ROLE_USER,
+    ROLE_ADMIN,
 
 }
