@@ -123,6 +123,64 @@
 
                 <hr>
 
+                <h4>Redigera sammanträde</h4>
+
+                <form
+                        th:attr="hx-post=@{/admin/meetings/{meetingId}/update(meetingId=${selectedMeeting.id})}"
+                        hx-target="#content-area"
+                        hx-swap="innerHTML"
+                        class="meeting-form"
+                >
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <div class="form-group">
+                        <label for="edit-title">Titel</label>
+                        <input id="edit-title" name="title" type="text" th:value="${selectedMeeting.title}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-startsAt">Start</label>
+                        <input id="edit-startsAt"
+                               name="startsAt"
+                               type="datetime-local"
+                               th:value="${#temporals.format(selectedMeeting.startsAt, 'yyyy-MM-dd''T''HH:mm')}"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-endsAt">Slut</label>
+                        <input id="edit-endsAt"
+                               name="endsAt"
+                               type="datetime-local"
+                               th:value="${selectedMeeting.endsAt != null ? #temporals.format(selectedMeeting.endsAt, 'yyyy-MM-dd''T''HH:mm') : ''}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-location">Plats</label>
+                        <input id="edit-location" name="location" type="text" th:value="${selectedMeeting.location}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-status">Status</label>
+                        <select id="edit-status" name="status" required>
+                            <option
+                                    th:each="meetingStatus : ${T(backendlab.team4you.meeting.MeetingStatus).values()}"
+                                    th:value="${meetingStatus}"
+                                    th:text="${meetingStatus}"
+                                    th:selected="${meetingStatus == selectedMeeting.status}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-notes">Anteckning</label>
+                        <textarea id="edit-notes" name="notes" rows="3" th:text="${selectedMeeting.notes}"></textarea>
+                    </div>
+
+                    <button class="submit" type="submit">Spara ändringar</button>
+                </form>
+
+                <hr>
+
                 <h4>Lägg till ärende</h4>
 
                 <form
