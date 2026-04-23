@@ -83,6 +83,67 @@ public class MeetingController {
         return "admin/meetings";
     }
 
+    @PostMapping("/{meetingId}/update")
+    public String updateMeeting(
+            @PathVariable Long meetingId,
+            @RequestParam String title,
+            @RequestParam String startsAt,
+            @RequestParam(required = false) String endsAt,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String notes,
+            @RequestParam MeetingStatus status,
+            Model model
+    ) {
+        try {
+            LocalDateTime parsedStartsAt = LocalDateTime.parse(startsAt);
+            LocalDateTime parsedEndsAt = (endsAt == null || endsAt.isBlank())
+                    ? null
+                    : LocalDateTime.parse(endsAt);
+
+            Meeting updatedMeeting = meetingService.updateMeeting(
+                    meetingId,
+                    title,
+                    parsedStartsAt,
+                    parsedEndsAt,
+                    location,
+                    notes,
+                    status
+            );
+
+            model.addAttribute("successMessage", "sammanträdet uppdaterades.");
+            populateMeetingsPage(model, updatedMeeting.getRegistry().getId(), updatedMeeting.getId());
+
+        } catch (Exception exception) {
+            Meeting meeting = meetingService.getMeetingById(meetingId);
+            model.addAttribute("errorMessage", exception.getMessage());
+            populateMeetingsPage(model, meeting.getRegistry().getId(), meetingId);
+        }
+
+        return "fragments/admin-meetings :: content";
+    }
+
+    @PostMapping("/{meetingId}/delete")
+    public String deleteMeeting(
+            @PathVariable Long meetingId,
+            Model model
+    ) {
+        try {
+            Meeting meeting = meetingService.getMeetingById(meetingId);
+            Long registryId = meeting.getRegistry().getId();
+
+            meetingService.deleteMeeting(meetingId);
+
+            model.addAttribute("successMessage", "sammanträdet togs bort.");
+            populateMeetingsPage(model, registryId, null);
+
+        } catch (Exception exception) {
+            model.addAttribute("errorMessage", exception.getMessage());
+            populateMeetingsPage(model, null, null);
+        }
+
+        return "fragments/admin-meetings :: content";
+    }
+
     @GetMapping("/{meetingId}")
     public String showMeeting(
             @PathVariable Long meetingId,
