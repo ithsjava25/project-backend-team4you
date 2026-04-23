@@ -16,7 +16,10 @@
                     hx-swap="innerHTML"
                     class="meeting-form"
             >
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <input type="hidden"
+       th:if="${_csrf != null}"
+       th:name="${_csrf.parameterName}"
+       th:value="${_csrf.token}">
                 <div class="form-group">
                     <label for="registryId">Instans</label>
                     <select id="registryId" name="registryId" required>
@@ -131,7 +134,10 @@
                         hx-swap="innerHTML"
                         class="meeting-form"
                 >
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <input type="hidden"
+       th:if="${_csrf != null}"
+       th:name="${_csrf.parameterName}"
+       th:value="${_csrf.token}">
                     <div class="form-group">
                         <label for="edit-title">Titel</label>
                         <input id="edit-title" name="title" type="text" th:value="${selectedMeeting.title}" required>
@@ -185,7 +191,10 @@
                         hx-swap="innerHTML"
                         class="delete-meeting-form"
                 >
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <input type="hidden"
+       th:if="${_csrf != null}"
+       th:name="${_csrf.parameterName}"
+       th:value="${_csrf.token}">
                     <button type="submit" class="danger-button">Ta bort sammanträde</button>
                 </form>
 
@@ -199,7 +208,10 @@
                         hx-swap="innerHTML"
                         class="meeting-form"
                 >
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <input type="hidden"
+       th:if="${_csrf != null}"
+       th:name="${_csrf.parameterName}"
+       th:value="${_csrf.token}">
                     <div class="form-group">
                         <label for="caseRecordId">Ärende</label>
                         <select id="caseRecordId" name="caseRecordId" required>
@@ -237,7 +249,10 @@
                                         hx-target="#content-area"
                                         hx-swap="innerHTML"
                                 >
-                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <input type="hidden"
+       th:if="${_csrf != null}"
+       th:name="${_csrf.parameterName}"
+       th:value="${_csrf.token}">
                                     <button type="submit" class="secondary-button">Upp</button>
                                 </form>
 
@@ -246,7 +261,10 @@
                                         hx-target="#content-area"
                                         hx-swap="innerHTML"
                                 >
-                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <input type="hidden"
+       th:if="${_csrf != null}"
+       th:name="${_csrf.parameterName}"
+       th:value="${_csrf.token}">
                                     <button type="submit" class="secondary-button">Ner</button>
                                 </form>
 
@@ -255,7 +273,10 @@
                                         hx-target="#content-area"
                                         hx-swap="innerHTML"
                                 >
-                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <input type="hidden"
+       th:if="${_csrf != null}"
+       th:name="${_csrf.parameterName}"
+       th:value="${_csrf.token}">
                                     <button type="submit" class="danger-button">Ta bort ärende</button>
                                 </form>
                             </div>
@@ -278,7 +299,10 @@
                                                 hx-target="#content-area"
                                                 hx-swap="innerHTML"
                                         >
-                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                            <input type="hidden"
+       th:if="${_csrf != null}"
+       th:name="${_csrf.parameterName}"
+       th:value="${_csrf.token}">
                                             <button type="submit" class="danger-button">Ta bort</button>
                                         </form>
                                     </div>
@@ -301,7 +325,10 @@
                                                 hx-target="#content-area"
                                                 hx-swap="innerHTML"
                                         >
-                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                            <input type="hidden"
+       th:if="${_csrf != null}"
+       th:name="${_csrf.parameterName}"
+       th:value="${_csrf.token}">
 
                                             <input type="hidden" name="caseFileId" th:value="${caseFile.id}">
                                             <button type="submit" class="submit">Lägg till</button>

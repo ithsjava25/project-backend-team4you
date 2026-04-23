@@ -3,6 +3,9 @@ package backendlab.team4you.meeting;
 import backendlab.team4you.casefile.CaseFile;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
+import backendlab.team4you.exceptions.InvalidMeetingStateException;
+import backendlab.team4you.exceptions.MeetingNotFoundException;
+import backendlab.team4you.exceptions.RegistryNotFoundException;
 import backendlab.team4you.registry.Registry;
 import backendlab.team4you.registry.RegistryRepository;
 import org.springframework.stereotype.Controller;
@@ -71,7 +74,7 @@ public class MeetingController {
             model.addAttribute("successMessage", "sammanträdet skapades.");
             populateMeetingsPage(model, registryId, meeting.getId());
 
-        } catch (IllegalArgumentException exception) {
+        } catch (InvalidMeetingStateException | MeetingNotFoundException | RegistryNotFoundException exception) {
             model.addAttribute("errorMessage", exception.getMessage());
             populateMeetingsPage(model, registryId, null);
         }
