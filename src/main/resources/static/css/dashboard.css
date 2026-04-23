@@ -15,8 +15,9 @@
     font-family: Poppins, sans-serif;
 
 }
-li, ul, span
-{
+.sidebar li,
+.sidebar a,
+.sidebar span {
     list-style-type: none;
     text-decoration: none;
     padding:10px;

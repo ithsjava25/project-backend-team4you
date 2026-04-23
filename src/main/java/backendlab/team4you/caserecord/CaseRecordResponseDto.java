@@ -1,5 +1,7 @@
 package backendlab.team4you.caserecord;
 
+import backendlab.team4you.common.ConfidentialityLevel;
+
 import java.time.LocalDateTime;
 
 public record CaseRecordResponseDto(
@@ -9,10 +11,10 @@ public record CaseRecordResponseDto(
         String registryCode,
         String title,
         String description,
-        String status,
+        CaseStatus status,
         String ownerUserId,
         String assignedUserId,
-        String confidentialityLevel,
+        ConfidentialityLevel confidentialityLevel,
         LocalDateTime openedAt,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,

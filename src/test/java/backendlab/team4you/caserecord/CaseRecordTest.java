@@ -1,5 +1,6 @@
 package backendlab.team4you.caserecord;
 
+import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.registry.Registry;
 import backendlab.team4you.user.UserEntity;
 import org.junit.jupiter.api.DisplayName;
@@ -21,16 +22,16 @@ class CaseRecordTest {
                 registry,
                 "  test title  ",
                 "description",
-                "   ",
+                CaseStatus.OPEN,
                 owner,
                 assignedUser,
-                "   ",
+                ConfidentialityLevel.OPEN,
                 null
         );
 
         assertThat(caseRecord.getTitle()).isEqualTo("test title");
-        assertThat(caseRecord.getStatus()).isEqualTo("OPEN");
-        assertThat(caseRecord.getConfidentialityLevel()).isEqualTo("OPEN");
+        assertThat(caseRecord.getStatus()).isEqualTo(CaseStatus.OPEN);
+        assertThat(caseRecord.getConfidentialityLevel()).isEqualTo(ConfidentialityLevel.OPEN);
     }
 
     @Test
@@ -44,10 +45,10 @@ class CaseRecordTest {
                 registry,
                 "   ",
                 "description",
-                "OPEN",
+                CaseStatus.OPEN,
                 owner,
                 assignedUser,
-                "OPEN",
+                ConfidentialityLevel.OPEN,
                 null
         )).isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("title is required");
@@ -64,10 +65,10 @@ class CaseRecordTest {
                 registry,
                 "test title",
                 "description",
-                "OPEN",
+                CaseStatus.OPEN,
                 owner,
                 assignedUser,
-                "OPEN",
+                ConfidentialityLevel.OPEN,
                 null
         );
 

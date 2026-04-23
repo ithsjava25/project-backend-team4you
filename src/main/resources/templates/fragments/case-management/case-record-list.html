@@ -1,0 +1,98 @@
+<div th:fragment="caseRecordList">
+    <div class="case-record-panel-content">
+        <h2 class="case-record-heading">
+            Ärenden för
+            <span class="case-record-heading-name" th:text="${registryName}">registry</span>
+        </h2>
+
+        <p th:if="${successMessage}"
+           th:text="${successMessage}"
+           class="feedback-message success-message"></p>
+
+        <p th:if="${errorMessage}"
+           th:text="${errorMessage}"
+           class="feedback-message error-message"></p>
+
+        <h3 class="form-section-title">nytt ärende</h3>
+
+        <form th:attr="hx-post=@{/dashboard/case-management/registries/{id}/case-records(id=${registryId})}"
+              hx-target="#case-record-panel"
+              hx-swap="innerHTML">
+
+            <input type="hidden"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}">
+
+            <div class="form-group">
+                <label for="case-title">titel</label>
+                <input id="case-title" type="text" name="title" required>
+            </div>
+
+            <div class="form-group">
+                <label for="case-description">beskrivning</label>
+                <textarea id="case-description" name="description"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="case-status">status</label>
+                <select id="case-status" name="status" required>
+                    <option value="OPEN">öppen</option>
+                    <option value="CLOSED">stängd</option>
+                </select>
+            </div>
+
+            <label for="case-owner">ägare</label>
+            <input id="case-owner"
+                   type="text"
+                   th:value="${currentUserDisplayName}"
+                   readonly
+                   aria-describedby="case-owner-help">
+            <small id="case-owner-help" class="form-help">sätts automatiskt till inloggad användare</small>
+
+            <div class="form-group">
+                <label for="assigned-user-id">tilldela till</label>
+                <select id="assigned-user-id" name="assignedUserId">
+                    <option value="">ej tilldelad</option>
+                    <option th:each="user : ${assignableUsers}"
+                            th:value="${user.id}"
+                            th:text="${user.displayName}">
+                        användare
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="confidentiality-level">sekretessnivå</label>
+                <select id="confidentiality-level" name="confidentialityLevel" required>
+                    <option value="" selected disabled>välj sekretessnivå</option>
+                    <option value="OPEN">öppen</option>
+                    <option value="RESTRICTED">begränsad</option>
+                    <option value="CONFIDENTIAL">konfidentiell</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-primary">skapa ärende</button>
+        </form>
+
+        <hr class="section-divider">
+
+        <h3 class="form-section-title">befintliga ärenden</h3>
+
+        <ul class="case-record-list">
+            <li th:if="${#lists.isEmpty(caseRecords)}" class="empty-state">
+                inga ärenden ännu
+            </li>
+
+            <li th:each="caseRecord : ${caseRecords}">
+                <button type="button"
+                        class="case-record-button"
+                        th:attr="hx-get=@{/dashboard/case-management/case-records/{id}(id=${caseRecord.id})}"
+                        hx-target="#case-detail-panel"
+                        hx-swap="innerHTML">
+                    <span class="case-record-number" th:text="${caseRecord.caseNumber}">KS26-1</span>
+                    <span class="case-record-title" th:text="${caseRecord.title}">titel</span>
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>

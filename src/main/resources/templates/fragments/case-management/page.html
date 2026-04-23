@@ -1,0 +1,19 @@
+<div th:fragment="content">
+    <div class="case-management-wrapper">
+        <aside id="registry-panel"
+               class="case-panel"
+               hx-get="/dashboard/case-management/registries"
+               hx-trigger="load"
+               hx-swap="innerHTML">
+            <p>laddar diarier...</p>
+        </aside>
+
+        <section id="case-record-panel" class="case-panel">
+            <p>välj ett diarium</p>
+        </section>
+
+        <section id="case-detail-panel" class="case-panel">
+            <p>välj ett ärende</p>
+        </section>
+    </div>
+</div>

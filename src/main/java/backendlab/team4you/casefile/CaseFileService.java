@@ -1,19 +1,26 @@
 package backendlab.team4you.casefile;
 
+import backendlab.team4you.casefile.access.CaseFileAccessService;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
+import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.exceptions.CaseFileNotFoundException;
 import backendlab.team4you.exceptions.CaseRecordNotFoundException;
+import backendlab.team4you.exceptions.FileStorageConfigurationException;
+import backendlab.team4you.exceptions.FileTooLargeException;
 import backendlab.team4you.exceptions.InvalidFileNameException;
 import backendlab.team4you.s3.S3Service;
+import backendlab.team4you.user.UserEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,31 +36,49 @@ public class CaseFileService {
 
     private final CaseRecordRepository caseRecordRepository;
     private final CaseFileRepository caseFileRepository;
+    private final CaseFileAccessService caseFileAccessService;
     private final S3Service s3Service;
 
     public CaseFileService(
             CaseRecordRepository caseRecordRepository,
             CaseFileRepository caseFileRepository,
+            CaseFileAccessService caseFileAccessService,
             S3Service s3Service
-    )  {
+    ) {
         this.caseRecordRepository = caseRecordRepository;
         this.caseFileRepository = caseFileRepository;
+        this.caseFileAccessService = caseFileAccessService;
         this.s3Service = s3Service;
     }
 
     @Transactional
-    public CaseFile uploadFile(Long caseRecordId, MultipartFile file) throws IOException {
+    public CaseFile uploadFile(
+            Long caseRecordId,
+            MultipartFile file,
+            ConfidentialityLevel confidentialityLevel,
+            UserEntity actor
+    ) throws IOException {
 
-        if (file.getSize() > MAX_FILE_SIZE_BYTES) {
-            throw new IllegalArgumentException("File exceeds maximum size");
+        ConfidentialityLevel effectiveConfidentialityLevel =
+                confidentialityLevel != null ? confidentialityLevel : ConfidentialityLevel.OPEN;
+
+        if (!caseFileAccessService.canUploadFile(actor, caseRecordId, effectiveConfidentialityLevel)) {
+            throw new AccessDeniedException("Du har inte behörighet att ladda upp denna fil.");
         }
 
-        CaseRecord caseRecord = caseRecordRepository.findById(caseRecordId)
+        if (file.getSize() > MAX_FILE_SIZE_BYTES) {
+            throw new FileTooLargeException(MAX_FILE_SIZE_BYTES);
+        }
+
+        CaseRecord caseRecord = caseRecordRepository.findByIdWithLock(caseRecordId)
                 .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
+
+        int nextDocumentNumber = allocateNextDocumentNumber(caseRecord.getId());
+        String documentReference = caseRecord.getCaseNumber() + "-" + nextDocumentNumber;
 
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null || originalFilename.isBlank()) {
-            throw new InvalidFileNameException("Filename must not be blank");
+            throw new InvalidFileNameException("Filnamn måste anges.");
         }
 
         String contentType = normalizeContentType(file.getContentType());
@@ -72,9 +97,17 @@ public class CaseFileService {
             caseFile.setContentType(contentType);
             caseFile.setSize(file.getSize());
             caseFile.setUploadedAt(LocalDateTime.now());
+            caseFile.setDocumentNumber(nextDocumentNumber);
+            caseFile.setDocumentReference(documentReference);
+            caseFile.setConfidentialityLevel(effectiveConfidentialityLevel);
 
             return caseFileRepository.saveAndFlush(caseFile);
 
+        } catch (NoSuchBucketException exception) {
+            throw new FileStorageConfigurationException(
+                    "Filuppladdning är inte korrekt konfigurerad: S3-bucket saknas.",
+                    exception
+            );
         } catch (RuntimeException | IOException exception) {
             if (uploadedToS3) {
                 cleanupUploadedObjectIfPossible(s3Key, exception);
@@ -86,7 +119,33 @@ public class CaseFileService {
     @Transactional(readOnly = true)
     public List<CaseFile> listFiles(Long caseRecordId) {
         ensureCaseRecordExists(caseRecordId);
-        return caseFileRepository.findByCaseRecordId(caseRecordId);
+        return caseFileRepository.findByCaseRecordIdOrderByDocumentNumberAsc(caseRecordId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CaseFileListItemDto> listFileItemsForViewer(Long caseRecordId, UserEntity viewer) {
+        ensureCaseRecordExists(caseRecordId);
+
+        return caseFileRepository.findByCaseRecordIdOrderByDocumentNumberAsc(caseRecordId).stream()
+                .map(file -> {
+                    boolean canView = caseFileAccessService.canViewFile(viewer, file);
+                    boolean confidential = file.getConfidentialityLevel() == ConfidentialityLevel.CONFIDENTIAL;
+
+                    String displayName = (!confidential || canView)
+                            ? file.getOriginalFilename()
+                            : "Sekretess";
+
+                    boolean canDownload = !confidential || canView;
+
+                    return new CaseFileListItemDto(
+                            file.getId(),
+                            file.getDocumentReference(),
+                            displayName,
+                            confidential,
+                            canDownload
+                    );
+                })
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -96,14 +155,29 @@ public class CaseFileService {
     }
 
     @Transactional(readOnly = true)
-    public InputStream downloadFile(Long caseRecordId, Long fileId) {
+    public CaseFile getCaseFileForViewer(Long caseRecordId, Long fileId, UserEntity viewer) {
         CaseFile caseFile = getCaseFile(caseRecordId, fileId);
+
+        if (!caseFileAccessService.canViewFile(viewer, caseFile)) {
+            throw new AccessDeniedException("Du har inte behörighet att öppna denna fil.");
+        }
+
+        return caseFile;
+    }
+
+    @Transactional(readOnly = true)
+    public InputStream downloadFile(Long caseRecordId, Long fileId, UserEntity viewer) {
+        CaseFile caseFile = getCaseFileForViewer(caseRecordId, fileId, viewer);
         return s3Service.downloadFile(caseFile.getS3Key());
     }
 
     @Transactional
-    public void deleteFile(Long caseRecordId, Long fileId) {
+    public void deleteFile(Long caseRecordId, Long fileId, UserEntity actor) {
         CaseFile caseFile = getCaseFile(caseRecordId, fileId);
+
+        if (!caseFileAccessService.canDeleteFile(actor, caseFile)) {
+            throw new AccessDeniedException("Du har inte behörighet att radera denna fil.");
+        }
 
         String s3Key = caseFile.getS3Key();
         caseFileRepository.delete(caseFile);
@@ -120,7 +194,7 @@ public class CaseFileService {
             return MediaType.APPLICATION_OCTET_STREAM_VALUE;
         }
         try {
-                return MediaType.parseMediaType(contentType).toString();
+            return MediaType.parseMediaType(contentType).toString();
         } catch (InvalidMediaTypeException exception) {
             return MediaType.APPLICATION_OCTET_STREAM_VALUE;
         }
@@ -153,7 +227,16 @@ public class CaseFileService {
         }
 
         if (originalException instanceof DataIntegrityViolationException) {
-            log.warn("Data integrity violation while persisting CaseFile (possible duplicate s3_key or invalid FK/NULL). Attempted cleanup for key={}", s3Key);
+            log.warn(
+                    "Data integrity violation while persisting CaseFile (possible duplicate s3_key or invalid FK/NULL). Attempted cleanup for key={}",
+                    s3Key
+            );
         }
+    }
+
+    private int allocateNextDocumentNumber(Long caseRecordId) {
+        return caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(caseRecordId)
+                .map(caseFile -> caseFile.getDocumentNumber() + 1)
+                .orElse(1);
     }
 }

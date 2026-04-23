@@ -1,0 +1,98 @@
+<div id="case-detail-panel" th:fragment="caseRecordDetail">
+    <div class="case-detail-panel-content" th:if="${caseRecord != null}">
+        <h2 th:text="${caseRecord.caseNumber}">KS26-1</h2>
+
+        <p>
+            <strong>titel:</strong>
+            <span th:text="${caseRecord.title}">testärendet</span>
+        </p>
+
+        <p>
+            <strong>status:</strong>
+            <span th:text="${caseRecord.status}">OPEN</span>
+        </p>
+
+        <p>
+            <strong>registry:</strong>
+            <span th:text="${caseRecord.registryCode}">KS</span>
+        </p>
+
+        <p>
+            <strong>owner:</strong>
+            <span th:text="${caseRecord.ownerUserId}">owner-id</span>
+        </p>
+
+        <p>
+            <strong>assigned:</strong>
+            <span th:text="${caseRecord.assignedUserId ?: 'ej tilldelad'}">assigned-id</span>
+        </p>
+
+        <p>
+            <strong>sekretess:</strong>
+            <span th:text="${caseRecord.confidentialityLevel}">OPEN</span>
+        </p>
+
+        <hr class="section-divider">
+
+        <h3 class="form-section-title">uppdatera ärende</h3>
+
+        <form th:action="@{/dashboard/case-management/case-records/{id}/update(id=${caseRecordId})}"
+              method="post"
+              th:attr="hx-post=@{/dashboard/case-management/case-records/{id}/update(id=${caseRecordId})}"
+              hx-target="#case-detail-panel"
+              hx-swap="outerHTML">
+
+            <div class="form-group">
+                <label for="update-case-status">status</label>
+                <select id="update-case-status" name="status" required>
+                    <option value="OPEN" th:selected="${caseRecord.status?.name() == 'OPEN'}">öppen</option>
+                    <option value="CLOSED" th:selected="${caseRecord.status?.name() == 'CLOSED'}">stängd</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="update-assigned-user-id">tilldela till</label>
+                <select id="update-assigned-user-id" name="assignedUserId">
+                    <option value="">ej tilldelad</option>
+                    <option th:each="user : ${assignableUsers}"
+                            th:value="${user.id}"
+                            th:text="${user.displayName}"
+                            th:selected="${caseRecord.assignedUserId == user.id}">
+                        användare
+                    </option>
+                </select>
+            </div>
+
+            <p th:if="${successMessage}"
+               th:text="${successMessage}"
+               class="feedback-message success-message"></p>
+
+            <p th:if="${errorMessage}"
+               th:text="${errorMessage}"
+               class="feedback-message error-message"></p>
+
+            <button type="submit" class="btn-primary">spara ändringar</button>
+        </form>
+
+        <hr class="section-divider">
+
+        <div id="case-file-panel"
+             th:attr="hx-get=@{/dashboard/case-management/case-records/{id}/files(id=${caseRecordId})}"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+            <p>laddar filer...</p>
+        </div>
+    </div>
+
+    <div class="case-detail-panel-content" th:if="${caseRecord == null}">
+        <h2>ärende</h2>
+
+        <p th:if="${errorMessage}"
+           th:text="${errorMessage}"
+           class="feedback-message error-message"></p>
+
+        <p th:unless="${errorMessage}">
+            Ärendet kunde inte laddas.
+        </p>
+    </div>
+</div>

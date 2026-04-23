@@ -9,6 +9,13 @@
         <ul class="sidebar-links">
 
             <li>
+                <a th:href="@{/dashboard}">
+                    <i class="fa-solid fa-table-columns"></i>
+                    <span>Till dashboard</span>
+                </a>
+            </li>
+
+            <li>
                 <a th:href="@{/admin/users}" hx-get="/admin/users" hx-target="#content-area">
                     <i class="fa-solid fa-house"></i>
                     <span>Hantera användare</span>

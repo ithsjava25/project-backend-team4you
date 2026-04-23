@@ -44,7 +44,7 @@ public class SecurityConfig {
 
                                 .requestMatchers("/webauthn/**").hasAnyRole("USER", ADMIN)
                                 .requestMatchers("/admin/**").hasRole(ADMIN)
-                                .requestMatchers("/home", "/profile/**").hasRole("USER")
+                                .requestMatchers("/home", "/profile/**").hasAnyRole("USER", ADMIN)
                                 .requestMatchers("/add-passkey", "/webauthn/register/**").hasAnyRole("USER", ADMIN)
 
                                 .anyRequest().authenticated()
@@ -81,11 +81,14 @@ public class SecurityConfig {
             if (user == null) {
                 throw new UsernameNotFoundException("User not found: " + username);
             }
+            if (user.getRole() == null) {
+                throw new UsernameNotFoundException("User has no role assigned: " + username);
+            }
 
             return User.builder()
                     .username(user.getName())
                     .password(user.getPasswordHash())
-                    .authorities(user.getRole())
+                    .roles(user.getRole().name())
                     .accountLocked(false)
                     .build();
         };

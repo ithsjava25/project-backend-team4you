@@ -1,14 +1,6 @@
 package backendlab.team4you.user;
 
-
 import jakarta.persistence.*;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import org.jspecify.annotations.Nullable;
-
 import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.security.web.webauthn.api.PublicKeyCredentialUserEntity;
 
@@ -22,24 +14,20 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     @Column(name = "id")
     private String id;
 
-
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-
     @Column(name = "display_name")
     private String displayName;
-    
 
     @Column(name = "first_name")
     private String firstName;
 
     @Column(name = "last_name")
     private String lastName;
-
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
@@ -62,7 +50,6 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
         this.displayName = displayName;
     }
 
-
     public void setId(Bytes id) {
         this.id = id != null ? id.toBase64UrlString() : null;
     }
@@ -77,23 +64,19 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
     }
 
     @Override
-
     public Bytes getId() {
         return id != null ? Bytes.fromBase64(id) : null;
     }
 
     @Override
     public String getDisplayName() {
-        return (this.firstName != null ? this.firstName : "") + " " + (this.lastName != null ? this.lastName : "");
+        return (this.firstName != null ? this.firstName : "") + " " +
+                (this.lastName != null ? this.lastName : "");
     }
-
-
-
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
-
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -143,22 +126,19 @@ public class UserEntity implements PublicKeyCredentialUserEntity {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getRole() {
+    public UserRole getRole() {
+        return role;
+    }
 
-        return role.name();
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 
     public void setRole(String role) {
-
         this.role = UserRole.valueOf(role);
     }
 
-     public String getIdAsString() {
+    public String getIdAsString() {
         return this.id;
     }
-
-
 }
-
-
-

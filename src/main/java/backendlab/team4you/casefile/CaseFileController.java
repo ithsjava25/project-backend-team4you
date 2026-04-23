@@ -1,16 +1,20 @@
 package backendlab.team4you.casefile;
 
+import backendlab.team4you.common.ConfidentialityLevel;
+import backendlab.team4you.user.UserEntity;
+import backendlab.team4you.user.UserService;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-import org.springframework.http.ContentDisposition;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -18,25 +22,34 @@ import java.util.List;
 public class CaseFileController {
 
     private final CaseFileService caseFileService;
+    private final UserService userService;
 
-    public CaseFileController(CaseFileService caseFileService) {
+    public CaseFileController(CaseFileService caseFileService, UserService userService) {
         this.caseFileService = caseFileService;
+        this.userService = userService;
     }
 
     @PostMapping
     public ResponseEntity<CaseFileResponseDto> uploadFile(
             @PathVariable Long caseRecordId,
-            @RequestParam("file") MultipartFile file
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("confidentialityLevel") ConfidentialityLevel confidentialityLevel,
+            Principal principal
     ) throws IOException {
-        CaseFile savedFile = caseFileService.uploadFile(caseRecordId, file);
+        UserEntity currentUser = userService.getCurrentUser(principal);
+        CaseFile savedFile = caseFileService.uploadFile(caseRecordId, file, confidentialityLevel, currentUser);
         return ResponseEntity.ok(CaseFileResponseDto.from(savedFile));
     }
 
     @GetMapping
-    public ResponseEntity <List<CaseFileResponseDto>> listFiles(@PathVariable Long caseRecordId) {
-        List<CaseFileResponseDto> files = caseFileService.listFiles(caseRecordId).stream()
-                .map(CaseFileResponseDto::from)
-                .toList();
+    public ResponseEntity<List<CaseFileListItemDto>> listFiles(
+            @PathVariable Long caseRecordId,
+            Principal principal
+    ) {
+        UserEntity currentUser = userService.getCurrentUser(principal);
+
+        List<CaseFileListItemDto> files =
+                caseFileService.listFileItemsForViewer(caseRecordId, currentUser);
 
         return ResponseEntity.ok(files);
     }
@@ -44,19 +57,23 @@ public class CaseFileController {
     @GetMapping("/{fileId}")
     public ResponseEntity<StreamingResponseBody> downloadFile(
             @PathVariable Long caseRecordId,
-            @PathVariable Long fileId
+            @PathVariable Long fileId,
+            Principal principal
     ) {
-        CaseFile caseFile = caseFileService.getCaseFile(caseRecordId, fileId);
+        UserEntity currentUser = userService.getCurrentUser(principal);
+        CaseFile caseFile = caseFileService.getCaseFileForViewer(caseRecordId, fileId, currentUser);
 
         MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
         if (caseFile.getContentType() != null && !caseFile.getContentType().isBlank()) {
             mediaType = MediaType.parseMediaType(caseFile.getContentType());
         }
+
         StreamingResponseBody body = outputStream -> {
-            try (InputStream stream = caseFileService.downloadFile(caseRecordId, fileId)) {
+            try (InputStream stream = caseFileService.downloadFile(caseRecordId, fileId, currentUser)) {
                 stream.transferTo(outputStream);
             }
         };
+
         return ResponseEntity.ok()
                 .header(
                         HttpHeaders.CONTENT_DISPOSITION,
@@ -72,9 +89,11 @@ public class CaseFileController {
     @DeleteMapping("/{fileId}")
     public ResponseEntity<Void> deleteFile(
             @PathVariable Long caseRecordId,
-            @PathVariable Long fileId
+            @PathVariable Long fileId,
+            Principal principal
     ) {
-        caseFileService.deleteFile(caseRecordId, fileId);
+        UserEntity currentUser = userService.getCurrentUser(principal);
+        caseFileService.deleteFile(caseRecordId, fileId, currentUser);
         return ResponseEntity.noContent().build();
     }
 }

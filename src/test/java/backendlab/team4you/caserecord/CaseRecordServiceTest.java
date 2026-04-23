@@ -1,5 +1,6 @@
 package backendlab.team4you.caserecord;
 
+import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.exceptions.RegistryNotFoundException;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import backendlab.team4you.registry.Registry;
@@ -53,10 +54,10 @@ class CaseRecordServiceTest {
                 1L,
                 "test case",
                 "test description",
-                "OPEN",
+                CaseStatus.OPEN,
                 owner.getIdAsString(),
                 assignedUser.getIdAsString(),
-                "OPEN",
+                ConfidentialityLevel.OPEN,
                 LocalDateTime.of(2026, 4, 9, 10, 0)
         );
 
@@ -94,10 +95,10 @@ class CaseRecordServiceTest {
                 99L,
                 "test case",
                 "test description",
-                "OPEN",
+                CaseStatus.OPEN,
                 "owner-id",
                 "assigned-id",
-                "OPEN",
+                ConfidentialityLevel.OPEN,
                 null
         );
 
@@ -117,10 +118,10 @@ class CaseRecordServiceTest {
                 1L,
                 "test case",
                 "test description",
-                "OPEN",
+                CaseStatus.OPEN,
                 "missing-owner",
                 "assigned-id",
-                "OPEN",
+                ConfidentialityLevel.OPEN,
                 null
         );
 
@@ -144,10 +145,10 @@ class CaseRecordServiceTest {
                 1L,
                 "test case",
                 "test description",
-                "OPEN",
+                CaseStatus.OPEN,
                 owner.getIdAsString(),
                 assignedUser.getIdAsString(),
-                "OPEN",
+                ConfidentialityLevel.OPEN,
                 LocalDateTime.of(2026, 4, 9, 10, 0)
         );
 
@@ -201,10 +202,10 @@ class CaseRecordServiceTest {
                 1L,
                 "test case",
                 "test description",
-                "OPEN",
+                CaseStatus.OPEN,
                 owner.getIdAsString(),
                 assignedUser.getIdAsString(),
-                "OPEN",
+                ConfidentialityLevel.OPEN,
                 LocalDateTime.of(2026, 4, 9, 10, 0)
         );
 

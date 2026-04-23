@@ -1,5 +1,6 @@
 package backendlab.team4you.caserecord;
 
+import backendlab.team4you.exceptions.CaseRecordNotFoundException;
 import backendlab.team4you.exceptions.RegistryNotFoundException;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import backendlab.team4you.registry.Registry;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Transactional
@@ -39,8 +41,11 @@ public class CaseRecordService {
         UserEntity owner = userRepository.findById(requestDto.ownerUserId())
                 .orElseThrow(() -> new UserNotFoundException("user not found: " + requestDto.ownerUserId()));
 
-        UserEntity assignedUser = userRepository.findById(requestDto.assignedUserId())
-                .orElseThrow(() -> new UserNotFoundException("user not found: " + requestDto.assignedUserId()));
+        UserEntity assignedUser = null;
+        if (requestDto.assignedUserId() != null && !requestDto.assignedUserId().isBlank()) {
+            assignedUser = userRepository.findById(requestDto.assignedUserId())
+                    .orElseThrow(() -> new UserNotFoundException("user not found: " + requestDto.assignedUserId()));
+        }
 
         CaseRecord caseRecord = new CaseRecord(
                 registry,
@@ -114,12 +119,63 @@ public class CaseRecordService {
                 caseRecord.getDescription(),
                 caseRecord.getStatus(),
                 caseRecord.getOwner().getIdAsString(),
-                caseRecord.getAssignedUser().getIdAsString(),
+                caseRecord.getAssignedUser() != null ? caseRecord.getAssignedUser().getIdAsString() : null,
                 caseRecord.getConfidentialityLevel(),
                 caseRecord.getOpenedAt(),
                 caseRecord.getCreatedAt(),
                 caseRecord.getUpdatedAt(),
                 caseRecord.getClosedAt()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<CaseRecordResponseDto> findByRegistryId(Long registryId) {
+        Registry registry = registryRepository.findById(registryId)
+                .orElseThrow(() -> new RegistryNotFoundException("registry not found: " + registryId));
+
+        return caseRecordRepository.findByRegistryIdOrderByCreatedAtDesc(registry.getId()).stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public CaseRecordResponseDto findById(Long caseRecordId) {
+        CaseRecord caseRecord = caseRecordRepository.findById(caseRecordId)
+                .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
+
+        return toResponseDto(caseRecord);
+    }
+
+    public CaseRecordResponseDto updateCaseRecord(Long caseRecordId, CaseStatus status, String assignedUserId) {
+        CaseRecord caseRecord = caseRecordRepository.findById(caseRecordId)
+                .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
+
+        caseRecord.setStatus(status);
+
+        if (assignedUserId == null || assignedUserId.isBlank()) {
+            caseRecord.setAssignedUser(null);
+        } else {
+            UserEntity assignedUser = userRepository.findById(assignedUserId)
+                    .orElseThrow(() -> new UserNotFoundException("user not found: " + assignedUserId));
+            caseRecord.setAssignedUser(assignedUser);
+        }
+
+        CaseRecord savedCaseRecord = caseRecordRepository.save(caseRecord);
+        return toResponseDto(savedCaseRecord);
+    }
+
+    private String normalizeStatus(String status) {
+        if (status == null || status.isBlank()) {
+            throw new IllegalArgumentException("status is required");
+        }
+
+        String normalizedStatus = status.trim().toUpperCase();
+
+        if (!normalizedStatus.equals("OPEN")
+                && !normalizedStatus.equals("CLOSED")) {
+            throw new IllegalArgumentException("invalid status: " + status);
+        }
+
+        return normalizedStatus;
     }
 }

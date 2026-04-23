@@ -1,8 +1,8 @@
 package backendlab.team4you.registry;
 
-import backendlab.team4you.exceptions.ApiExceptionHandler;
 import backendlab.team4you.exceptions.DuplicateRegistryCodeException;
 import backendlab.team4you.exceptions.DuplicateRegistryNameException;
+import backendlab.team4you.exceptions.GlobalRestExceptionHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(RegistryController.class)
-@Import(ApiExceptionHandler.class)
+@Import(GlobalRestExceptionHandler.class)
 class RegistryControllerTest {
 
     @Autowired

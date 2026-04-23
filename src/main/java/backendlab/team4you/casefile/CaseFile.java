@@ -1,6 +1,7 @@
 package backendlab.team4you.casefile;
 
 import backendlab.team4you.caserecord.CaseRecord;
+import backendlab.team4you.common.ConfidentialityLevel;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -9,7 +10,11 @@ import java.time.LocalDateTime;
 @Table(
         name = "case_file",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_case_file_s3_key", columnNames = "s3_key")
+                @UniqueConstraint(name = "uk_case_file_s3_key", columnNames = "s3_key"),
+                @UniqueConstraint(name = "uk_case_file_case_record_document_number",
+                        columnNames = {"case_record_id", "document_number"}),
+                @UniqueConstraint(name = "uk_case_file_document_reference",
+                        columnNames = "document_reference")
         }
 )
 public class CaseFile {
@@ -36,6 +41,16 @@ public class CaseFile {
 
     @Column(name = "uploaded_at", nullable = false)
     private LocalDateTime uploadedAt;
+
+    @Column(name = "document_number", nullable = false)
+    private int documentNumber;
+
+    @Column(name = "document_reference", nullable = false)
+    private String documentReference;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "confidentiality_level", nullable = false, length = 50)
+    private ConfidentialityLevel confidentialityLevel;
 
     public String getS3Key() {
         return s3Key;
@@ -91,5 +106,33 @@ public class CaseFile {
 
     public String getOriginalFilename() {
         return originalFileName;
+    }
+
+    public int getDocumentNumber() {
+        return documentNumber;
+    }
+
+    public void setDocumentNumber(int documentNumber) {
+        this.documentNumber = documentNumber;
+    }
+
+    public String getDocumentReference() {
+        return documentReference;
+    }
+
+    public void setDocumentReference(String documentReference) {
+        this.documentReference = documentReference;
+    }
+
+    public ConfidentialityLevel getConfidentialityLevel() {
+        return confidentialityLevel;
+    }
+
+    public void setConfidentialityLevel(ConfidentialityLevel confidentialityLevel) {
+        this.confidentialityLevel = confidentialityLevel;
+    }
+
+    public boolean isConfidential() {
+        return confidentialityLevel == ConfidentialityLevel.CONFIDENTIAL;
     }
 }

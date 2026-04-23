@@ -1,6 +1,7 @@
 package backendlab.team4you.caserecord;
 
-import backendlab.team4you.exceptions.ApiExceptionHandler;
+import backendlab.team4you.common.ConfidentialityLevel;
+import backendlab.team4you.exceptions.GlobalRestExceptionHandler;
 import backendlab.team4you.exceptions.RegistryNotFoundException;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CaseRecordController.class)
-@Import(ApiExceptionHandler.class)
+@Import(GlobalRestExceptionHandler.class)
 class CaseRecordControllerTest {
 
     @Autowired
@@ -50,10 +51,10 @@ class CaseRecordControllerTest {
                 "KS",
                 "Test case title",
                 "Test description",
-                "OPEN",
+                CaseStatus.OPEN,
                 "owner-123",
                 "assigned-456",
-                "OPEN",
+                ConfidentialityLevel.OPEN,
                 java.time.LocalDateTime.of(2026, 4, 9, 10, 30),
                 java.time.LocalDateTime.of(2026, 4, 9, 10, 31),
                 null,

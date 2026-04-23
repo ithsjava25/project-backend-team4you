@@ -5,8 +5,6 @@ import backendlab.team4you.exceptions.DuplicateEmailException;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import jakarta.transaction.Transactional;
 
-import org.jspecify.annotations.Nullable;
-
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,13 +14,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.stereotype.Service;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-
-
 import java.security.Principal;
 
 import org.springframework.web.server.ResponseStatusException;
-
 
 import java.security.SecureRandom;
 
@@ -31,8 +25,6 @@ import java.util.List;
 
 @Service
 public class UserService {
-
-
 
     UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -45,7 +37,6 @@ public class UserService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
 
     @Transactional
     public void save(UserEntity userEntity){
@@ -74,7 +65,6 @@ public class UserService {
         return userRepository.save(userEntity);
     }
 
-
     public void registerUser(UserRegistrationDTO dto) {
 
         if (dto.name() == null || dto.name().isBlank()) {
@@ -97,9 +87,10 @@ public class UserService {
         user.setEmail(cleanEmail);
         user.setPhoneNumber(dto.phoneNumber());
 
-
         String hashedPw = passwordEncoder.encode(dto.password());
         user.setPasswordHash(hashedPw);
+
+        user.setRole(UserRole.USER);
 
 
         userRepository.save(user);
@@ -135,8 +126,7 @@ public class UserService {
         userEntity.setLastName(lastName);
 
         //Every user that register themselves will automatically get the role USER assigned
-        String assignedRole = "ROLE_USER";
-        userEntity.setRole(assignedRole);
+        userEntity.setRole(UserRole.USER);
 
         try {
             return userRepository.save(userEntity);
@@ -185,9 +175,19 @@ public class UserService {
         return userRepository.findAll(PageRequest.of(page, size));
     }
     public Page<UserEntity> getAdmins(int page, int size) {
-        return userRepository.findByRole("ROLE_ADMIN", PageRequest.of(page, size));
+        return userRepository.findByRole(UserRole.ADMIN, PageRequest.of(page, size));
     }
     public UserEntity findByUsername(String disPlayName) {
         return userRepository.findByDisplayName(disPlayName);
+    }
+
+    @Transactional
+    public UserEntity getCurrentUser(Principal principal) {
+        if (principal == null || principal.getName() == null || principal.getName().isBlank()) {
+            throw new UserNotFoundException("No authenticated user found");
+        }
+
+        return userRepository.findByName(principal.getName().trim())
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + principal.getName()));
     }
 }

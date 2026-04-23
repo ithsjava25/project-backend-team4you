@@ -1,6 +1,7 @@
 package backendlab.team4you.caserecord;
 
 import backendlab.team4you.casefile.CaseFile;
+import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.registry.Registry;
 import backendlab.team4you.user.UserEntity;
 import jakarta.persistence.*;
@@ -36,19 +37,21 @@ public class CaseRecord {
     @Column(columnDefinition = "text")
     private String description;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private String status;
+    private CaseStatus status;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_user_id", nullable = false)
     private UserEntity owner;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "assigned_user_id", nullable = false)
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_user_id", nullable = true)
     private UserEntity assignedUser;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "confidentiality_level", nullable = false, length = 50)
-    private String confidentialityLevel = "OPEN";
+    private ConfidentialityLevel confidentialityLevel = ConfidentialityLevel.OPEN;
 
     @Column(name = "opened_at", nullable = false)
     private LocalDateTime openedAt;
@@ -72,10 +75,10 @@ public class CaseRecord {
             Registry registry,
             String title,
             String description,
-            String status,
+            CaseStatus status,
             UserEntity owner,
             UserEntity assignedUser,
-            String confidentialityLevel,
+            ConfidentialityLevel confidentialityLevel,
             LocalDateTime openedAt
     ) {
         this.registry = Objects.requireNonNull(registry, "registry is required");
@@ -84,14 +87,11 @@ public class CaseRecord {
         }
         this.title = title.trim();
         this.description = description;
-        this.status = (status == null || status.isBlank()) ? "OPEN" : status.trim();
+        this.status = Objects.requireNonNull(status, "status is required");
         this.owner = Objects.requireNonNull(owner, "owner is required");
-        this.assignedUser = Objects.requireNonNull(assignedUser, "assignedUser is required");
+        this.assignedUser = assignedUser;
         this.confidentialityLevel =
-                (confidentialityLevel == null || confidentialityLevel.isBlank())
-                        ? "OPEN"
-                        : confidentialityLevel.trim();
-
+                confidentialityLevel != null ? confidentialityLevel : ConfidentialityLevel.OPEN;
         this.openedAt = openedAt;
     }
 
@@ -145,8 +145,12 @@ public class CaseRecord {
         return description;
     }
 
-    public String getStatus() {
+    public CaseStatus getStatus() {
         return status;
+    }
+
+    public void setStatus(CaseStatus status) {
+        this.status = Objects.requireNonNull(status, "status is required");
     }
 
     public UserEntity getOwner() {
@@ -157,7 +161,7 @@ public class CaseRecord {
         return assignedUser;
     }
 
-    public String getConfidentialityLevel() {
+    public ConfidentialityLevel getConfidentialityLevel() {
         return confidentialityLevel;
     }
 
@@ -180,4 +184,10 @@ public class CaseRecord {
     public void setId(long l) {
         this.id = l;
     }
+
+    public void setAssignedUser(UserEntity assignedUser) {
+        this.assignedUser = assignedUser;
+    }
+
+
 }
