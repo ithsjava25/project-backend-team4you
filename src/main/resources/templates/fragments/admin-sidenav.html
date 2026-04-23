@@ -37,8 +37,11 @@
             </li>
 
             <li>
-                <a th:href="@{/admin/meetings}" hx-get="/admin/meetings" hx-target="#content-area">
-                    <i class="fa-solid fa-gavel"></i>
+                <a th:href="@{/admin/meetings}"
+                   hx-get="/admin/meetings"
+                   hx-target="#content-area"
+                   hx-swap="innerHTML">
+                    <i class="fa-solid fa-calendar-days"></i>
                     <span>Sammanträden</span>
                 </a>
             </li>

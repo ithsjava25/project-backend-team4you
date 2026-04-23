@@ -16,6 +16,7 @@
                     hx-swap="innerHTML"
                     class="meeting-form"
             >
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                 <div class="form-group">
                     <label for="registryId">Instans</label>
                     <select id="registryId" name="registryId" required>
@@ -130,6 +131,7 @@
                         hx-swap="innerHTML"
                         class="meeting-form"
                 >
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <div class="form-group">
                         <label for="caseRecordId">Ärende</label>
                         <select id="caseRecordId" name="caseRecordId" required>
@@ -166,6 +168,7 @@
                                     hx-target="#content-area"
                                     hx-swap="innerHTML"
                             >
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                                 <button type="submit" class="danger-button">Ta bort</button>
                             </form>
                         </div>
