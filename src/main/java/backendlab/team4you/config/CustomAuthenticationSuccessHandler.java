@@ -50,7 +50,14 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         if (isAdmin)
             getRedirectStrategy().sendRedirect(request, response, "/admin");
         else {
-            getRedirectStrategy().sendRedirect(request, response, "/home");
+            boolean isCaseOfficer = authorities.stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_CASE_OFFICER"));
+
+            if(isCaseOfficer)
+                getRedirectStrategy().sendRedirect(request, response, "/case-officer");
+            else {
+                getRedirectStrategy().sendRedirect(request, response, "/home");
+            }
         }
     }
 }

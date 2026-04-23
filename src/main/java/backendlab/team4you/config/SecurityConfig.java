@@ -24,6 +24,7 @@ public class SecurityConfig {
 
     private static final String ADMIN = "ADMIN";
     private static final String LOGIN = "/login";
+    private static final String CASE_OFFICER = "CASE_OFFICER";
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -38,14 +39,15 @@ public class SecurityConfig {
                                 .requestMatchers( "/", LOGIN, "/login/webauthn", "/signup", "/error").permitAll()
 
                                 .requestMatchers("/webauthn/authenticate/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/files/upload").hasAnyRole("USER", ADMIN)
-                                .requestMatchers(HttpMethod.GET, "/api/files/download/**").hasRole(ADMIN)
-                                .requestMatchers(HttpMethod.DELETE, "/api/files/delete/**").hasRole(ADMIN)
+                                .requestMatchers(HttpMethod.POST, "/api/files/upload").hasAnyRole("USER", ADMIN, CASE_OFFICER)
+                                .requestMatchers(HttpMethod.GET, "/api/files/download/**").hasAnyRole(ADMIN, CASE_OFFICER)
+                                .requestMatchers(HttpMethod.DELETE, "/api/files/delete/**").hasAnyRole(ADMIN, CASE_OFFICER)
 
-                                .requestMatchers("/webauthn/**").hasAnyRole("USER", ADMIN)
+                                .requestMatchers("/webauthn/**").hasAnyRole("USER", ADMIN, CASE_OFFICER)
                                 .requestMatchers("/admin/**").hasRole(ADMIN)
-                                .requestMatchers("/home", "/profile/**").hasAnyRole("USER", ADMIN)
-                                .requestMatchers("/add-passkey", "/webauthn/register/**").hasAnyRole("USER", ADMIN)
+                                .requestMatchers("/case-officer/**").hasRole(CASE_OFFICER)
+                                .requestMatchers("/home", "/profile/**").hasAnyRole("USER", ADMIN, CASE_OFFICER)
+                                .requestMatchers("/add-passkey", "/webauthn/register/**").hasAnyRole("USER", ADMIN, CASE_OFFICER)
 
                                 .anyRequest().authenticated()
                 )
