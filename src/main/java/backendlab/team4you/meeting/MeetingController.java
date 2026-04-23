@@ -146,6 +146,46 @@ public class MeetingController {
         return "admin/meetings";
     }
 
+    @PostMapping("/{meetingId}/agenda-items/{agendaItemId}/documents")
+    public String addAgendaDocument(
+            @PathVariable Long meetingId,
+            @PathVariable Long agendaItemId,
+            @RequestParam Long caseFileId,
+            Model model
+    ) {
+        Meeting meeting = meetingService.getMeetingById(meetingId);
+
+        try {
+            meetingService.addDocumentToAgendaItem(meetingId, agendaItemId, caseFileId);
+            model.addAttribute("successMessage", "Handlingen lades till som beslutsunderlag.");
+        } catch (Exception exception) {
+            model.addAttribute("errorMessage", exception.getMessage());
+        }
+
+        populateMeetingsPage(model, meeting.getRegistry().getId(), meetingId);
+        return "fragments/admin-meetings :: content";
+    }
+
+    @PostMapping("/{meetingId}/agenda-items/{agendaItemId}/documents/{documentId}/remove")
+    public String removeAgendaDocument(
+            @PathVariable Long meetingId,
+            @PathVariable Long agendaItemId,
+            @PathVariable Long documentId,
+            Model model
+    ) {
+        Meeting meeting = meetingService.getMeetingById(meetingId);
+
+        try {
+            meetingService.removeDocumentFromAgendaItem(meetingId, agendaItemId, documentId);
+            model.addAttribute("successMessage", "Handlingen togs bort från beslutsunderlaget.");
+        } catch (Exception exception) {
+            model.addAttribute("errorMessage", exception.getMessage());
+        }
+
+        populateMeetingsPage(model, meeting.getRegistry().getId(), meetingId);
+        return "fragments/admin-meetings :: content";
+    }
+
     private void populateMeetingsPage(Model model, Long registryId, Long selectedMeetingId) {
         List<Registry> registries = registryRepository.findAll();
         model.addAttribute("registries", registries);
