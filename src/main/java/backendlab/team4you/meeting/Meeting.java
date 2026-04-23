@@ -145,7 +145,7 @@ public class Meeting {
         this.notes = notes;
     }
 
-    public List<MeetingAgendaItemEntity> getAgendaItems() {
+    public List<MeetingAgendaItem> getAgendaItems() {
         return agendaItems;
     }
 
