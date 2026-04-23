@@ -169,8 +169,58 @@
                                     hx-swap="innerHTML"
                             >
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                                <button type="submit" class="danger-button">Ta bort</button>
+                                <button type="submit" class="danger-button">Ta bort ärende</button>
                             </form>
+                        </div>
+
+                        <div class="agenda-documents-section">
+                            <h5>Valda beslutsunderlag</h5>
+
+                            <div th:if="${#lists.isEmpty(documentsByAgendaItemId[agendaItem.id])}">
+                                <p>Inga handlingar valda ännu.</p>
+                            </div>
+
+                            <ul class="agenda-document-list" th:if="${not #lists.isEmpty(documentsByAgendaItemId[agendaItem.id])}">
+                                <li th:each="document : ${documentsByAgendaItemId[agendaItem.id]}">
+                                    <div class="agenda-document-row">
+                                        <span th:text="${document.caseFile.originalFilename}">tjansteskrivelse.pdf</span>
+
+                                        <form
+                                                th:attr="hx-post=@{/admin/meetings/{meetingId}/agenda-items/{agendaItemId}/documents/{documentId}/remove(meetingId=${selectedMeeting.id}, agendaItemId=${agendaItem.id}, documentId=${document.id})}"
+                                                hx-target="#content-area"
+                                                hx-swap="innerHTML"
+                                        >
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                            <button type="submit" class="danger-button">Ta bort</button>
+                                        </form>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <h5>Tillgängliga handlingar</h5>
+
+                            <div th:if="${#lists.isEmpty(availableFilesByAgendaItemId[agendaItem.id])}">
+                                <p>Det finns inga handlingar kopplade till ärendet.</p>
+                            </div>
+
+                            <ul class="agenda-document-list" th:if="${not #lists.isEmpty(availableFilesByAgendaItemId[agendaItem.id])}">
+                                <li th:each="caseFile : ${availableFilesByAgendaItemId[agendaItem.id]}">
+                                    <div class="agenda-document-row">
+                                        <span th:text="${caseFile.originalFilename}">budgetunderlag.pdf</span>
+
+                                        <form
+                                                th:attr="hx-post=@{/admin/meetings/{meetingId}/agenda-items/{agendaItemId}/documents(meetingId=${selectedMeeting.id}, agendaItemId=${agendaItem.id})}"
+                                                hx-target="#content-area"
+                                                hx-swap="innerHTML"
+                                        >
+                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                                            <input type="hidden" name="caseFileId" th:value="${caseFile.id}">
+                                            <button type="submit" class="submit">Lägg till</button>
+                                        </form>
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
                     </li>
                 </ol>

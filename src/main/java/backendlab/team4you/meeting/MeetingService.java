@@ -158,7 +158,7 @@ public class MeetingService {
         MeetingAgendaItem agendaItem = meetingAgendaItemRepository.findById(agendaItemId)
                 .orElseThrow(() -> new IllegalArgumentException("Dagordningspunkten hittades inte."));
 
-        return caseFileRepository.findByCaseRecordIdOrderByCreatedAtDesc(agendaItem.getCaseRecord().getId());
+        return caseFileRepository.findByCaseRecordIdOrderByUploadedAtDesc(agendaItem.getCaseRecord().getId());
     }
 
     public MeetingAgendaDocument addDocumentToAgendaItem(Long meetingId, Long agendaItemId, Long caseFileId) {
