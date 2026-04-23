@@ -1,5 +1,6 @@
 package backendlab.team4you.meeting;
 
+import backendlab.team4you.casefile.CaseFile;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
 import backendlab.team4you.registry.Registry;
@@ -9,7 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/admin/meetings")
@@ -201,6 +204,9 @@ public class MeetingController {
         List<MeetingAgendaItem> agendaItems = List.of();
         List<CaseRecord> availableCaseRecords = List.of();
 
+        Map<Long, List<MeetingAgendaDocument>> documentsByAgendaItemId = new HashMap<>();
+        Map<Long, List<CaseFile>> availableFilesByAgendaItemId = new HashMap<>();
+
         if (selectedMeetingId != null) {
             selectedMeeting = meetingService.getMeetingById(selectedMeetingId);
             agendaItems = meetingService.getAgendaItems(selectedMeetingId);
@@ -208,10 +214,24 @@ public class MeetingController {
             Long selectedRegistryId = selectedMeeting.getRegistry().getId();
             availableCaseRecords = caseRecordRepository.findByRegistryIdOrderByCreatedAtDesc(selectedRegistryId);
             model.addAttribute("selectedRegistryId", selectedRegistryId);
+
+            for (MeetingAgendaItem agendaItem : agendaItems) {
+                documentsByAgendaItemId.put(
+                        agendaItem.getId(),
+                        meetingService.getAgendaDocuments(agendaItem.getId())
+                );
+
+                availableFilesByAgendaItemId.put(
+                        agendaItem.getId(),
+                        meetingService.getAvailableCaseFilesForAgendaItem(agendaItem.getId())
+                );
+            }
         }
 
         model.addAttribute("selectedMeeting", selectedMeeting);
         model.addAttribute("agendaItems", agendaItems);
         model.addAttribute("availableCaseRecords", availableCaseRecords);
+        model.addAttribute("documentsByAgendaItemId", documentsByAgendaItemId);
+        model.addAttribute("availableFilesByAgendaItemId", availableFilesByAgendaItemId);
     }
 }
