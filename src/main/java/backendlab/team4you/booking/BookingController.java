@@ -70,7 +70,7 @@ public class BookingController {
 
     @PostMapping("/booking/cancel")
     public String cancelBooking(
-            @RequestParam String id,
+            @RequestParam Long id,
             Model model
     ) {
 

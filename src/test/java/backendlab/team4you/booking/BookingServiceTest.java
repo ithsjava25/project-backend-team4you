@@ -77,4 +77,20 @@ class BookingServiceTest {
 
         assertThrows(RuntimeException.class, () -> bookingService.delete(99L));
     }
+
+    @Test
+    void cancelBooking_shouldSetStatusToCancelled() {
+        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+
+        bookingService.cancelBooking(1L);
+
+        assertEquals(BookingEnum.CANCELLED, booking.getStatus());
+    }
+
+    @Test
+    void cancelBooking_shouldThrowException_whenBookingNotFound() {
+        when(bookingRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> bookingService.cancelBooking(99L));
+    }
 }
