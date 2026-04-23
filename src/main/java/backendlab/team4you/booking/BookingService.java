@@ -15,7 +15,7 @@ public class BookingService {
 
 
     @Transactional
-    public void cancelBooking(String id) {
+    public void cancelBooking(Long id) {
         BookingEntity booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
