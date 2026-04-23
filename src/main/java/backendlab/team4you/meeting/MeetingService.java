@@ -4,6 +4,7 @@ import backendlab.team4you.casefile.CaseFile;
 import backendlab.team4you.casefile.CaseFileRepository;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
+import backendlab.team4you.exceptions.MeetingNotFoundException;
 import backendlab.team4you.registry.Registry;
 import backendlab.team4you.registry.RegistryRepository;
 import org.springframework.stereotype.Service;
@@ -145,7 +146,7 @@ public class MeetingService {
     @Transactional(readOnly = true)
     public Meeting getMeetingById(Long meetingId) {
         return meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new IllegalArgumentException("Sammanträdet hittades inte."));
+                .orElseThrow(() -> new MeetingNotFoundException("Sammanträdet hittades inte."));
     }
 
     @Transactional(readOnly = true)
