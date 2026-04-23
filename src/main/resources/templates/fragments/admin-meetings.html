@@ -179,6 +179,16 @@
                     <button class="submit" type="submit">Spara ändringar</button>
                 </form>
 
+                <form
+                        th:attr="hx-post=@{/admin/meetings/{meetingId}/delete(meetingId=${selectedMeeting.id})}"
+                        hx-target="#content-area"
+                        hx-swap="innerHTML"
+                        class="delete-meeting-form"
+                >
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button type="submit" class="danger-button">Ta bort sammanträde</button>
+                </form>
+
                 <hr>
 
                 <h4>Lägg till ärende</h4>

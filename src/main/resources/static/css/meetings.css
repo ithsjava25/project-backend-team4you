@@ -186,3 +186,7 @@
     color: #b42318;
     border: 1px solid #fecdca;
 }
+
+.delete-meeting-form {
+    margin-top: 12px;
+}
