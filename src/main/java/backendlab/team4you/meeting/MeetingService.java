@@ -94,6 +94,11 @@ public class MeetingService {
     }
 
     @Transactional(readOnly = true)
+    public List<Meeting> getAllMeetings() {
+        return meetingRepository.findAllByOrderByStartsAtDesc();
+    }
+
+    @Transactional(readOnly = true)
     public List<MeetingAgendaItem> getAgendaItems(Long meetingId) {
         Meeting meeting = getMeetingById(meetingId);
         return meetingAgendaItemRepository.findByMeetingOrderByAgendaOrderAsc(meeting);

@@ -9,4 +9,5 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 
     List<Meeting> findByRegistryOrderByStartsAtAsc(Registry registry);
     List<Meeting> findByRegistryOrderByStartsAtDesc(Registry registry);
+    List<Meeting> findAllByOrderByStartsAtDesc();
 }

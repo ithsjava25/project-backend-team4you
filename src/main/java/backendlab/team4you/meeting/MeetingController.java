@@ -196,7 +196,7 @@ public class MeetingController {
 
         List<Meeting> meetings = registryId != null
                 ? meetingService.getMeetingsForRegistry(registryId)
-                : List.of();
+                : meetingService.getAllMeetings();
 
         model.addAttribute("meetings", meetings);
 
