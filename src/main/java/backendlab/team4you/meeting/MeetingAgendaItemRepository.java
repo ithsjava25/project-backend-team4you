@@ -15,4 +15,8 @@ public interface MeetingAgendaItemRepository extends JpaRepository<MeetingAgenda
     boolean existsByMeetingAndCaseRecord(Meeting meeting, CaseRecord caseRecord);
 
     long countByMeeting(Meeting meeting);
+
+    Optional<MeetingAgendaItem> findByMeetingAndAgendaOrder(Meeting meeting, Integer agendaOrder);
+
+    Optional<MeetingAgendaItem> findByIdAndMeeting(Long id, Meeting meeting);
 }

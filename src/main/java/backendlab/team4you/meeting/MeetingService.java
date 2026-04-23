@@ -191,6 +191,52 @@ public class MeetingService {
         return meetingAgendaItemRepository.save(agendaItem);
     }
 
+    @Transactional
+    public void moveAgendaItemUp(Long meetingId, Long agendaItemId) {
+        Meeting meeting = getMeetingById(meetingId);
+
+        MeetingAgendaItem currentItem = meetingAgendaItemRepository.findByIdAndMeeting(agendaItemId, meeting)
+                .orElseThrow(() -> new IllegalArgumentException("Dagordningspunkten hittades inte."));
+
+        if (currentItem.getAgendaOrder() == null || currentItem.getAgendaOrder() <= 1) {
+            return;
+        }
+
+        int currentOrder = currentItem.getAgendaOrder();
+        int targetOrder = currentOrder - 1;
+
+        MeetingAgendaItem previousItem = meetingAgendaItemRepository.findByMeetingAndAgendaOrder(meeting, targetOrder)
+                .orElseThrow(() -> new IllegalArgumentException("Kunde inte flytta upp dagordningspunkten."));
+
+        currentItem.setAgendaOrder(targetOrder);
+        previousItem.setAgendaOrder(currentOrder);
+    }
+
+    @Transactional
+    public void moveAgendaItemDown(Long meetingId, Long agendaItemId) {
+        Meeting meeting = getMeetingById(meetingId);
+
+        MeetingAgendaItem currentItem = meetingAgendaItemRepository.findByIdAndMeeting(agendaItemId, meeting)
+                .orElseThrow(() -> new IllegalArgumentException("Dagordningspunkten hittades inte."));
+
+        if (currentItem.getAgendaOrder() == null) {
+            return;
+        }
+
+        int currentOrder = currentItem.getAgendaOrder();
+        int targetOrder = currentOrder + 1;
+
+        MeetingAgendaItem nextItem = meetingAgendaItemRepository.findByMeetingAndAgendaOrder(meeting, targetOrder)
+                .orElse(null);
+
+        if (nextItem == null) {
+            return;
+        }
+
+        currentItem.setAgendaOrder(targetOrder);
+        nextItem.setAgendaOrder(currentOrder);
+    }
+
     public void removeAgendaItem(Long meetingId, Long agendaItemId) {
         Meeting meeting = getMeetingById(meetingId);
 
