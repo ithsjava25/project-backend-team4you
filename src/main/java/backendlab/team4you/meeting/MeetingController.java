@@ -185,6 +185,44 @@ public class MeetingController {
         return "admin/meetings";
     }
 
+    @PostMapping("/{meetingId}/agenda-items/{agendaItemId}/move-up")
+    public String moveAgendaItemUp(
+            @PathVariable Long meetingId,
+            @PathVariable Long agendaItemId,
+            Model model
+    ) {
+        Meeting meeting = meetingService.getMeetingById(meetingId);
+
+        try {
+            meetingService.moveAgendaItemUp(meetingId, agendaItemId);
+            model.addAttribute("successMessage", "Dagordningspunkten flyttades upp.");
+        } catch (Exception exception) {
+            model.addAttribute("errorMessage", exception.getMessage());
+        }
+
+        populateMeetingsPage(model, meeting.getRegistry().getId(), meetingId);
+        return "fragments/admin-meetings :: content";
+    }
+
+    @PostMapping("/{meetingId}/agenda-items/{agendaItemId}/move-down")
+    public String moveAgendaItemDown(
+            @PathVariable Long meetingId,
+            @PathVariable Long agendaItemId,
+            Model model
+    ) {
+        Meeting meeting = meetingService.getMeetingById(meetingId);
+
+        try {
+            meetingService.moveAgendaItemDown(meetingId, agendaItemId);
+            model.addAttribute("successMessage", "Dagordningspunkten flyttades ner.");
+        } catch (Exception exception) {
+            model.addAttribute("errorMessage", exception.getMessage());
+        }
+
+        populateMeetingsPage(model, meeting.getRegistry().getId(), meetingId);
+        return "fragments/admin-meetings :: content";
+    }
+
     @DeleteMapping("/{meetingId}/agenda-items/{agendaItemId}")
     public String removeAgendaItem(
             @PathVariable Long meetingId,
