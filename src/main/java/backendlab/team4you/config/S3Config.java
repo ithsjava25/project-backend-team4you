@@ -33,8 +33,9 @@ public class S3Config {
         return S3Client.builder()
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(credentials))
-                .endpointOverride(URI.create(endpointUrl)) // Points to LocalStack instead of real AWS
-                .forcePathStyle(true) // Required for LocalStack
+                .endpointOverride(URI.create(endpointUrl))
+                .forcePathStyle(true)
                 .build();
     }
+
 }

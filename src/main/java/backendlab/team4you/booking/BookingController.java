@@ -88,7 +88,17 @@ public class BookingController {
     }
 
     @GetMapping("/booking")
-    public String bookingPage() {
+    public String booking(
+            Model model,
+            @RequestHeader(value = "HX-Request", required = false) String htmx
+    ) {
+
+        model.addAttribute("bookings", bookingService.getAll());
+
+        if (htmx != null) {
+            return "booking :: content";
+        }
+
         return "booking";
     }
 

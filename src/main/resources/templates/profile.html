@@ -24,8 +24,11 @@
             <p class="widget-value" th:text="${applicationCount}">0</p>
 
             <a hx-get="/application"
+               th:href="@{/application/apply}"
                hx-target="#content-area"
                hx-swap="innerHTML">
+
+
                 Visa
             </a>
         </div>
@@ -36,6 +39,7 @@
             <p class="widget-value" th:text="${bookingCount}">0</p>
 
             <a hx-get="/booking"
+               th:href="@{/booking/application}"
                hx-target="#content-area"
                hx-swap="innerHTML">
                 Visa
@@ -47,8 +51,10 @@
     <hr>
 
     <a hx-get="/profile/change-password"
+       th:href="@{/profile/change-password}"
        hx-target="#content-area"
        hx-swap="innerHTML">
+
         Ändra lösenord
     </a>
 
@@ -57,7 +63,7 @@
         <h3>Farlig zon</h3>
 
         <button
-                hx-delete="/account"
+                hx-delete="/profile"
                 hx-confirm="Är du säker?"
                 class="btn-danger">
             Ta bort konto

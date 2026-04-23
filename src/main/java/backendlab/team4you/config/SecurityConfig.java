@@ -2,9 +2,9 @@ package backendlab.team4you.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,44 +19,42 @@ import backendlab.team4you.user.UserService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @Configuration
-@EnableMethodSecurity
 public class SecurityConfig {
-
-    private static final String ADMIN = "ADMIN";
-    private static final String LOGIN = "/login";
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http,
                                             CustomAuthenticationSuccessHandler successHandler) throws Exception {
 
         return http
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/webauthn/**", "/api/files/**"))
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(
                         authorizeHttp -> authorizeHttp
                                 // Public endpoints
                                 .requestMatchers("/css/**", "/js/**", "/images/**").permitAll()
-                                .requestMatchers( "/", LOGIN, "/login/webauthn", "/signup", "/error").permitAll()
-
+                                .requestMatchers("/", "/login", "/login/webauthn", "/signup", "/error").permitAll()
                                 .requestMatchers("/webauthn/authenticate/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/files/upload").hasAnyRole("USER", ADMIN)
-                                .requestMatchers(HttpMethod.GET, "/api/files/download/**").hasRole(ADMIN)
-                                .requestMatchers(HttpMethod.DELETE, "/api/files/delete/**").hasRole(ADMIN)
+                                .requestMatchers("/api/files/**").permitAll()
+                                .requestMatchers("/register", "/user/register").permitAll()
 
-                                .requestMatchers("/webauthn/**").hasAnyRole("USER", ADMIN)
-                                .requestMatchers("/admin/**").hasRole(ADMIN)
+
+                                .requestMatchers("/webauthn-check").authenticated()
+
+                                .requestMatchers("/admin/**").permitAll()
+                                .requestMatchers("/dashboard").hasAnyRole("USER", "ADMIN")
                                 .requestMatchers("/home", "/profile/**").hasRole("USER")
-                                .requestMatchers("/add-passkey", "/webauthn/register/**").hasAnyRole("USER", ADMIN)
+                                .requestMatchers("/add-passkey").hasAnyRole("USER", "ADMIN")
+                                .requestMatchers("/webauthn/register/**").hasAnyRole("USER", "ADMIN")
 
                                 .anyRequest().authenticated()
                 )
-                .webAuthn( passkeys -> passkeys
+                .webAuthn(passkeys -> passkeys
                         .rpId("localhost")
                         .allowedOrigins("http://localhost:8080")
                         .rpName("Passkey team4you")
                 )
                 .formLogin(form -> form
-                        .loginPage(LOGIN)
-                        .loginProcessingUrl(LOGIN)
+                        .loginPage("/")
+                        .loginProcessingUrl("/login")
                         .successHandler(successHandler)
                         .permitAll()
                 )
@@ -64,15 +62,13 @@ public class SecurityConfig {
                 .build();
     }
 
+
     @Bean
     PublicKeyCredentialUserEntityRepository jdbcPublicKeyCredentialRepository(JdbcOperations jdbc) {
         return new JdbcPublicKeyCredentialUserEntityRepository(jdbc);
     }
 
-    @Bean
-    UserCredentialRepository userCredentialRepository(JdbcOperations jdbc) {
-        return new JdbcUserCredentialRepository(jdbc);
-    }
+
 
     @Bean
     public UserDetailsService userDetailsService(UserService userService){
@@ -83,9 +79,9 @@ public class SecurityConfig {
             }
 
             return User.builder()
-                    .username(user.getName())
+                    .username(user.getUsername())
                     .password(user.getPasswordHash())
-                    .authorities(user.getRole())
+                    .roles(user.getRole().replace("ROLE_", ""))
                     .accountLocked(false)
                     .build();
         };
@@ -94,5 +90,12 @@ public class SecurityConfig {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config
+    ) throws Exception {
+        return config.getAuthenticationManager();
     }
 }

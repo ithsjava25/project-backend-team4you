@@ -13,12 +13,8 @@ import java.util.Optional;
 @Repository
 public interface ApplicationRepository extends JpaRepository<ApplicationEntity, Long> {
 
+    Page<ApplicationEntity> findByStatus(ApplicationStatus status, Pageable pageable);
 
-    Page<ApplicationEntity> findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
-            String name,
-            String email,
-            Pageable pageable
-    );
 
     long countByStatus(ApplicationStatus status);
 
@@ -26,8 +22,7 @@ public interface ApplicationRepository extends JpaRepository<ApplicationEntity, 
     Page<ApplicationEntity> findAll(Pageable pageable);
 
     Page<ApplicationEntity> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String email, Pageable pageable);
-//
-//    Optional<UserEntity> findByUsername(String username);
+
 
     List<ApplicationEntity> findByOwner(UserEntity owner);
 

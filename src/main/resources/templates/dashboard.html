@@ -16,6 +16,7 @@
         <p>Avbrutna: <strong th:text="${cancelledCount}">0</strong></p>
 
         <a hx-get="/application"
+           th:href="@{/application}"
            hx-target="#content-area"
            hx-swap="innerHTML">
             Visa alla

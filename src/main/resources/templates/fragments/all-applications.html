@@ -1,0 +1,13 @@
+<div th:fragment="content">
+
+    <h2>Mina ärenden</h2>
+
+    <div th:each="app : ${applications}">
+        <p>
+            <strong th:text="${app.title}"></strong>
+            -
+            <span th:text="${app.status}"></span>
+        </p>
+    </div>
+
+</div>

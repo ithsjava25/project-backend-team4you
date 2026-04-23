@@ -40,6 +40,8 @@ public class Registry {
         this.code = normalizedCode;
     }
 
+
+
     public Long getId() {
         return id;
     }

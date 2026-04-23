@@ -21,20 +21,13 @@ public class ApplicationController {
     @GetMapping("/application")
     public String application(
             Model model,
-            @AuthenticationPrincipal UserDetails userDetails,
-            @RequestHeader(value = "HX-Request", required = false) String htmxRequest
+            @RequestHeader(value = "HX-Request", required = false) String htmx
     ) {
 
-        List<ApplicationEntity> applications =
-                applicationService.getByUsername(userDetails.getUsername());
+        model.addAttribute("applications", applicationService.getAll());
 
-        model.addAttribute("applications", applications);
-        model.addAttribute("userName", userDetails.getUsername());
-        System.out.println("USER: " + userDetails.getUsername());
-        System.out.println("APPLICATIONS: " + applications.size());
-
-        if (htmxRequest != null) {
-            return "fragments/application :: content";
+        if (htmx != null) {
+            return "booking :: content";
         }
 
         return "application";

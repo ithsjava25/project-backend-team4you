@@ -4,12 +4,6 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
 
-<head>
-    <meta charset="UTF-8">
-    <title>Register</title>
-    <link rel="stylesheet" th:href="@{/css/register.css}">
-</head>
-
 <body>
 
 <section layout:fragment="content">
@@ -23,42 +17,53 @@
 
             <div class="form-container">
 
-            <form class="register-form" th:action="@{/register}" method="post">
+                <form th:action="@{/register}"
+                      th:object="${user}"
+                      method="post">
 
-                <h1 class="register-h1">Registrera dig</h1>
-                <div class="form-group">
-                <label for="firstName">Förnamn</label>
-                <input type="text" id="firstName" name="firstName" required>
+
+                    <h1 class="register-h1">Registrera dig</h1>
+                    <div class="form-group">
+                        <label>
+                            Användarnamn
+                            <input type="text" th:field="*{username}" required>
+                        </label>
+
+                        <input type="hidden" th:field="*{role}" value="ROLE_USER">
+
+                        <label >Förnamn</label>
+                        <input type="text" th:field="*{firstName}" required>
+                    </div>
+                    <div class="form-group">
+                        <label >Efternamn</label>
+                        <input type="text" th:field="*{lastName}" required>
+                    </div>
+                    <label >E-post</label>
+                    <input type="email" th:field="*{email}" required>
+
+                    <div class="form-group">
+                        <label >Mobilnummer</label>
+
+                        <input type="tel" th:field="*{phoneNumber}">
+                    </div>
+
+                    <label >Lösenord</label>
+
+                    <input type="password" th:field="*{password}" required>
+                    <div class="form-group">
+                        <label >Bekräfta lösenord</label>
+                        <input type="password" th:field="*{confirmPassword}" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Skapa konto</button>
+
+                </form>
+
+                <div class="footer-links">
+                    <p>Har du redan ett konto? <a th:href="@{/login}">Logga in</a></p>
+                    <p><a th:href="@{/}">Tillbaka</a></p>
                 </div>
-                <div class="form-group">
-                <label for="lastName">Efternamn</label>
-                <input type="text" id="lastName" name="lastName" required>
-                </div>
-                <label for="email">E-post</label>
-                <input type="email" id="email" name="email" required>
-                <div class="form-group">
-                <label for="phone">Mobilnummer</label>
 
-                <input type="tel" id="phone" name="phoneNumber">
-                </div>
-
-                <label for="password">Lösenord</label>
-
-                <input type="password" id="password" name="password" required>
-                <div class="form-group">
-                <label for="confirmPassword">Bekräfta lösenord</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required>
-                </div>
-                <button type="submit" class="btn-primary">Skapa konto</button>
-
-            </form>
-
-            <div class="footer-links">
-                <p>Har du redan ett konto? <a th:href="@{/login}">Logga in</a></p>
-                <p><a th:href="@{/}">Tillbaka</a></p>
             </div>
-
-        </div>
         </div>
 
     </div>

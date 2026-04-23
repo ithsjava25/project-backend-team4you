@@ -40,6 +40,7 @@ public class UserService {
     private final SecureRandom random = new SecureRandom();
     private final LogService logService;
 
+
     public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LogService logService){
 
 
@@ -80,11 +81,8 @@ public class UserService {
 
     public void registerUser(UserRegistrationDTO dto) {
 
-        if (dto.name() == null || dto.name().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Username is required");
-        }
-        if (userRepository.findByUsername(dto.name().trim()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST ,"Username already exists");
+        if (dto.firstName() == null || dto.firstName().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"First name is required");
         }
 
         String cleanEmail = dto.email() != null ? dto.email().trim() : null;
@@ -92,17 +90,21 @@ public class UserService {
         if (cleanEmail != null && userRepository.findByEmail(cleanEmail).isPresent()) {
             throw new DuplicateEmailException("E-posten är redan tagen");
         }
+        String cleanUsername = dto.username() != null ? dto.username().trim() : null;
+        if (cleanUsername == null || cleanUsername.isBlank()) {
+            cleanUsername = cleanEmail;
+        }
+
 
         UserEntity user = new UserEntity();
+        user.setUsername(cleanEmail);
         user.setFirstName(dto.firstName());
         user.setLastName(dto.lastName());
         user.setEmail(cleanEmail);
         user.setPhoneNumber(dto.phoneNumber());
 
-
         String hashedPw = passwordEncoder.encode(dto.password());
         user.setPasswordHash(hashedPw);
-
 
         userRepository.save(user);
     }

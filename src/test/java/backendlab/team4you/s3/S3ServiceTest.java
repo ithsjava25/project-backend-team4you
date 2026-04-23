@@ -44,11 +44,11 @@ class S3ServiceTest {
 
     @Test
     void deleteFile_shouldCallDeleteObject() {
-        // Arrange
+
         when(s3Client.deleteObject(any(DeleteObjectRequest.class)))
                 .thenReturn(DeleteObjectResponse.builder().build());
 
-        // Act
+
         s3Service.deleteFile("test.txt");
 
         // Assert — verify that deleteObject was called once

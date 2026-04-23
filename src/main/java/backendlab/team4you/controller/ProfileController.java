@@ -42,7 +42,7 @@ public class ProfileController {
         return "profile";
     }
 
-    @DeleteMapping("/account")
+    @DeleteMapping("/profile")
     public String deleteAccount(
             @AuthenticationPrincipal UserDetails user,
             HttpServletResponse response

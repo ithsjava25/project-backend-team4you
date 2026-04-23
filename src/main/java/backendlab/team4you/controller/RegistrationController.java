@@ -4,6 +4,10 @@ import backendlab.team4you.dto.UserRegistrationDTO;
 import backendlab.team4you.exceptions.DuplicateEmailException;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,21 +21,25 @@ import java.security.Principal;
 public class RegistrationController {
 
     private final UserService userService;
+    private final AuthenticationManager authenticationManager;
 
-    public RegistrationController(UserService userService){
+    public RegistrationController(UserService userService, AuthenticationManager authenticationManager){
         this.userService = userService;
+        this.authenticationManager = authenticationManager;
     }
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
 
-        model.addAttribute("user", new UserRegistrationDTO("","", "", "", "", "", ""));
+        model.addAttribute("user", new UserRegistrationDTO("","", "", "", "", "", "", ""));
         return "register";
     }
 
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute("user") UserRegistrationDTO registrationDto, Model model) {
-
+    public String registerUser(
+            @ModelAttribute("user") UserRegistrationDTO registrationDto,
+            Model model
+    ) {
 
         if (!registrationDto.password().equals(registrationDto.confirmPassword())) {
             model.addAttribute("error", "Lösenorden matchar inte!");
@@ -40,15 +48,24 @@ public class RegistrationController {
 
         try {
             userService.registerUser(registrationDto);
-         } catch (DuplicateEmailException e) {
-        model.addAttribute("error", "E-postadressen är redan registrerad!");
-        return "register";
-               } catch (Exception e) {
-                   model.addAttribute("error", "Ett oväntat fel uppstod. Försök igen.");
-                    return "register";
-    }
 
-        return "redirect:/login?registered";
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(
+                            registrationDto.email(),
+                            registrationDto.password()
+                    );
+
+            Authentication authentication =
+                    authenticationManager.authenticate(authToken);
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            return "redirect:/dashboard";
+
+        } catch (DuplicateEmailException e) {
+            model.addAttribute("error", "E-postadressen är redan registrerad!");
+            return "register";
+        }
     }
 
     @GetMapping("/login")
