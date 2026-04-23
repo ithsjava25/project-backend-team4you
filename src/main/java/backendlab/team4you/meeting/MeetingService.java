@@ -4,7 +4,7 @@ import backendlab.team4you.casefile.CaseFile;
 import backendlab.team4you.casefile.CaseFileRepository;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
-import backendlab.team4you.exceptions.MeetingNotFoundException;
+import backendlab.team4you.exceptions.*;
 import backendlab.team4you.registry.Registry;
 import backendlab.team4you.registry.RegistryRepository;
 import org.springframework.stereotype.Service;
@@ -49,23 +49,23 @@ public class MeetingService {
             String notes
     ) {
         if (registryId == null) {
-            throw new IllegalArgumentException("Registry-id måste anges.");
+            throw new InvalidMeetingStateException("Registry-id måste anges.");
         }
 
         if (title == null || title.isBlank()) {
-            throw new IllegalArgumentException("Titel måste anges.");
+            throw new InvalidMeetingStateException("Titel måste anges.");
         }
 
         if (startsAt == null) {
-            throw new IllegalArgumentException("Starttid måste anges.");
+            throw new InvalidMeetingStateException("Starttid måste anges.");
         }
 
         if (endsAt != null && endsAt.isBefore(startsAt)) {
-            throw new IllegalArgumentException("Sluttid kan inte vara före starttid.");
+            throw new InvalidMeetingStateException("Sluttid kan inte vara före starttid.");
         }
 
         Registry registry = registryRepository.findById(registryId)
-                .orElseThrow(() -> new IllegalArgumentException("Registry hittades inte."));
+                .orElseThrow(() -> new RegistryNotFoundException("Registry hittades inte."));
 
         Meeting meeting = new Meeting(
                 registry,
@@ -91,27 +91,27 @@ public class MeetingService {
             MeetingStatus status
     ) {
         if (meetingId == null) {
-            throw new IllegalArgumentException("Meeting-id måste anges.");
+            throw new InvalidMeetingStateException("Meeting-id måste anges.");
         }
 
         if (title == null || title.isBlank()) {
-            throw new IllegalArgumentException("Titel måste anges.");
+            throw new InvalidMeetingStateException("Titel måste anges.");
         }
 
         if (startsAt == null) {
-            throw new IllegalArgumentException("Starttid måste anges.");
+            throw new InvalidMeetingStateException("Starttid måste anges.");
         }
 
         if (endsAt != null && endsAt.isBefore(startsAt)) {
-            throw new IllegalArgumentException("Sluttid kan inte vara före starttid.");
+            throw new InvalidMeetingStateException("Sluttid kan inte vara före starttid.");
         }
 
         if (status == null) {
-            throw new IllegalArgumentException("Status måste anges.");
+            throw new InvalidMeetingStateException("Status måste anges.");
         }
 
         Meeting meeting = meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new IllegalArgumentException("Sammanträdet hittades inte."));
+                .orElseThrow(() -> new MeetingNotFoundException("Sammanträdet hittades inte."));
 
         meeting.setTitle(title.trim());
         meeting.setStartsAt(startsAt);
@@ -126,11 +126,11 @@ public class MeetingService {
     @Transactional
     public void deleteMeeting(Long meetingId) {
         if (meetingId == null) {
-            throw new IllegalArgumentException("Meeting-id måste anges.");
+            throw new InvalidMeetingStateException("Meeting-id måste anges.");
         }
 
         Meeting meeting = meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new IllegalArgumentException("Sammanträdet hittades inte."));
+                .orElseThrow(() -> new MeetingNotFoundException("Sammanträdet hittades inte."));
 
         meetingRepository.delete(meeting);
     }
@@ -162,11 +162,11 @@ public class MeetingService {
 
     public MeetingAgendaItem addCaseRecordToMeeting(Long meetingId, Long caseRecordId) {
         if (meetingId == null) {
-            throw new IllegalArgumentException("Meeting-id måste anges.");
+            throw new InvalidMeetingStateException("Meeting-id måste anges.");
         }
 
         if (caseRecordId == null) {
-            throw new IllegalArgumentException("Case record-id måste anges.");
+            throw new InvalidMeetingStateException("Case record-id måste anges.");
         }
 
         Meeting meeting = getMeetingById(meetingId);
@@ -177,7 +177,7 @@ public class MeetingService {
         validateCaseRecordBelongsToMeetingRegistry(meeting, caseRecord);
 
         if (meetingAgendaItemRepository.existsByMeetingAndCaseRecord(meeting, caseRecord)) {
-            throw new IllegalArgumentException("Ärendet är redan tillagt på sammanträdet.");
+            throw new DuplicateMeetingAgendaItemException("Ärendet är redan tillagt på sammanträdet.");
         }
 
         long nextAgendaOrder = meetingAgendaItemRepository.countByMeeting(meeting) + 1;
@@ -197,7 +197,7 @@ public class MeetingService {
         Meeting meeting = getMeetingById(meetingId);
 
         MeetingAgendaItem currentItem = meetingAgendaItemRepository.findByIdAndMeeting(agendaItemId, meeting)
-                .orElseThrow(() -> new IllegalArgumentException("Dagordningspunkten hittades inte."));
+                .orElseThrow(() -> new MeetingAgendaItemNotFoundException("Dagordningspunkten hittades inte."));
 
         if (currentItem.getAgendaOrder() == null || currentItem.getAgendaOrder() <= 1) {
             return;
@@ -207,7 +207,7 @@ public class MeetingService {
         int targetOrder = currentOrder - 1;
 
         MeetingAgendaItem previousItem = meetingAgendaItemRepository.findByMeetingAndAgendaOrder(meeting, targetOrder)
-                .orElseThrow(() -> new IllegalArgumentException("Kunde inte flytta upp dagordningspunkten."));
+                .orElseThrow(() -> new InvalidMeetingStateException("Kunde inte flytta upp dagordningspunkten."));
 
         currentItem.setAgendaOrder(0);
         meetingAgendaItemRepository.saveAndFlush(currentItem);
@@ -224,7 +224,7 @@ public class MeetingService {
         Meeting meeting = getMeetingById(meetingId);
 
         MeetingAgendaItem currentItem = meetingAgendaItemRepository.findByIdAndMeeting(agendaItemId, meeting)
-                .orElseThrow(() -> new IllegalArgumentException("Dagordningspunkten hittades inte."));
+                .orElseThrow(() -> new MeetingAgendaItemNotFoundException("Dagordningspunkten hittades inte."));
 
         if (currentItem.getAgendaOrder() == null) {
             return;
@@ -254,10 +254,10 @@ public class MeetingService {
         Meeting meeting = getMeetingById(meetingId);
 
         MeetingAgendaItem agendaItem = meetingAgendaItemRepository.findById(agendaItemId)
-                .orElseThrow(() -> new IllegalArgumentException("Dagordningspunkten hittades inte."));
+                .orElseThrow(() -> new MeetingAgendaItemNotFoundException("Dagordningspunkten hittades inte."));
 
         if (!agendaItem.getMeeting().getId().equals(meeting.getId())) {
-            throw new IllegalArgumentException("Dagordningspunkten tillhör inte detta sammanträde.");
+            throw new InvalidMeetingStateException("Dagordningspunkten tillhör inte detta sammanträde.");
         }
 
         meetingAgendaItemRepository.delete(agendaItem);
@@ -267,7 +267,7 @@ public class MeetingService {
     @Transactional(readOnly = true)
     public List<MeetingAgendaDocument> getAgendaDocuments(Long agendaItemId) {
         MeetingAgendaItem agendaItem = meetingAgendaItemRepository.findById(agendaItemId)
-                .orElseThrow(() -> new IllegalArgumentException("Dagordningspunkten hittades inte."));
+                .orElseThrow(() -> new MeetingAgendaItemNotFoundException("Dagordningspunkten hittades inte."));
 
         return meetingAgendaDocumentRepository.findByAgendaItem(agendaItem);
     }
@@ -275,7 +275,7 @@ public class MeetingService {
     @Transactional(readOnly = true)
     public List<CaseFile> getAvailableCaseFilesForAgendaItem(Long agendaItemId) {
         MeetingAgendaItem agendaItem = meetingAgendaItemRepository.findById(agendaItemId)
-                .orElseThrow(() -> new IllegalArgumentException("Dagordningspunkten hittades inte."));
+                .orElseThrow(() -> new MeetingAgendaItemNotFoundException("Dagordningspunkten hittades inte."));
 
         return caseFileRepository.findByCaseRecordIdOrderByUploadedAtDesc(agendaItem.getCaseRecord().getId());
     }
@@ -284,19 +284,19 @@ public class MeetingService {
         Meeting meeting = getMeetingById(meetingId);
 
         MeetingAgendaItem agendaItem = meetingAgendaItemRepository.findById(agendaItemId)
-                .orElseThrow(() -> new IllegalArgumentException("Dagordningspunkten hittades inte."));
+                .orElseThrow(() -> new MeetingAgendaItemNotFoundException("Dagordningspunkten hittades inte."));
 
         if (!agendaItem.getMeeting().getId().equals(meeting.getId())) {
-            throw new IllegalArgumentException("Dagordningspunkten tillhör inte detta sammanträde.");
+            throw new InvalidMeetingStateException("Dagordningspunkten tillhör inte detta sammanträde.");
         }
 
         CaseFile caseFile = caseFileRepository.findById(caseFileId)
-                .orElseThrow(() -> new IllegalArgumentException("Handlingen hittades inte."));
+                .orElseThrow(() -> new MeetingAgendaDocumentNotFoundException("Handlingen hittades inte."));
 
         validateCaseFileBelongsToAgendaItemCaseRecord(agendaItem, caseFile);
 
         if (meetingAgendaDocumentRepository.existsByAgendaItemAndCaseFile(agendaItem, caseFile)) {
-            throw new IllegalArgumentException("Handlingen är redan vald för denna dagordningspunkt.");
+            throw new DuplicateMeetingAgendaDocumentException("Handlingen är redan vald för denna dagordningspunkt.");
         }
 
         MeetingAgendaDocument document = new MeetingAgendaDocument(agendaItem, caseFile);
@@ -307,17 +307,17 @@ public class MeetingService {
         Meeting meeting = getMeetingById(meetingId);
 
         MeetingAgendaItem agendaItem = meetingAgendaItemRepository.findById(agendaItemId)
-                .orElseThrow(() -> new IllegalArgumentException("Dagordningspunkten hittades inte."));
+                .orElseThrow(() -> new MeetingAgendaItemNotFoundException("Dagordningspunkten hittades inte."));
 
         if (!agendaItem.getMeeting().getId().equals(meeting.getId())) {
-            throw new IllegalArgumentException("Dagordningspunkten tillhör inte detta sammanträde.");
+            throw new InvalidMeetingStateException("Dagordningspunkten tillhör inte detta sammanträde.");
         }
 
         MeetingAgendaDocument document = meetingAgendaDocumentRepository.findById(documentId)
                 .orElseThrow(() -> new IllegalArgumentException("Dokumentkopplingen hittades inte."));
 
         if (!document.getAgendaItem().getId().equals(agendaItem.getId())) {
-            throw new IllegalArgumentException("Dokumentet tillhör inte denna dagordningspunkt.");
+            throw new InvalidMeetingStateException("Dokumentet tillhör inte denna dagordningspunkt.");
         }
 
         meetingAgendaDocumentRepository.delete(document);
@@ -336,21 +336,21 @@ public class MeetingService {
 
     private void validateCaseRecordBelongsToMeetingRegistry(Meeting meeting, CaseRecord caseRecord) {
         if (caseRecord.getRegistry() == null || caseRecord.getRegistry().getId() == null) {
-            throw new IllegalArgumentException("Ärendet saknar diarum.");
+            throw new InvalidMeetingStateException("Ärendet saknar diarum.");
         }
 
         if (!caseRecord.getRegistry().getId().equals(meeting.getRegistry().getId())) {
-            throw new IllegalArgumentException("Ärendet tillhör inte samma organisation som sammanträdet.");
+            throw new InvalidMeetingStateException("Ärendet tillhör inte samma organisation som sammanträdet.");
         }
     }
 
     private void validateCaseFileBelongsToAgendaItemCaseRecord(MeetingAgendaItem agendaItem, CaseFile caseFile) {
         if (caseFile.getCaseRecord() == null || caseFile.getCaseRecord().getId() == null) {
-            throw new IllegalArgumentException("Handlingen saknar kopplat ärende.");
+            throw new InvalidMeetingStateException("Handlingen saknar kopplat ärende.");
         }
 
         if (!caseFile.getCaseRecord().getId().equals(agendaItem.getCaseRecord().getId())) {
-            throw new IllegalArgumentException("Handlingen tillhör inte ärendet på denna dagordningspunkt.");
+            throw new InvalidMeetingStateException("Handlingen tillhör inte ärendet på denna dagordningspunkt.");
         }
     }
 

@@ -43,7 +43,10 @@ public class GlobalRestExceptionHandler {
             CaseFileNotFoundException.class,
             CaseRecordNotFoundException.class,
             RegistryNotFoundException.class,
-            UserNotFoundException.class
+            UserNotFoundException.class,
+            MeetingNotFoundException.class,
+            MeetingAgendaItemNotFoundException.class,
+            MeetingAgendaDocumentNotFoundException.class
     })
     public ResponseEntity<ErrorResponseDto> handleNotFound(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -58,7 +61,8 @@ public class GlobalRestExceptionHandler {
     @ExceptionHandler({
             InvalidFileNameException.class,
             IllegalArgumentException.class,
-            IllegalStateException.class
+            IllegalStateException.class,
+            InvalidMeetingStateException.class
     })
     public ResponseEntity<ErrorResponseDto> handleBadRequest(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -85,7 +89,9 @@ public class GlobalRestExceptionHandler {
             DuplicateRegistryNameException.class,
             DuplicateRegistryCodeException.class,
             DuplicateEmailException.class,
-            FileKeyConflictException.class
+            FileKeyConflictException.class,
+            DuplicateMeetingAgendaItemException.class,
+            DuplicateMeetingAgendaDocumentException.class
     })
     public ResponseEntity<ErrorResponseDto> handleConflict(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
