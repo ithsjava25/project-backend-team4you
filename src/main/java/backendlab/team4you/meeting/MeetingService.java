@@ -208,8 +208,14 @@ public class MeetingService {
         MeetingAgendaItem previousItem = meetingAgendaItemRepository.findByMeetingAndAgendaOrder(meeting, targetOrder)
                 .orElseThrow(() -> new IllegalArgumentException("Kunde inte flytta upp dagordningspunkten."));
 
-        currentItem.setAgendaOrder(targetOrder);
+        currentItem.setAgendaOrder(0);
+        meetingAgendaItemRepository.saveAndFlush(currentItem);
+
         previousItem.setAgendaOrder(currentOrder);
+        meetingAgendaItemRepository.saveAndFlush(previousItem);
+
+        currentItem.setAgendaOrder(targetOrder);
+        meetingAgendaItemRepository.saveAndFlush(currentItem);
     }
 
     @Transactional
@@ -233,8 +239,14 @@ public class MeetingService {
             return;
         }
 
-        currentItem.setAgendaOrder(targetOrder);
+        currentItem.setAgendaOrder(0);
+        meetingAgendaItemRepository.saveAndFlush(currentItem);
+
         nextItem.setAgendaOrder(currentOrder);
+        meetingAgendaItemRepository.saveAndFlush(nextItem);
+
+        currentItem.setAgendaOrder(targetOrder);
+        meetingAgendaItemRepository.saveAndFlush(currentItem);
     }
 
     public void removeAgendaItem(Long meetingId, Long agendaItemId) {
