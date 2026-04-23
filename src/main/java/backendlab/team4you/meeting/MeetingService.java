@@ -79,6 +79,61 @@ public class MeetingService {
         return meetingRepository.save(meeting);
     }
 
+    @Transactional
+    public Meeting updateMeeting(
+            Long meetingId,
+            String title,
+            LocalDateTime startsAt,
+            LocalDateTime endsAt,
+            String location,
+            String notes,
+            MeetingStatus status
+    ) {
+        if (meetingId == null) {
+            throw new IllegalArgumentException("Meeting-id måste anges.");
+        }
+
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("Titel måste anges.");
+        }
+
+        if (startsAt == null) {
+            throw new IllegalArgumentException("Starttid måste anges.");
+        }
+
+        if (endsAt != null && endsAt.isBefore(startsAt)) {
+            throw new IllegalArgumentException("Sluttid kan inte vara före starttid.");
+        }
+
+        if (status == null) {
+            throw new IllegalArgumentException("Status måste anges.");
+        }
+
+        Meeting meeting = meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new IllegalArgumentException("Sammanträdet hittades inte."));
+
+        meeting.setTitle(title.trim());
+        meeting.setStartsAt(startsAt);
+        meeting.setEndsAt(endsAt);
+        meeting.setLocation(blankToNull(location));
+        meeting.setNotes(blankToNull(notes));
+        meeting.setStatus(status);
+
+        return meetingRepository.save(meeting);
+    }
+
+    @Transactional
+    public void deleteMeeting(Long meetingId) {
+        if (meetingId == null) {
+            throw new IllegalArgumentException("Meeting-id måste anges.");
+        }
+
+        Meeting meeting = meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new IllegalArgumentException("Sammanträdet hittades inte."));
+
+        meetingRepository.delete(meeting);
+    }
+
     @Transactional(readOnly = true)
     public List<Meeting> getMeetingsForRegistry(Long registryId) {
         Registry registry = registryRepository.findById(registryId)
