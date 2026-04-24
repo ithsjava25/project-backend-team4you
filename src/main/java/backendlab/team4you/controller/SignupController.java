@@ -41,6 +41,8 @@ public class SignupController {
     }
 
     @GetMapping("/signup")
+    @ResponseBody
+    @AuditAction(action = "SIGNUP", entity = "USER")
     String signup(org.springframework.security.web.csrf.CsrfToken token, Model model) {
         model.addAttribute("csrfToken", token.getToken());
         return "signup";

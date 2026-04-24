@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.webauthn.api.Bytes;
 import org.springframework.stereotype.Service;
@@ -196,7 +198,10 @@ public class UserService {
 
     public void updateRole(Long userId, UserRole newRole) {
 
-        UserEntity user = userRepository.findById(String.valueOf(userId)).orElseThrow();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String actor = (auth != null) ? auth.getName() : "system";
+
+        UserEntity user = userRepository.findById(String.valueOf(userId)).orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
 
         UserRole oldRole = user.getRole();
 
@@ -204,7 +209,7 @@ public class UserService {
         userRepository.save(user);
 
         auditLogService.log(
-                "admin",
+                actor,
                 "ROLE_UPDATED",
                 "USER",
                 userId,

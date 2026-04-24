@@ -1,5 +1,6 @@
 package backendlab.team4you.casefile.ui;
 
+import backendlab.team4you.audit.AuditAction;
 import backendlab.team4you.caserecord.CaseRecordRequestDto;
 import backendlab.team4you.caserecord.CaseRecordService;
 import backendlab.team4you.caserecord.CaseStatus;
@@ -40,12 +41,16 @@ public class CaseRecordViewController {
     }
 
     @GetMapping("/registries/{registryId}/case-records")
+    @ResponseBody
+    @AuditAction(action = "CASE_RECORD_LIST", entity = "CASE_RECORD")
     public String caseRecords(@PathVariable Long registryId, Model model, Principal principal) {
         UserEntity currentUser = userService.getCurrentUser(principal);
         return reloadCaseRecordListFragment(registryId, model, currentUser);
     }
 
     @PostMapping("/registries/{registryId}/case-records")
+    @ResponseBody
+    @AuditAction(action = "CASE_RECORD_CREATE", entity = "CASE_RECORD")
     public String createCaseRecord(
             @PathVariable Long registryId,
             @RequestParam String title,
@@ -86,6 +91,8 @@ public class CaseRecordViewController {
     }
 
     @GetMapping("/case-records/{caseId}")
+    @ResponseBody
+    @AuditAction(action = "CASE_RECORD_DETAIL", entity = "CASE_RECORD")
     public String caseRecordDetail(@PathVariable Long caseId, Model model) {
         try {
             populateCaseRecordDetailModel(caseId, model);
@@ -102,6 +109,8 @@ public class CaseRecordViewController {
     }
 
     @PostMapping("/case-records/{caseId}/update")
+    @ResponseBody
+    @AuditAction(action = "CASE_RECORD_UPDATE", entity = "CASE_RECORD")
     public String updateCaseRecord(
             @PathVariable Long caseId,
             @RequestParam CaseStatus status,
@@ -124,7 +133,9 @@ public class CaseRecordViewController {
         return reloadCaseRecordDetailFragment(caseId, model);
     }
 
-    private String reloadCaseRecordListFragment(Long registryId, Model model, UserEntity currentUser) {
+    private String reloadCaseRecordListFragment
+
+            (Long registryId, Model model, UserEntity currentUser) {
         try {
             populateCaseRecordPanelModel(registryId, model, currentUser);
         } catch (RegistryNotFoundException exception) {
@@ -139,7 +150,10 @@ public class CaseRecordViewController {
         return "fragments/case-management/case-record-list :: caseRecordList";
     }
 
-    private String reloadCaseRecordDetailFragment(Long caseId, Model model) {
+    private String reloadCaseRecordDetailFragment
+
+            (Long caseId, Model model)
+    {
         try {
             populateCaseRecordDetailModel(caseId, model);
         } catch (CaseRecordNotFoundException exception) {

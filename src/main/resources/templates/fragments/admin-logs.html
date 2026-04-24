@@ -15,12 +15,14 @@
                 <th>Status</th>
             </tr>
             </thead>
+
+
             <tbody>
             <tr th:each="log : ${logs}">
                 <td th:text="${log.timestamp != null ? #temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm') : 'Datum saknas'}"></td>
                 <td th:text="${log.username}"></td>
                 <td><span class="badge" th:text="${log.action}"></span></td>
-                <td th:text="${log.entityType + ' (ID: ' + log.entityId + ')'}"></td>
+                <td th:text="${(log.entityType != null ? log.entityType : '-') + ' (ID: ' + log.entityId + ')'}"></td>
                 <td th:text="${log.status}"></td>
             </tr>
             </tbody>

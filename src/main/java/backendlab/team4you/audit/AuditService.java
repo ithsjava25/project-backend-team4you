@@ -1,12 +1,16 @@
 package backendlab.team4you.audit;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
 
 @Service
 public class AuditService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuditService.class);
 
     AuditLogRepository auditLogRepository;
     public AuditService(AuditLogRepository auditRepository) {
@@ -32,8 +36,9 @@ public class AuditService {
         log.setIpAddress(ipAddress);
         log.setTimestamp(ZonedDateTime.now());
         log.setStatus(status);
+        log.setHttpMethod(httpMethod);
                 log.setEntityType(entityType);
-                log.setEntityId(entityId);
+                log.setEntityId((long) entityId);
 
         auditLogRepository.save(log);
 
@@ -51,18 +56,17 @@ public class AuditService {
         {
             try {
                 AuditLog auditLog = new AuditLog();
-
                 auditLog.setUsername(username);
                 auditLog.setAction(action);
                 auditLog.setEntityType(entityType);
-                auditLog.setEntityId(Math.toIntExact(entityId));
+                auditLog.setEntityId((long) Math.toIntExact(entityId));
                 auditLog.setDetails(details);
                 auditLog.setStatus(status);
                 auditLog.setTimestamp(ZonedDateTime.now());
 
                 auditLogRepository.save(auditLog);
 
-                System.out.println(" Audit log saved " + action);
+                log.info("Audit log saved: action={}, entity={}:{}", action, entityType, entityId);
 
             } catch (Exception e) {
                 System.out.println("Failed to save audit log " + e.getMessage());

@@ -10,6 +10,7 @@ import backendlab.team4you.booking.BookingService;
 import backendlab.team4you.service.LogService;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserRepository;
+import backendlab.team4you.user.UserRole;
 import backendlab.team4you.user.UserService;
 import groovy.util.logging.Slf4j;
 
@@ -37,6 +38,7 @@ import java.util.List;
 public class AdminController {
 
     private final LogService logService = new LogService();
+    private final List<String> logs = logService.getLogs();
 
     private final UserService userService;
     private final BookingService bookingService;
@@ -58,16 +60,16 @@ public class AdminController {
 
     @PostMapping("/admin/update-role")
     @AuditAction(action = "UPDATE_USER_ROLE", entity = "USER")
-    public String changeRole(String id, String role) {
+    public String changeRole(@RequestParam String id, @RequestParam String role) {
 
-
+        userService.updateRole(Long.parseLong(id), UserRole.valueOf(role));
         return "redirect:/admin/users";
     }
 
 
 
     @PostMapping("/admin/users")
-    @AuditAction(action = "UPDATE_USER_ROLE", entity = "USER")
+    @AuditAction(action = "DELETE_USER", entity = "USER")
     public String deleteUser(@RequestParam String id, Model model){
 
         userService.deleteUser(id);
@@ -137,6 +139,7 @@ public class AdminController {
     }
 
     @GetMapping("/admin/users")
+    @AuditAction(action = "DELETE_USER", entity = "USER")
     public String getUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "displayName") String sort,
@@ -175,8 +178,11 @@ public class AdminController {
     @GetMapping("/admin/logs")
     public String viewLogs(Model model, @RequestHeader(value = "HX-Request", required = false) String htmx) {
 
-        List<AuditLog> logs = auditLogRepository.findAllByOrderByTimestampDesc();
-        model.addAttribute("logs", logs);
+        var pageable = PageRequest.of(0, 50, Sort.by("timestamp").descending());
+
+        Page<AuditLog> logsPage = auditLogRepository.findAll(pageable);
+
+        model.addAttribute("logs", logsPage.getContent());
 
         if (htmx != null) {
             return "fragments/admin-logs :: content";

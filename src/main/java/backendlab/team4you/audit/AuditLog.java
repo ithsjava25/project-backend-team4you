@@ -21,12 +21,13 @@ public class AuditLog {
 
     private String action;
 
+    private String httpMethod;
 
     private String endpoint;
 
     private String entityType;
 
-            private int entityId;
+    private Long entityId;
 
     @Column(name = "ip_address")
     private String ipAddress;
@@ -76,10 +77,10 @@ public class AuditLog {
     public void setEntityType(String entityType) {
         this.entityType = entityType;
     }
-    public int getEntityId() {
+    public Long getEntityId() {
         return entityId;
     }
-    public void setEntityId(int entityId) {
+    public void setEntityId(Long entityId) {
         this.entityId = entityId;
     }
 
@@ -106,5 +107,11 @@ public class AuditLog {
     }
     public void setDetails(String details) {
         this.details = details;
+    }
+    public String getHttpMethod() {
+        return httpMethod;
+    }
+    public void setHttpMethod(String httpMethod) {
+        this.httpMethod = httpMethod;
     }
 }
