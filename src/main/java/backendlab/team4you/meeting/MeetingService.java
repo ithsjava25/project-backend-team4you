@@ -138,7 +138,7 @@ public class MeetingService {
     @Transactional(readOnly = true)
     public List<Meeting> getMeetingsForRegistry(Long registryId) {
         Registry registry = registryRepository.findById(registryId)
-                .orElseThrow(() -> new IllegalArgumentException("Registry hittades inte."));
+                .orElseThrow(() -> new RegistryNotFoundException("Registry hittades inte."));
 
         return meetingRepository.findByRegistryOrderByStartsAtDesc(registry);
     }
@@ -172,7 +172,7 @@ public class MeetingService {
         Meeting meeting = getMeetingById(meetingId);
 
         CaseRecord caseRecord = caseRecordRepository.findById(caseRecordId)
-                .orElseThrow(() -> new IllegalArgumentException("Ärendet hittades inte."));
+                .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
 
         validateCaseRecordBelongsToMeetingRegistry(meeting, caseRecord);
 
@@ -314,7 +314,7 @@ public class MeetingService {
         }
 
         MeetingAgendaDocument document = meetingAgendaDocumentRepository.findById(documentId)
-                .orElseThrow(() -> new IllegalArgumentException("Dokumentkopplingen hittades inte."));
+                .orElseThrow(() -> new MeetingAgendaDocumentNotFoundException("Dokumentkopplingen hittades inte."));
 
         if (!document.getAgendaItem().getId().equals(agendaItem.getId())) {
             throw new InvalidMeetingStateException("Dokumentet tillhör inte denna dagordningspunkt.");
