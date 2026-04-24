@@ -13,4 +13,6 @@ public interface MeetingAgendaDocumentRepository extends JpaRepository<MeetingAg
     Optional<MeetingAgendaDocument> findByAgendaItemAndCaseFile(MeetingAgendaItem agendaItem, CaseFile caseFile);
 
     boolean existsByAgendaItemAndCaseFile(MeetingAgendaItem agendaItem, CaseFile caseFile);
+
+    boolean existsByCaseFileId(Long caseFileId);
 }

@@ -205,4 +205,10 @@ public class GlobalRestExceptionHandler {
                         LocalDateTime.now()
                 ));
     }
+
+    @ExceptionHandler(FileInUseException.class)
+    public ResponseEntity<String> handleFileInUse(FileInUseException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ex.getMessage());
+    }
 }
