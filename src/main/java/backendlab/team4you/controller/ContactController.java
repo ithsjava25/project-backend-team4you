@@ -34,11 +34,13 @@ public class ContactController {
     @PostMapping("/contact/send")
     public String receiveMessage(
             @Valid @ModelAttribute("contactForm") ContactFormDTO form,
-            BindingResult bindingResult
+            BindingResult bindingResult,
+            Model model
     ) {
 
         if (bindingResult.hasErrors()) {
-            return "fragments/contact-form :: form";
+            model.addAttribute("contactForm", form);
+            return "fragments/contact-fragments :: contact-form";
         }
 
         ContactMessage msg = new ContactMessage();
