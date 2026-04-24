@@ -96,4 +96,19 @@ public class ProtocolController {
 
         return "fragments/admin-protocols :: content";
     }
+
+    @GetMapping("/paragraphs/{paragraphId}/decision-text")
+    public String getDefaultDecisionText(
+            @PathVariable Long paragraphId,
+            @RequestParam ProtocolDecisionType decisionType,
+            Model model
+    ) {
+        model.addAttribute(
+                "decisionText",
+                protocolService.buildDefaultDecisionText(paragraphId, decisionType)
+        );
+        model.addAttribute("paragraphId", paragraphId);
+
+        return "fragments/admin-protocols :: decisionTextField";
+    }
 }

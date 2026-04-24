@@ -112,14 +112,14 @@
                         <strong th:text="${paragraph.heading}">§ 1 Ärendenamn</strong>
 
                         <span>
-            Ärendenummer:
-            <span th:text="${paragraph.caseRecord.caseNumber}">KS26-1</span>
-        </span>
+                            Ärendenummer:
+                            <span th:text="${paragraph.caseRecord.caseNumber}">KS26-1</span>
+                        </span>
 
                         <span th:if="${paragraph.caseRecord.description}"
                               th:text="${paragraph.caseRecord.description}">
-            Ärendebeskrivning
-        </span>
+                            Ärendebeskrivning
+                        </span>
 
                         <div class="protocol-decision-display" th:if="${paragraph.decisionType != null}">
                             <strong>Beslut:</strong>
@@ -131,12 +131,11 @@
                             </p>
                         </div>
 
-                        <form
-                                th:attr="hx-post=@{/admin/protocols/paragraphs/{paragraphId}/decision(paragraphId=${paragraph.id})}"
-                                hx-target="#content-area"
-                                hx-swap="innerHTML"
-                                class="meeting-form protocol-decision-form"
-                        >
+                        <form th:attr="hx-post=@{/admin/protocols/paragraphs/{paragraphId}/decision(paragraphId=${paragraph.id})}"
+                              hx-target="#content-area"
+                              hx-swap="innerHTML"
+                              class="meeting-form protocol-decision-form">
+
                             <input type="hidden"
                                    th:if="${_csrf != null}"
                                    th:name="${_csrf.parameterName}"
@@ -144,12 +143,15 @@
 
                             <div class="form-group">
                                 <label th:for="${'decisionType-' + paragraph.id}">Beslut</label>
+
                                 <select th:id="${'decisionType-' + paragraph.id}"
                                         name="decisionType"
-                                        required>
+                                        required
+                                        th:attr="hx-get=@{/admin/protocols/paragraphs/{paragraphId}/decision-text(paragraphId=${paragraph.id})}"
+                                        hx-target="next .decision-text-wrapper"
+                                        hx-swap="outerHTML">
                                     <option value="">Välj beslut</option>
-                                    <option
-                                            th:each="decisionType : ${T(backendlab.team4you.protocol.ProtocolDecisionType).values()}"
+                                    <option th:each="decisionType : ${T(backendlab.team4you.protocol.ProtocolDecisionType).values()}"
                                             th:value="${decisionType}"
                                             th:text="${decisionType.label}"
                                             th:selected="${decisionType == paragraph.decisionType}">
@@ -157,16 +159,18 @@
                                 </select>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group decision-text-wrapper"
+                                 th:id="${'decision-text-wrapper-' + paragraph.id}">
                                 <label th:for="${'decisionText-' + paragraph.id}">Beslutstext</label>
+
                                 <textarea th:id="${'decisionText-' + paragraph.id}"
                                           name="decisionText"
                                           rows="3"
                                           required
                                           th:text="${paragraph.decisionText != null
-                              ? paragraph.decisionText
-                              : selectedProtocol.registry.name + ' beslutar att bifalla ärendet.'}">
-                </textarea>
+                                                  ? paragraph.decisionText
+                                                  : selectedProtocol.registry.name + ' beslutar att bifalla ärendet.'}">
+                                </textarea>
                             </div>
 
                             <button type="submit" class="submit protocol-create-button">
@@ -181,4 +185,18 @@
         </section>
 
     </div>
+</div>
+
+<div th:fragment="decisionTextField(paragraphId, decisionText)"
+     class="form-group decision-text-wrapper"
+     th:id="${'decision-text-wrapper-' + paragraphId}">
+
+    <label th:for="${'decisionText-' + paragraphId}">Beslutstext</label>
+
+    <textarea th:id="${'decisionText-' + paragraphId}"
+              name="decisionText"
+              rows="3"
+              required
+              th:text="${decisionText}">
+    </textarea>
 </div>

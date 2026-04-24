@@ -106,6 +106,22 @@ public class ProtocolService {
         return paragraph.getProtocol();
     }
 
+    @Transactional(readOnly = true)
+    public String buildDefaultDecisionText(Long paragraphId, ProtocolDecisionType decisionType) {
+        Objects.requireNonNull(paragraphId, "paragraphId is required");
+        Objects.requireNonNull(decisionType, "decisionType is required");
+
+        ProtocolParagraph paragraph = paragraphRepository.findById(paragraphId)
+                .orElseThrow(() -> new ProtocolParagraphNotFoundException(paragraphId));
+
+        String registryName = paragraph.getProtocol().getRegistry().getName();
+
+        return switch (decisionType) {
+            case APPROVED -> registryName + " beslutar att bifalla ärendet.";
+            case REJECTED -> registryName + " beslutar att avslå ärendet.";
+        };
+    }
+
     private Long allocateNextParagraphNumber(Registry registry, Integer year) {
         ProtocolParagraphSequence sequence = sequenceRepository
                 .findByRegistryIdAndYear(registry.getId(), year)
