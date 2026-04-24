@@ -50,18 +50,31 @@ public class Team4youApplication {
 				repository.save(devUser);
 				System.out.println("✅ User created");
 
-				UserEntity devCaseOfficer = new UserEntity(
+				UserEntity officer1 = new UserEntity(
 						Bytes.fromBase64("YLRtaW5="),
-						"officer",
-						"caseofficer"
+						"officer1",
+						"caseofficer1"
 				);
 
-				devCaseOfficer.setPasswordHash(encoder.encode("abcd"));
-				devCaseOfficer.setRole(UserRole.CASE_OFFICER);
-				devCaseOfficer.setEmail("devcaseofficer@gmail.com");
+				officer1.setPasswordHash(encoder.encode("abcd"));
+				officer1.setRole(UserRole.CASE_OFFICER);
+				officer1.setEmail("devcaseofficer@gmail.com");
 
-				repository.save(devCaseOfficer);
-				System.out.println("✅ Case officer created");
+				repository.save(officer1);
+				System.out.println("✅ Case officer 1 created");
+
+				UserEntity officer2 = new UserEntity(
+						Bytes.fromBase64("YLRtaG6="),
+						"officer2",
+						"caseofficer2"
+				);
+
+				officer2.setPasswordHash(encoder.encode("aaaa"));
+				officer2.setRole(UserRole.CASE_OFFICER);
+				officer2.setEmail("devcaseofficer2@gmail.com");
+
+				repository.save(officer2);
+				System.out.println("✅ Case officer 2 created");
 			}
 		};
 	}
