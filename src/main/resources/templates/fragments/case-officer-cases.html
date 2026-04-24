@@ -10,7 +10,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div>
                         <span class="badge bg-primary me-2" th:text="${case.caseNumber}">Case Number</span>
-                        <strong th:text="${case.title}">Título del Caso</strong>
+                        <strong th:text="${case.title}">Title</strong>
                     </div>
                     <div>
                         <span class="badge"
@@ -40,12 +40,12 @@
                 <div class="card-footer bg-transparent border-top-0">
                     <button
                             class="btn btn-outline-danger btn-sm float-end"
-                            th:attr="hx-post=@{/case-officer/cases/delete(id=${case.id})}"
+                            th:attr="hx-post=@{/case-officer/cases/close(id=${case.id})}"
                             hx-target="closest .col-12"
                             hx-swap="outerHTML"
                             hx-confirm="Är du säker på att du vill ta bort detta ärende?"
                     >
-                        <i class="bi bi-trash"></i> Ta bort
+                        <i class="bi bi-trash"></i> Close Case
                     </button>
                 </div>
             </div>

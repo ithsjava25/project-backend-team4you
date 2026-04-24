@@ -6,6 +6,7 @@ import backendlab.team4you.application.ApplicationService;
 import backendlab.team4you.booking.BookingService;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
+import backendlab.team4you.exceptions.CaseRecordNotFoundException;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import backendlab.team4you.service.LogService;
 import backendlab.team4you.user.UserEntity;
@@ -194,10 +195,14 @@ public class AdminController {
             Model model
     ) {
         CaseRecord caseRecord = caseRecordRepository.findById(caseId)
-                .orElseThrow(() -> new RuntimeException("Case not found"));
+                .orElseThrow(() -> new CaseRecordNotFoundException(caseId));
 
         UserEntity officer = userRepository.findById(officerId)
                 .orElseThrow(() -> new UserNotFoundException("Officer not found"));
+
+        if (officer.getRole() != UserRole.CASE_OFFICER) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selected user is not a case officer");
+        }
 
         caseRecord.setAssignedUser(officer);
         caseRecordRepository.save(caseRecord);
