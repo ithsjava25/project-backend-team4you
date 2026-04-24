@@ -75,15 +75,9 @@ public class MeetingController {
         } catch (InvalidMeetingStateException | MeetingNotFoundException | RegistryNotFoundException exception) {
             model.addAttribute("errorMessage", exception.getMessage());
             // If registryId was the invalid input, fall back to the all-meetings listing.
-            Long safeRegistryId = null;
-            if (registryId != null) {
-                try {
-                    registryRepository.findById(registryId).ifPresent(r -> {});
-                    safeRegistryId = registryId;
-                    } catch (Exception ignored) {
-                    safeRegistryId = null;
-                    }
-                }
+                    Long safeRegistryId = (registryId != null && registryRepository.existsById(registryId))
+                    ? registryId
+                    : null;
             populateMeetingsPage(model, safeRegistryId, null);
         }
 
@@ -327,7 +321,7 @@ public class MeetingController {
     private void populateMeetingsPageAfterMeetingAction(Model model, Long registryId, Long meetingId) {
         try {
             populateMeetingsPage(model, registryId, meetingId);
-        } catch (MeetingNotFoundException exception) {
+        } catch (MeetingNotFoundException | RegistryNotFoundException exception) {
             populateMeetingsPage(model, null, null);
         }
     }
