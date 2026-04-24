@@ -31,7 +31,9 @@ public class GlobalViewExceptionHandler {
     @ExceptionHandler({
             CaseRecordNotFoundException.class,
             RegistryNotFoundException.class,
-            CaseFileNotFoundException.class
+            CaseFileNotFoundException.class,
+            MeetingNotFoundException.class,
+            MeetingAgendaDocumentNotFoundException.class,
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleNotFound(RuntimeException ex, Model model) {
