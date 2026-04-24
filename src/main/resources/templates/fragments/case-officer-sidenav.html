@@ -7,18 +7,11 @@
     <ul class="sidebar-links">
 
         <li>
-            <a th:href="@{/dashboard}">
-                <i class="fa-solid fa-table-columns"></i>
-                <span>Till dashboard</span>
-            </a>
-        </li>
-
-        <li>
             <a th:href="@{/case-officer/cases}"
                hx-get="/case-officer/cases"
                hx-target="#content-area">
                 <i class="fa-solid fa-file-invoice"></i>
-                <span>Hantera ansökningar</span>
+                <span>Hantera ärenden</span>
             </a>
         </li>
 
