@@ -4,3 +4,22 @@
     white-space: nowrap;
     padding: 0.75rem 1.25rem;
 }
+
+.protocol-decision-form {
+    margin-top: 1rem;
+}
+
+.protocol-decision-display {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.protocol-paragraph {
+    align-items: stretch;
+}
+
+.protocol-paragraph .agenda-item-main {
+    width: 100%;
+}
