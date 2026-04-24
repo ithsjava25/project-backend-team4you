@@ -3,9 +3,7 @@ package backendlab.team4you.meeting;
 import backendlab.team4you.casefile.CaseFile;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
-import backendlab.team4you.exceptions.InvalidMeetingStateException;
-import backendlab.team4you.exceptions.MeetingNotFoundException;
-import backendlab.team4you.exceptions.RegistryNotFoundException;
+import backendlab.team4you.exceptions.*;
 import backendlab.team4you.registry.Registry;
 import backendlab.team4you.registry.RegistryRepository;
 import org.springframework.stereotype.Controller;
@@ -180,7 +178,9 @@ public class MeetingController {
         try {
             meetingService.addCaseRecordToMeeting(meetingId, caseRecordId);
             model.addAttribute("successMessage", "ärendet lades till på sammanträdet.");
-        } catch (IllegalArgumentException exception) {
+        } catch (DuplicateMeetingAgendaItemException |
+                 InvalidMeetingStateException |
+                 MeetingNotFoundException exception) {
             model.addAttribute("errorMessage", exception.getMessage());
         }
 
@@ -243,7 +243,9 @@ public class MeetingController {
         try {
             meetingService.removeAgendaItem(meetingId, agendaItemId);
             model.addAttribute("successMessage", "dagordningspunkten togs bort.");
-        } catch (IllegalArgumentException exception) {
+        } catch (InvalidMeetingStateException |
+                 MeetingAgendaItemNotFoundException |
+                 MeetingNotFoundException exception) {
             model.addAttribute("errorMessage", exception.getMessage());
         }
 
