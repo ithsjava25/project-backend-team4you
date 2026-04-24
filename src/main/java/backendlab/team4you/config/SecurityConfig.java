@@ -39,9 +39,9 @@ public class SecurityConfig {
                                 .requestMatchers( "/", LOGIN, "/login/webauthn", "/signup", "/error").permitAll()
 
                                 .requestMatchers("/webauthn/authenticate/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/files/upload").hasAnyRole("USER", ADMIN, CASE_OFFICER)
-                                .requestMatchers(HttpMethod.GET, "/api/files/download/**").hasAnyRole(ADMIN, CASE_OFFICER)
-                                .requestMatchers(HttpMethod.DELETE, "/api/files/delete/**").hasAnyRole(ADMIN, CASE_OFFICER)
+                                .requestMatchers(HttpMethod.POST, "/api/files/upload").hasAnyRole("USER", ADMIN)
+                                .requestMatchers(HttpMethod.GET, "/api/files/download/**").hasRole(ADMIN)
+                                .requestMatchers(HttpMethod.DELETE, "/api/files/delete/**").hasRole(ADMIN)
 
                                 .requestMatchers("/webauthn/**").hasAnyRole("USER", ADMIN, CASE_OFFICER)
                                 .requestMatchers("/admin/**").hasRole(ADMIN)

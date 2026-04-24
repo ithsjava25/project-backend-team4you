@@ -78,7 +78,7 @@ class CaseFileServiceTest {
                 "hello world".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -115,13 +115,16 @@ class CaseFileServiceTest {
                 "hello".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(false);
+        when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
+
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(false);
 
         assertThatThrownBy(() -> caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN, actor))
                 .isInstanceOf(AccessDeniedException.class)
                 .hasMessage("Du har inte behörighet att ladda upp denna fil.");
 
-        verifyNoInteractions(caseRecordRepository, caseFileRepository, s3Service);
+        verify(caseRecordRepository).findByIdWithLock(1L);
+        verifyNoInteractions(caseFileRepository, s3Service);
     }
 
     @Test
@@ -134,7 +137,6 @@ class CaseFileServiceTest {
                 "hello world".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 99L, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> caseFileService.uploadFile(99L, file, ConfidentialityLevel.OPEN, actor))
@@ -150,7 +152,7 @@ class CaseFileServiceTest {
     void uploadFile_shouldThrowInvalidFileNameException_whenFilenameIsBlank() {
         MultipartFile file = mock(MultipartFile.class);
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(file.getSize()).thenReturn(10L);
         when(file.getOriginalFilename()).thenReturn(" ");
@@ -173,7 +175,7 @@ class CaseFileServiceTest {
                 "abc".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -355,7 +357,7 @@ class CaseFileServiceTest {
                 "hello".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -380,7 +382,7 @@ class CaseFileServiceTest {
                 "hello".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
         doNothing().when(s3Service).uploadFileIfAbsent(anyString(), any(byte[].class), eq("application/pdf"));
@@ -412,7 +414,7 @@ class CaseFileServiceTest {
                 "hello".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
         doNothing().when(s3Service).uploadFileIfAbsent(anyString(), any(byte[].class), eq("application/pdf"));
@@ -444,7 +446,7 @@ class CaseFileServiceTest {
                 "hello".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
 
@@ -494,7 +496,9 @@ class CaseFileServiceTest {
                 new byte[6 * 1024 * 1024]
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
+
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
 
         assertThatThrownBy(() -> caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN, actor))
                 .isInstanceOf(FileTooLargeException.class)
@@ -511,13 +515,16 @@ class CaseFileServiceTest {
                 new byte[6 * 1024 * 1024]
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
+
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
 
         assertThatThrownBy(() -> caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN, actor))
                 .isInstanceOf(FileTooLargeException.class)
                 .hasMessageContaining("Filen är för stor.");
 
-        verifyNoInteractions(caseRecordRepository, caseFileRepository, s3Service);
+        verify(caseRecordRepository).findByIdWithLock(1L);
+        verifyNoInteractions(caseFileRepository, s3Service);
     }
 
     @Test
@@ -530,7 +537,7 @@ class CaseFileServiceTest {
                 "hello".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -554,7 +561,7 @@ class CaseFileServiceTest {
         CaseFile existingFile = new CaseFile();
         existingFile.setDocumentNumber(1);
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L))
                 .thenReturn(Optional.of(existingFile));
