@@ -13,7 +13,6 @@ import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserRepository;
 import backendlab.team4you.user.UserRole;
 import backendlab.team4you.user.UserService;
-import groovy.util.logging.Slf4j;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,7 +33,7 @@ import java.util.List;
 import static backendlab.team4you.user.UserRole.CASE_OFFICER;
 
 
-@Slf4j
+
 @Controller
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
