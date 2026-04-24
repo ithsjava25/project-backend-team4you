@@ -1,6 +1,8 @@
 package backendlab.team4you.caserecord;
 
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -16,4 +18,5 @@ public interface CaseRecordRepository extends JpaRepository<CaseRecord, Long> {
     @Query("select c from CaseRecord c where c.id = :id")
     Optional<CaseRecord> findByIdWithLock(Long id);
     boolean existsByCaseNumber(String caseNumber);
+    Page<CaseRecord> findByAssignedUserId(String officerId, PageRequest pageRequest);
 }

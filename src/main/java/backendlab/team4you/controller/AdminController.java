@@ -4,9 +4,13 @@ import backendlab.team4you.application.ApplicationEntity;
 import backendlab.team4you.application.ApplicationRepository;
 import backendlab.team4you.application.ApplicationService;
 import backendlab.team4you.booking.BookingService;
+import backendlab.team4you.caserecord.CaseRecord;
+import backendlab.team4you.caserecord.CaseRecordRepository;
+import backendlab.team4you.exceptions.UserNotFoundException;
 import backendlab.team4you.service.LogService;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserRepository;
+import backendlab.team4you.user.UserRole;
 import backendlab.team4you.user.UserService;
 import groovy.util.logging.Slf4j;
 
@@ -26,6 +30,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+import static backendlab.team4you.user.UserRole.CASE_OFFICER;
+
 
 @Slf4j
 @Controller
@@ -39,16 +45,20 @@ public class AdminController {
     private final ApplicationService applicationService;
     private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
+    private final CaseRecordRepository caseRecordRepository;
 
-    public AdminController(UserService userService, BookingService bookingService, ApplicationService applicationService, ApplicationRepository applicationRepository, UserRepository userRepository) {
+    public AdminController(UserService userService,
+                           BookingService bookingService,
+                           ApplicationService applicationService,
+                           ApplicationRepository applicationRepository,
+                           UserRepository userRepository,
+                           CaseRecordRepository caseRecordRepository) {
         this.userService = userService;
         this.bookingService = bookingService;
         this.applicationService = applicationService;
         this.applicationRepository = applicationRepository;
         this.userRepository = userRepository;
-
-
-
+        this.caseRecordRepository = caseRecordRepository;
     }
 
     @GetMapping("/admin/logs")
@@ -62,9 +72,6 @@ public class AdminController {
         model.addAttribute("logs", logs);
         return "fragments/admin-logs :: content";
     }
-
-
-
 
     @PostMapping("/admin/users")
     public String deleteUser(@RequestParam String id, Model model){
@@ -82,9 +89,6 @@ public class AdminController {
         return "";
     }
 
-
-
-
     @GetMapping("/admin")
     public String admin(Authentication auth) {
         System.out.println(auth.getAuthorities());
@@ -92,14 +96,11 @@ public class AdminController {
         return "admin";
     }
 
-
     @GetMapping("/admin/applications")
     public String adminApplications(
             @RequestParam(defaultValue = "0") int page,
             Model model
     ) {
-
-
         Page<ApplicationEntity> applications =
                 applicationRepository.findAll(PageRequest.of(page, 5));
 
@@ -109,7 +110,6 @@ public class AdminController {
 
         return "fragments/admin-applications :: content";
     }
-
 
     @GetMapping("/admin/bookings")
     public String adminBookings(Model model){
@@ -170,4 +170,41 @@ public class AdminController {
 
         return "fragments/alert :: success";
     }
+
+    @GetMapping("/admin/cases")
+    public String listCases(
+            @RequestParam(defaultValue = "0") int page,
+            Model model
+    ) {
+        Page<CaseRecord> cases = caseRecordRepository.findAll(PageRequest.of(page, 10));
+        List<UserEntity> officers = userRepository.findByRole(UserRole.CASE_OFFICER);
+
+        model.addAttribute("cases", cases.getContent());
+        model.addAttribute("officers", officers);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", cases.getTotalPages());
+
+        return "fragments/admin-cases :: content";
+    }
+
+    @PostMapping("/admin/cases/assign")
+    public String assignCase(
+            @RequestParam Long caseId,
+            @RequestParam String officerId,
+            Model model
+    ) {
+        CaseRecord caseRecord = caseRecordRepository.findById(caseId)
+                .orElseThrow(() -> new RuntimeException("Case not found"));
+
+        UserEntity officer = userRepository.findById(officerId)
+                .orElseThrow(() -> new UserNotFoundException("Officer not found"));
+
+        caseRecord.setAssignedUser(officer);
+        caseRecordRepository.save(caseRecord);
+
+        model.addAttribute("message", "Ärende tilldelat till " + officer.getDisplayName());
+        return "fragments/alert :: success";
+    }
+
+
 }

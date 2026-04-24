@@ -1,8 +1,11 @@
 package backendlab.team4you.controller;
 
-import backendlab.team4you.application.ApplicationEntity;
-import backendlab.team4you.application.ApplicationRepository;
 import backendlab.team4you.application.ApplicationService;
+import backendlab.team4you.caserecord.CaseRecord;
+import backendlab.team4you.caserecord.CaseRecordRepository;
+import backendlab.team4you.exceptions.UserNotFoundException;
+import backendlab.team4you.user.UserEntity;
+import backendlab.team4you.user.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,12 +20,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 @PreAuthorize("hasRole('CASE_OFFICER')")
 public class CaseOfficerController {
 
-    private final ApplicationService applicationService;
-    private final ApplicationRepository applicationRepository;
+    private final CaseRecordRepository caseRecordRepository;
+    private final UserRepository userRepository;
 
-    public CaseOfficerController(ApplicationService applicationService, ApplicationRepository applicationRepository) {
-        this.applicationService = applicationService;
-        this.applicationRepository = applicationRepository;
+    public CaseOfficerController(CaseRecordRepository caseRecordRepository, UserRepository userRepository) {
+        this.caseRecordRepository = caseRecordRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/case-officer")
@@ -31,31 +34,34 @@ public class CaseOfficerController {
         return "case-officer";
     }
 
-    @GetMapping("/case-officer/applications")
-    public String listApplications(
+    @GetMapping("/case-officer/cases")
+    public String listCases(
             @RequestParam(defaultValue = "0") int page,
+            Authentication auth,
             Model model
     ) {
+        UserEntity officer = userRepository.findByName(auth.getName())
+                .orElseThrow(() -> new UserNotFoundException("Case Officer not found"));
 
-        Page<ApplicationEntity> applications =
-                applicationRepository.findAll(PageRequest.of(page, 5));
+        Page<CaseRecord> cases =
+                caseRecordRepository.findByAssignedUserId(officer.getIdAsString(), PageRequest.of(page, 5));
 
-        model.addAttribute("applications", applications.getContent());
+        model.addAttribute("cases", cases.getContent());
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", applications.getTotalPages());
+        model.addAttribute("totalPages", cases.getTotalPages());
 
-        return "fragments/case-officer-applications :: content";
+        return "fragments/case-officer-cases :: content";
     }
 
-    @PostMapping("/case-officer/applications/delete")
-    public String deleteApplication(@RequestParam Long id, Model model) {
+    //todo: endpoint to delete a case
 
-        applicationService.delete(id);
-
-        model.addAttribute("message", "Ansökan borttagen");
-
-        return "fragments/alert :: success";
-    }
-
-
+//    @PostMapping("/case-officer/cases/delete")
+//    public String deleteApplication(@RequestParam Long id, Model model) {
+//
+//        applicationService.delete(id);
+//
+//        model.addAttribute("message", "Ansökan borttagen");
+//
+//        return "fragments/alert :: success";
+//    }
 }
