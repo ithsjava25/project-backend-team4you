@@ -22,7 +22,8 @@ import java.time.LocalDateTime;
         "backendlab.team4you.caserecord",
         "backendlab.team4you.registry",
         "backendlab.team4you.user",
-        "backendlab.team4you.controller"
+        "backendlab.team4you.controller",
+        "backendlab.team4you.protocol"
 })
 public class GlobalRestExceptionHandler {
 
@@ -46,7 +47,8 @@ public class GlobalRestExceptionHandler {
             UserNotFoundException.class,
             MeetingNotFoundException.class,
             MeetingAgendaItemNotFoundException.class,
-            MeetingAgendaDocumentNotFoundException.class
+            MeetingAgendaDocumentNotFoundException.class,
+            ProtocolNotFoundException.class
     })
     public ResponseEntity<ErrorResponseDto> handleNotFound(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -91,7 +93,8 @@ public class GlobalRestExceptionHandler {
             DuplicateEmailException.class,
             FileKeyConflictException.class,
             DuplicateMeetingAgendaItemException.class,
-            DuplicateMeetingAgendaDocumentException.class
+            DuplicateMeetingAgendaDocumentException.class,
+            ProtocolAlreadyExistsException.class
     })
     public ResponseEntity<ErrorResponseDto> handleConflict(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
