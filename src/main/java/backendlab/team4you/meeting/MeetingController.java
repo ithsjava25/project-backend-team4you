@@ -116,11 +116,16 @@ public class MeetingController {
             model.addAttribute("successMessage", "sammanträdet uppdaterades.");
             populateMeetingsPage(model, updatedMeeting.getRegistry().getId(), updatedMeeting.getId());
 
-        } catch (Exception exception) {
-            Meeting meeting = meetingService.getMeetingById(meetingId);
+        } catch (InvalidMeetingStateException | MeetingNotFoundException | RegistryNotFoundException exception) {
             model.addAttribute("errorMessage", exception.getMessage());
-            populateMeetingsPage(model, meeting.getRegistry().getId(), meetingId);
-        }
+            Long registryId = null;
+            try {
+                registryId = meetingService.getMeetingById(meetingId).getRegistry().getId();
+                } catch (MeetingNotFoundException ignored) {
+                // meeting no longer exists — fall back to the generic listing
+                        }
+            populateMeetingsPage(model, registryId, registryId == null ? null : meetingId);
+            }
 
         return "fragments/admin-meetings :: content";
     }
