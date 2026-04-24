@@ -55,12 +55,16 @@ public class AuditAspect {
             }
 
 
+            String methodName = joinPoint.getSignature().toShortString();
+            String details = "Executed method: " + methodName;
             int entityId = 0;
+
             Object[] args = joinPoint.getArgs();
             for (Object arg : args) {
                 if (arg instanceof Long) {
                     entityId = ((Long) arg).intValue();
-                    break;
+                } else if (arg instanceof String && !((String) arg).contains("/")) {
+                    details = "File/Key: " + arg;
                 }
             }
 

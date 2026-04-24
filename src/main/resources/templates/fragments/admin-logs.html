@@ -1,31 +1,64 @@
-<section layout:fragment="content" xmlns:layout="">
-    <div class="application-container">
-        <header class="page-header">
-            <h1>Systemlogg</h1>
-            <p>Historik över alla händelser i systemet.</p>
-        </header>
-
-        <table class="audit-table">
-            <thead>
-            <tr>
-                <th>Tid</th>
-                <th>Användare</th>
-                <th>Handling</th>
-                <th>Entitet</th>
-                <th>Status</th>
-            </tr>
-            </thead>
 
 
-            <tbody>
-            <tr th:each="log : ${logs}">
-                <td th:text="${log.timestamp != null ? #temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm') : 'Datum saknas'}"></td>
-                <td th:text="${log.username}"></td>
-                <td><span class="badge" th:text="${log.action}"></span></td>
-                <td th:text="${(log.entityType != null ? log.entityType : '-') + ' (ID: ' + log.entityId + ')'}"></td>
-                <td th:text="${log.status}"></td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</section>
+<div th:fragment="content">
+    <style>
+
+
+
+        *{
+            font-family: 'Roboto', sans-serif;
+            margin:0;
+            padding:0;
+            background: #161a2d;
+            color:white;
+
+        }
+
+        td{
+            padding:25px;
+        }
+
+        span{
+            font-size: 14px;
+            margin:20px;
+        }
+
+        th{
+            margin:20px;
+            padding:10px;
+            font-size:14px;
+        }
+
+
+    </style>
+
+<table class="audit-table">
+    <thead>
+    <tr>
+        <th>Tid</th>
+        <th>Användare</th>
+        <th>Metod</th> <th>Handling</th>
+        <th>Entitet</th>
+        <th>Detaljer</th> <th>IP</th> <th>Status</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <tr th:each="log : ${logs}">
+
+        <td th:text="${log.timestamp != null ? #temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm') : 'N/A'}"></td>
+        <td th:text="${log.username}"></td>
+        <td><span class="method-tag" th:text="${log.httpMethod}"></span></td>
+        <td><span class="badge" th:text="${log.action}"></span></td>
+        <td th:text="${log.entityType}"></td>
+        <td th:text="${log.details}"></td>
+        <td th:text="${log.ipAddress}" ></td>
+        <td>
+                <span th:class="${log.status == 'SUCCESS' ? 'status-ok' : 'status-fail'}"
+                      th:text="${log.status}"></span>
+        </td>
+    </tr>
+    </tbody>
+
+</table>
+</div>
