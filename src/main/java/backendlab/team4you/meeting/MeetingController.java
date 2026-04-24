@@ -198,7 +198,7 @@ public class MeetingController {
 
         try {
             meetingService.moveAgendaItemUp(meetingId, agendaItemId);
-            model.addAttribute("successMessage", "Dagordningspunkten flyttades upp.");
+            model.addAttribute("successMessage", "dagordningspunkten flyttades upp.");
         } catch (Exception exception) {
             model.addAttribute("errorMessage", exception.getMessage());
         }
@@ -217,7 +217,7 @@ public class MeetingController {
 
         try {
             meetingService.moveAgendaItemDown(meetingId, agendaItemId);
-            model.addAttribute("successMessage", "Dagordningspunkten flyttades ner.");
+            model.addAttribute("successMessage", "dagordningspunkten flyttades ner.");
         } catch (Exception exception) {
             model.addAttribute("errorMessage", exception.getMessage());
         }
@@ -262,7 +262,7 @@ public class MeetingController {
 
         try {
             meetingService.addDocumentToAgendaItem(meetingId, agendaItemId, caseFileId);
-            model.addAttribute("successMessage", "Handlingen lades till som beslutsunderlag.");
+            model.addAttribute("successMessage", "handlingen lades till som beslutsunderlag.");
         } catch (Exception exception) {
             model.addAttribute("errorMessage", exception.getMessage());
         }
@@ -282,7 +282,7 @@ public class MeetingController {
 
         try {
             meetingService.removeDocumentFromAgendaItem(meetingId, agendaItemId, documentId);
-            model.addAttribute("successMessage", "Handlingen togs bort från beslutsunderlaget.");
+            model.addAttribute("successMessage", "handlingen togs bort från beslutsunderlaget.");
         } catch (Exception exception) {
             model.addAttribute("errorMessage", exception.getMessage());
         }
