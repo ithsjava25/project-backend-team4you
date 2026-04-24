@@ -58,6 +58,7 @@ public class CaseFileController {
     }
 
     @GetMapping("/{fileId}")
+    @AuditAction(action = "FILE_DOWNLOAD", entity = "CASE_FILE")
     public ResponseEntity<StreamingResponseBody> downloadFile(
             @PathVariable Long caseRecordId,
             @PathVariable Long fileId,
