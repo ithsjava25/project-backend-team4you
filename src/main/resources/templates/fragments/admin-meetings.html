@@ -116,7 +116,7 @@
 
                 <p>
                     <strong>Status:</strong>
-                    <span th:text="${selectedMeeting.status}">PLANNED</span>
+                    <span th:text="${selectedMeeting.status.label}">Planerad</span>
                 </p>
 
                 <p th:if="${selectedMeeting.notes != null}">
@@ -171,8 +171,8 @@
                             <option
                                     th:each="meetingStatus : ${T(backendlab.team4you.meeting.MeetingStatus).values()}"
                                     th:value="${meetingStatus}"
-                                    th:text="${meetingStatus}"
-                                    th:selected="${meetingStatus == selectedMeeting.status}">
+                                    th:selected="${meetingStatus == selectedMeeting.status}"
+                                    th:text="${meetingStatus.label}">
                             </option>
                         </select>
                     </div>
