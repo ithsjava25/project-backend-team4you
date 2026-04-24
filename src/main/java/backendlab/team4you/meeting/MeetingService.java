@@ -336,7 +336,7 @@ public class MeetingService {
 
     private void validateCaseRecordBelongsToMeetingRegistry(Meeting meeting, CaseRecord caseRecord) {
         if (caseRecord.getRegistry() == null || caseRecord.getRegistry().getId() == null) {
-            throw new InvalidMeetingStateException("Ärendet saknar diarum.");
+            throw new InvalidMeetingStateException("Ärendet saknar diarium.");
         }
 
         if (!caseRecord.getRegistry().getId().equals(meeting.getRegistry().getId())) {
