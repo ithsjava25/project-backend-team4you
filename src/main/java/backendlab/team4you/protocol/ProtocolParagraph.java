@@ -55,6 +55,20 @@ public class ProtocolParagraph {
         this.heading = heading.trim();
     }
 
+    public void updateDecision(ProtocolDecisionType decisionType, String decisionText) {
+        this.decisionType = Objects.requireNonNull(decisionType, "decisionType is required");
+
+        if (decisionText == null || decisionText.isBlank()) {
+            throw new IllegalArgumentException("decisionText is required");
+        }
+
+        if (decisionText.length() > 2000) {
+            throw new IllegalArgumentException("decisionText length must be <= 2000");
+        }
+
+        this.decisionText = decisionText.trim();
+    }
+
     void setProtocol(Protocol protocol) {
         this.protocol = Objects.requireNonNull(protocol, "protocol is required");
     }
@@ -77,5 +91,13 @@ public class ProtocolParagraph {
 
     public String getHeading() {
         return heading;
+    }
+
+    public ProtocolDecisionType getDecisionType() {
+        return decisionType;
+    }
+
+    public String getDecisionText() {
+        return decisionText;
     }
 }
