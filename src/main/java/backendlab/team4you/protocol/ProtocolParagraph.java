@@ -27,6 +27,13 @@ public class ProtocolParagraph {
     @Column(nullable = false, length = 255)
     private String heading;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "decision_type", length = 30)
+    private ProtocolDecisionType decisionType;
+
+    @Column(name = "decision_text", length = 2000)
+    private String decisionText;
+
     protected ProtocolParagraph() {
     }
 
