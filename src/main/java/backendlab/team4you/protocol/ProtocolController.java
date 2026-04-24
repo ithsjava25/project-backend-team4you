@@ -11,7 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 
 @Controller
-@RequestMapping("/dashboard/admin/protocols")
+@RequestMapping("/admin/protocols")
 @PreAuthorize("hasRole('ADMIN')")
 public class ProtocolController {
 
@@ -30,31 +30,33 @@ public class ProtocolController {
     }
 
     @GetMapping
-    public String listProtocolOptions(Model model) {
-        List<Meeting> completedMeetingsWithoutProtocol =
-                meetingRepository.findCompletedMeetingsWithoutProtocol();
+    public String listProtocols(Model model) {
+        model.addAttribute(
+                "completedMeetingsWithoutProtocol",
+                meetingRepository.findCompletedMeetingsWithoutProtocol()
+        );
+        model.addAttribute("protocols", protocolRepository.findAll());
 
-        List<Protocol> protocols = protocolRepository.findAll();
-
-        model.addAttribute("completedMeetingsWithoutProtocol", completedMeetingsWithoutProtocol);
-        model.addAttribute("protocols", protocols);
-
-        return "dashboard/admin/protocols";
+        return "fragments/admin-protocols :: content";
     }
 
     @PostMapping("/meetings/{meetingId}")
     public String createProtocol(
             @PathVariable Long meetingId,
-            RedirectAttributes redirectAttributes
+            RedirectAttributes redirectAttributes,
+            Model model
     ) {
         Protocol protocol = protocolService.createProtocolForCompletedMeeting(meetingId);
 
-        redirectAttributes.addFlashAttribute(
-                "successMessage",
-                "Protokoll skapades."
+        model.addAttribute("successMessage", "Protokoll skapades.");
+        model.addAttribute("selectedProtocol", protocol);
+        model.addAttribute(
+                "completedMeetingsWithoutProtocol",
+                meetingRepository.findCompletedMeetingsWithoutProtocol()
         );
+        model.addAttribute("protocols", protocolRepository.findAll());
 
-        return "redirect:/dashboard/admin/protocols/" + protocol.getId();
+        return "fragments/admin-protocols :: content";
     }
 
     @GetMapping("/{protocolId}")
@@ -64,8 +66,13 @@ public class ProtocolController {
     ) {
         Protocol protocol = protocolService.getProtocol(protocolId);
 
-        model.addAttribute("protocol", protocol);
+        model.addAttribute("selectedProtocol", protocol);
+        model.addAttribute(
+                "completedMeetingsWithoutProtocol",
+                meetingRepository.findCompletedMeetingsWithoutProtocol()
+        );
+        model.addAttribute("protocols", protocolRepository.findAll());
 
-        return "dashboard/admin/protocol-detail";
+        return "fragments/admin-protocols :: content";
     }
 }
