@@ -84,6 +84,7 @@ class MeetingControllerTest {
         when(caseRecordRepository.findByRegistryIdOrderByCreatedAtDesc(1L)).thenReturn(List.of());
 
         mockMvc.perform(post("/admin/meetings")
+                        .with(csrf())
                         .header("HX-Request", "true")
                         .param("registryId", "1")
                         .param("title", "KS april")
@@ -168,6 +169,7 @@ class MeetingControllerTest {
         when(caseRecordRepository.findByRegistryIdOrderByCreatedAtDesc(1L)).thenReturn(List.of(caseRecord));
 
         mockMvc.perform(post("/admin/meetings/10/agenda-items")
+                        .with(csrf())
                         .header("HX-Request", "true")
                         .param("caseRecordId", "100"))
                 .andExpect(status().isOk())
@@ -202,6 +204,7 @@ class MeetingControllerTest {
         when(caseRecordRepository.findByRegistryIdOrderByCreatedAtDesc(1L)).thenReturn(List.of());
 
         mockMvc.perform(post("/admin/meetings/10/update")
+                        .with(csrf())
                         .header("HX-Request", "true")
                         .param("title", "KS april uppdaterad")
                         .param("startsAt", "2026-05-10T13:00")
@@ -226,6 +229,7 @@ class MeetingControllerTest {
         when(meetingService.getMeetingsForRegistry(1L)).thenReturn(List.of());
 
         mockMvc.perform(post("/admin/meetings/10/delete")
+                        .with(csrf())
                         .header("HX-Request", "true"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("fragments/admin-meetings :: content"))
