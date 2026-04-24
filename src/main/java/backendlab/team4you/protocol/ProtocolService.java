@@ -1,0 +1,111 @@
+package backendlab.team4you.protocol;
+
+import backendlab.team4you.caserecord.CaseRecord;
+import backendlab.team4you.exceptions.InvalidMeetingStateException;
+import backendlab.team4you.exceptions.MeetingNotFoundException;
+import backendlab.team4you.exceptions.ProtocolAlreadyExistsException;
+import backendlab.team4you.exceptions.ProtocolNotFoundException;
+import backendlab.team4you.meeting.Meeting;
+import backendlab.team4you.meeting.MeetingAgendaItem;
+import backendlab.team4you.meeting.MeetingRepository;
+import backendlab.team4you.meeting.MeetingStatus;
+import backendlab.team4you.registry.Registry;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
+
+@Service
+public class ProtocolService {
+
+    private final ProtocolRepository protocolRepository;
+    private final ProtocolParagraphSequenceRepository sequenceRepository;
+    private final MeetingRepository meetingRepository;
+
+    public ProtocolService(
+            ProtocolRepository protocolRepository,
+            ProtocolParagraphSequenceRepository sequenceRepository,
+            MeetingRepository meetingRepository
+    ) {
+        this.protocolRepository = protocolRepository;
+        this.sequenceRepository = sequenceRepository;
+        this.meetingRepository = meetingRepository;
+    }
+
+    @Transactional
+    public Protocol createProtocolForCompletedMeeting(Long meetingId) {
+        Objects.requireNonNull(meetingId, "meetingId is required");
+
+        Meeting meeting = meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new MeetingNotFoundException(meetingId));
+
+        if (meeting.getStatus() != MeetingStatus.COMPLETED) {
+            throw new InvalidMeetingStateException(
+                    "Only completed meetings can have protocols. meetingId=" + meetingId
+            );
+        }
+
+        if (protocolRepository.existsByMeetingId(meetingId)) {
+            throw new ProtocolAlreadyExistsException(meetingId);
+        }
+
+        Registry registry = meeting.getRegistry();
+        Integer year = meeting.getStartsAt().getYear();
+
+        Protocol protocol = new Protocol(
+                meeting,
+                registry,
+                buildProtocolTitle(meeting, registry, year),
+                year
+        );
+
+        for (MeetingAgendaItem agendaItem : meeting.getAgendaItems()) {
+            CaseRecord caseRecord = agendaItem.getCaseRecord();
+
+            Long paragraphNumber = allocateNextParagraphNumber(registry, year);
+
+            ProtocolParagraph paragraph = new ProtocolParagraph(
+                    caseRecord,
+                    paragraphNumber,
+                    buildParagraphHeading(paragraphNumber, caseRecord)
+            );
+
+            protocol.addParagraph(paragraph);
+        }
+
+        return protocolRepository.save(protocol);
+    }
+
+    @Transactional(readOnly = true)
+    public Protocol getProtocol(Long protocolId) {
+        Objects.requireNonNull(protocolId, "protocolId is required");
+
+        return protocolRepository.findById(protocolId)
+                .orElseThrow(() -> new ProtocolNotFoundException(protocolId));
+    }
+
+    @Transactional(readOnly = true)
+    public boolean protocolExistsForMeeting(Long meetingId) {
+        Objects.requireNonNull(meetingId, "meetingId is required");
+        return protocolRepository.existsByMeetingId(meetingId);
+    }
+
+    private Long allocateNextParagraphNumber(Registry registry, Integer year) {
+        ProtocolParagraphSequence sequence = sequenceRepository
+                .findByRegistryIdAndYear(registry.getId(), year)
+                .orElseGet(() -> new ProtocolParagraphSequence(registry, year, 0L));
+
+        sequence.increment();
+        sequenceRepository.save(sequence);
+
+        return sequence.getLastValue();
+    }
+
+    private String buildProtocolTitle(Meeting meeting, Registry registry, Integer year) {
+        return "Protokoll - " + registry.getName() + " - " + year;
+    }
+
+    private String buildParagraphHeading(Long paragraphNumber, CaseRecord caseRecord) {
+        return "§ " + paragraphNumber + " " + caseRecord.getTitle();
+    }
+}
