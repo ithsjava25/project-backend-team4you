@@ -174,7 +174,7 @@ class MeetingControllerTest {
                         .param("caseRecordId", "100"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("fragments/admin-meetings :: content"))
-                .andExpect(model().attribute("successMessage", "ärendet lades till på sammanträdet."));
+                .andExpect(model().attribute("successMessage", "Ärendet lades till på sammanträdet."));
 
         verify(meetingService).addCaseRecordToMeeting(10L, 100L);
     }

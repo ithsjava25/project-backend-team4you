@@ -183,18 +183,20 @@ public class MeetingController {
             @RequestHeader(value = "HX-Request", required = false) String htmx,
             Model model
     ) {
-        Meeting meeting = meetingService.getMeetingById(meetingId);
-
         try {
+            Meeting meeting = meetingService.getMeetingById(meetingId);
+
             meetingService.addCaseRecordToMeeting(meetingId, caseRecordId);
-            model.addAttribute("successMessage", "ärendet lades till på sammanträdet.");
+            model.addAttribute("successMessage", "Ärendet lades till på sammanträdet.");
+
+            populateMeetingsPageAfterMeetingAction(model, meeting.getRegistry().getId(), meetingId);
+
         } catch (DuplicateMeetingAgendaItemException |
                  InvalidMeetingStateException |
                  MeetingNotFoundException exception) {
             model.addAttribute("errorMessage", exception.getMessage());
+            populateMeetingsPageAfterMeetingAction(model, null, null);
         }
-
-        populateMeetingsPage(model, meeting.getRegistry().getId(), meetingId);
 
         if (htmx != null) {
             return "fragments/admin-meetings :: content";
@@ -209,16 +211,19 @@ public class MeetingController {
             @PathVariable Long agendaItemId,
             Model model
     ) {
-        Meeting meeting = meetingService.getMeetingById(meetingId);
-
         try {
+            Meeting meeting = meetingService.getMeetingById(meetingId);
+
             meetingService.moveAgendaItemUp(meetingId, agendaItemId);
-            model.addAttribute("successMessage", "dagordningspunkten flyttades upp.");
+            model.addAttribute("successMessage", "Dagordningspunkten flyttades upp.");
+
+            populateMeetingsPageAfterMeetingAction(model, meeting.getRegistry().getId(), meetingId);
+
         } catch (Exception exception) {
             model.addAttribute("errorMessage", exception.getMessage());
+            populateMeetingsPageAfterMeetingAction(model, null, null);
         }
 
-        populateMeetingsPage(model, meeting.getRegistry().getId(), meetingId);
         return "fragments/admin-meetings :: content";
     }
 
@@ -228,16 +233,19 @@ public class MeetingController {
             @PathVariable Long agendaItemId,
             Model model
     ) {
-        Meeting meeting = meetingService.getMeetingById(meetingId);
-
         try {
+            Meeting meeting = meetingService.getMeetingById(meetingId);
+
             meetingService.moveAgendaItemDown(meetingId, agendaItemId);
-            model.addAttribute("successMessage", "dagordningspunkten flyttades ner.");
+            model.addAttribute("successMessage", "Dagordningspunkten flyttades ner.");
+
+            populateMeetingsPageAfterMeetingAction(model, meeting.getRegistry().getId(), meetingId);
+
         } catch (Exception exception) {
             model.addAttribute("errorMessage", exception.getMessage());
+            populateMeetingsPageAfterMeetingAction(model, null, null);
         }
 
-        populateMeetingsPage(model, meeting.getRegistry().getId(), meetingId);
         return "fragments/admin-meetings :: content";
     }
 
@@ -248,18 +256,20 @@ public class MeetingController {
             @RequestHeader(value = "HX-Request", required = false) String htmx,
             Model model
     ) {
-        Meeting meeting = meetingService.getMeetingById(meetingId);
-
         try {
+            Meeting meeting = meetingService.getMeetingById(meetingId);
+
             meetingService.removeAgendaItem(meetingId, agendaItemId);
-            model.addAttribute("successMessage", "dagordningspunkten togs bort.");
+            model.addAttribute("successMessage", "Dagordningspunkten togs bort.");
+
+            populateMeetingsPageAfterMeetingAction(model, meeting.getRegistry().getId(), meetingId);
+
         } catch (InvalidMeetingStateException |
                  MeetingAgendaItemNotFoundException |
                  MeetingNotFoundException exception) {
             model.addAttribute("errorMessage", exception.getMessage());
+            populateMeetingsPageAfterMeetingAction(model, null, null);
         }
-
-        populateMeetingsPage(model, meeting.getRegistry().getId(), meetingId);
 
         if (htmx != null) {
             return "fragments/admin-meetings :: content";
@@ -275,16 +285,19 @@ public class MeetingController {
             @RequestParam Long caseFileId,
             Model model
     ) {
-        Meeting meeting = meetingService.getMeetingById(meetingId);
-
         try {
+            Meeting meeting = meetingService.getMeetingById(meetingId);
+
             meetingService.addDocumentToAgendaItem(meetingId, agendaItemId, caseFileId);
-            model.addAttribute("successMessage", "handlingen lades till som beslutsunderlag.");
+            model.addAttribute("successMessage", "Handlingen lades till som beslutsunderlag.");
+
+            populateMeetingsPageAfterMeetingAction(model, meeting.getRegistry().getId(), meetingId);
+
         } catch (Exception exception) {
             model.addAttribute("errorMessage", exception.getMessage());
+            populateMeetingsPageAfterMeetingAction(model, null, null);
         }
 
-        populateMeetingsPage(model, meeting.getRegistry().getId(), meetingId);
         return "fragments/admin-meetings :: content";
     }
 
@@ -295,17 +308,28 @@ public class MeetingController {
             @PathVariable Long documentId,
             Model model
     ) {
-        Meeting meeting = meetingService.getMeetingById(meetingId);
-
         try {
+            Meeting meeting = meetingService.getMeetingById(meetingId);
+
             meetingService.removeDocumentFromAgendaItem(meetingId, agendaItemId, documentId);
-            model.addAttribute("successMessage", "handlingen togs bort från beslutsunderlaget.");
+            model.addAttribute("successMessage", "Handlingen togs bort från beslutsunderlaget.");
+
+            populateMeetingsPageAfterMeetingAction(model, meeting.getRegistry().getId(), meetingId);
+
         } catch (Exception exception) {
             model.addAttribute("errorMessage", exception.getMessage());
+            populateMeetingsPageAfterMeetingAction(model, null, null);
         }
 
-        populateMeetingsPage(model, meeting.getRegistry().getId(), meetingId);
         return "fragments/admin-meetings :: content";
+    }
+
+    private void populateMeetingsPageAfterMeetingAction(Model model, Long registryId, Long meetingId) {
+        try {
+            populateMeetingsPage(model, registryId, meetingId);
+        } catch (MeetingNotFoundException exception) {
+            populateMeetingsPage(model, null, null);
+        }
     }
 
     private void populateMeetingsPage(Model model, Long registryId, Long selectedMeetingId) {
