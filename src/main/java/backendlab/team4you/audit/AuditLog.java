@@ -23,16 +23,16 @@ public class AuditLog {
 
 
     private String endpoint;
-    private String httpMethod;
 
+    private String entityType;
 
+            private int entityId;
+
+    @Column(name = "ip_address")
     private String ipAddress;
 
 
     private ZonedDateTime timestamp;
-
-
-
 
     private String status;
 
@@ -70,12 +70,19 @@ public class AuditLog {
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
     }
-    public String getHttpMethod() {
-        return httpMethod;
+    public String getEntityType() {
+        return entityType;
     }
-    public void setHttpMethod(String httpMethod) {
-        this.httpMethod = httpMethod;
+    public void setEntityType(String entityType) {
+        this.entityType = entityType;
     }
+    public int getEntityId() {
+        return entityId;
+    }
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
+    }
+
     public String getIpAddress() {
         return ipAddress;
     }

@@ -85,3 +85,8 @@ li{
     background: #6017a8;
     color: white;
 }
+
+.admin-shell { display: flex; min-height: 100vh;
+}
+.admin-main { flex: 1; padding: 24px;
+}

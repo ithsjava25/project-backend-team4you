@@ -9,14 +9,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
     <link rel="stylesheet" th:href="@{/components/form.css}">
-
-
 </head>
 
 <body>
 
-<aside th:replace="~{fragments/admin-sidenav :: aside}"></aside>
 
+<div class="admin-shell">
+    <aside th:replace="~{fragments/admin-sidenav :: aside}"></aside>
+
+    <main class="admin-main">
+        <section layout:fragment="content">
+
+        </section>
+    </main>
+</div>
 
 
 </body>

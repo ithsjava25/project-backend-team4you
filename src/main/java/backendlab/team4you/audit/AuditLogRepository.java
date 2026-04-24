@@ -8,6 +8,6 @@ import java.util.List;
 @Repository
 public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
 
-    List<AuditLog> findByEmail(String email);
-    List<AuditLog> findByLoggedTimeLike(String date);
+
+    List<AuditLog> findAllByOrderByTimestampDesc();
 }

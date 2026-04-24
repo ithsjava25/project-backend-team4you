@@ -1,5 +1,6 @@
 package backendlab.team4you.user;
 
+import backendlab.team4you.audit.AuditService;
 import backendlab.team4you.dto.UserRegistrationDTO;
 import backendlab.team4you.exceptions.DuplicateEmailException;
 import backendlab.team4you.exceptions.UserNotFoundException;
@@ -29,6 +30,8 @@ public class UserService {
     UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final SecureRandom random = new SecureRandom();
+    AuditService auditLogService;
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(UserService.class);
 
     public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder){
 
@@ -190,4 +193,28 @@ public class UserService {
         return userRepository.findByName(principal.getName().trim())
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + principal.getName()));
     }
+
+    public void updateRole(Long userId, UserRole newRole) {
+
+        UserEntity user = userRepository.findById(String.valueOf(userId)).orElseThrow();
+
+        UserRole oldRole = user.getRole();
+
+        user.setRole(newRole);
+        userRepository.save(user);
+
+        auditLogService.log(
+                "admin",
+                "ROLE_UPDATED",
+                "USER",
+                userId,
+                "Changed role from " + oldRole + " to " + newRole,
+                "SUCCESS"
+        );
+
+        logger.info("User {} role updated from {} to {}", userId, oldRole, newRole);
+
+    }
+
+
 }

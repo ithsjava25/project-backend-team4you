@@ -3,6 +3,9 @@ package backendlab.team4you.controller;
 import backendlab.team4you.application.ApplicationEntity;
 import backendlab.team4you.application.ApplicationRepository;
 import backendlab.team4you.application.ApplicationService;
+import backendlab.team4you.audit.AuditAction;
+import backendlab.team4you.audit.AuditLog;
+import backendlab.team4you.audit.AuditLogRepository;
 import backendlab.team4you.booking.BookingService;
 import backendlab.team4you.service.LogService;
 import backendlab.team4you.user.UserEntity;
@@ -21,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -39,16 +43,15 @@ public class AdminController {
     private final ApplicationService applicationService;
     private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
+    private final AuditLogRepository auditLogRepository;
 
-    public AdminController(UserService userService, BookingService bookingService, ApplicationService applicationService, ApplicationRepository applicationRepository, UserRepository userRepository) {
+    public AdminController(UserService userService, BookingService bookingService, ApplicationService applicationService, ApplicationRepository applicationRepository, UserRepository userRepository, AuditLogRepository auditLogRepository) {
         this.userService = userService;
         this.bookingService = bookingService;
         this.applicationService = applicationService;
         this.applicationRepository = applicationRepository;
         this.userRepository = userRepository;
-
-
-
+        this.auditLogRepository = auditLogRepository;
     }
 
     @GetMapping("/admin/logs")
@@ -64,9 +67,18 @@ public class AdminController {
     }
 
 
+    @PostMapping("/admin/update-role")
+    @AuditAction(action = "UPDATE_USER_ROLE", entity = "USER")
+    public String changeRole(String id, String role) {
+
+
+        return "redirect:/admin/users";
+    }
+
 
 
     @PostMapping("/admin/users")
+    @AuditAction(action = "UPDATE_USER_ROLE", entity = "USER")
     public String deleteUser(@RequestParam String id, Model model){
 
         userService.deleteUser(id);
@@ -169,5 +181,17 @@ public class AdminController {
         model.addAttribute("message", "Ansökan borttagen");
 
         return "fragments/alert :: success";
+    }
+
+    @GetMapping("/admin/logs")
+    public String viewLogs(Model model, @RequestHeader(value = "HX-Request", required = false) String htmx) {
+
+        List<AuditLog> logs = auditLogRepository.findAllByOrderByTimestampDesc();
+        model.addAttribute("logs", logs);
+
+        if (htmx != null) {
+            return "admin/logs :: content";
+        }
+        return "admin/logs";
     }
 }

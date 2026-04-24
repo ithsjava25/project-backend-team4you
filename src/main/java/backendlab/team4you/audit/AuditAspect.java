@@ -1,58 +1,56 @@
 package backendlab.team4you.audit;
 
-
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Pointcut;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.time.ZonedDateTime;
-
+@Aspect
 @Component
-public class AuditAspect implements HandlerInterceptor {
+public class AuditAspect {
 
-    private static final Logger logger =
-            LoggerFactory.getLogger(AuditAspect.class);
+    private final AuditService auditService;
 
-    private final AuditLogRepository auditRepository;
-
-    public AuditAspect(AuditLogRepository auditLogRepository, AuditLogRepository auditRepository) {
-        this.auditRepository = auditLogRepository;
-
+    public AuditAspect(AuditService auditService) {
+        this.auditService = auditService;
     }
 
-    @Pointcut("within(backendlab.team4you.controller..*)")
-    public void controllerMethods() {}
 
-    @AfterReturning("controllerMethods()")
-    public void logAfter(JoinPoint joinPoint) {
+    @AfterReturning(pointcut = "@annotation(auditAction)", returning = "result")
+    public void logAudit(JoinPoint joinPoint, AuditAction auditAction, Object result) {
         try {
-            String methodName = joinPoint.getSignature().getName();
 
-            Authentication authentication =
-                    SecurityContextHolder.getContext().getAuthentication();
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String username = (auth != null) ? auth.getName() : "system";
 
-            String username = authentication != null
-                    ? authentication.getName()
-                    : "anonymous";
 
-            AuditLog log = new AuditLog();
-            log.setAction(methodName.toUpperCase());
-            log.setUsername(username);
-            log.setTimestamp(ZonedDateTime.now());
-            log.setDetails("Executed method: " + methodName);
+            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            String ip = "unknown";
+            String endpoint = "unknown";
+            if (attrs != null) {
+                ip = attrs.getRequest().getRemoteAddr();
+                endpoint = attrs.getRequest().getRequestURI();
+            }
 
-            auditRepository.save(log);
 
-            logger.info("Audit log saved for method: {}", methodName);
+            auditService.saveLog(
+                    username,
+                    null,
+                    auditAction.action(),
+                    endpoint,
+                    "POST",
+                    ip,
+                    "SUCCESS",
+                    auditAction.entity(),
+                    0
+            );
 
         } catch (Exception e) {
-            logger.error("Failed to save audit log", e);
+
         }
     }
 }

@@ -1,27 +1,29 @@
-<div th:fragment="content">
-    <h2>Systemlogg</h2>
+<section layout:fragment="content" th:fragment="content" xmlns:layout="">
+    <div class="application-container">
+        <header class="page-header">
+            <h1>Systemlogg</h1>
+            <p>Historik över alla händelser i systemet.</p>
+        </header>
 
-    <div id="alert-area"></div>
-
-    <ul>
-        <li th:each="log : ${logs}" th:text="${log}"></li>
-    </ul>
-
-    <button
-            hx-get="/admin/logs?page=2"
-            hx-target="#logs-container"
-            hx-swap="beforeend"
-    >
-        Ladda fler
-    </button>
-    <button
-            class="btn btn-danger"
-            hx-delete="/admin/users/123"
-            hx-confirm="Är du säker?"
-            hx-target="closest tr"
-            hx-swap="outerHTML"
-    >
-        Ta bort
-    </button>
-    <div th:replace="fragments/pagination :: pagination('/admin/users')"></div>
-</div>
+        <table class="audit-table">
+            <thead>
+            <tr>
+                <th>Tid</th>
+                <th>Användare</th>
+                <th>Handling</th>
+                <th>Entitet</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="log : ${logs}">
+                <td th:text="${#temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm')}"></td>
+                <td th:text="${log.username}"></td>
+                <td><span class="badge" th:text="${log.action}"></span></td>
+                <td th:text="${log.entityType + ' (ID: ' + log.entityId + ')'}"></td>
+                <td th:text="${log.status}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
