@@ -21,15 +21,18 @@ public class ProtocolService {
     private final ProtocolRepository protocolRepository;
     private final ProtocolParagraphSequenceRepository sequenceRepository;
     private final MeetingRepository meetingRepository;
+    private final ProtocolParagraphRepository paragraphRepository;
 
     public ProtocolService(
             ProtocolRepository protocolRepository,
             ProtocolParagraphSequenceRepository sequenceRepository,
-            MeetingRepository meetingRepository
+            MeetingRepository meetingRepository,
+            ProtocolParagraphRepository paragraphRepository
     ) {
         this.protocolRepository = protocolRepository;
         this.sequenceRepository = sequenceRepository;
         this.meetingRepository = meetingRepository;
+        this.paragraphRepository = paragraphRepository;
     }
 
     @Transactional
@@ -88,6 +91,22 @@ public class ProtocolService {
     public boolean protocolExistsForMeeting(Long meetingId) {
         Objects.requireNonNull(meetingId, "meetingId is required");
         return protocolRepository.existsByMeetingId(meetingId);
+    }
+
+    @Transactional
+    public Protocol updateParagraphDecision(
+            Long paragraphId,
+            ProtocolDecisionType decisionType,
+            String decisionText
+    ) {
+        Objects.requireNonNull(paragraphId, "paragraphId is required");
+
+        ProtocolParagraph paragraph = paragraphRepository.findById(paragraphId)
+                .orElseThrow(() -> new ProtocolParagraphNotFoundException(paragraphId));
+
+        paragraph.updateDecision(decisionType, decisionText);
+
+        return paragraph.getProtocol();
     }
 
     private Long allocateNextParagraphNumber(Registry registry, Integer year) {

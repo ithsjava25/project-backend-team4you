@@ -48,7 +48,8 @@ public class GlobalRestExceptionHandler {
             MeetingNotFoundException.class,
             MeetingAgendaItemNotFoundException.class,
             MeetingAgendaDocumentNotFoundException.class,
-            ProtocolNotFoundException.class
+            ProtocolNotFoundException.class,
+            ProtocolParagraphNotFoundException.class
     })
     public ResponseEntity<ErrorResponseDto> handleNotFound(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)

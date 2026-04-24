@@ -38,7 +38,8 @@ public class GlobalViewExceptionHandler {
             CaseFileNotFoundException.class,
             MeetingNotFoundException.class,
             MeetingAgendaDocumentNotFoundException.class,
-            ProtocolNotFoundException.class
+            ProtocolNotFoundException.class,
+            ProtocolParagraphNotFoundException.class,
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleNotFound(RuntimeException ex, Model model) {
