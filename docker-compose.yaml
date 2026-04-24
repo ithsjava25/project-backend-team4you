@@ -22,12 +22,11 @@ services:
       AWS_BUCKET_NAME: ${AWS_BUCKET_NAME:-team4you-files}
     volumes:
       - ./init-localstack.sh:/etc/localstack/init/ready.d/init-localstack.sh
-      - localstack_data:/var/lib/localstack
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
       interval: 10s
       timeout: 5s
       retries: 5
+
 volumes:
   postgres_data:
-  localstack_data:
