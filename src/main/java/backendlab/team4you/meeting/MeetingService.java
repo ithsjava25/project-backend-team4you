@@ -290,8 +290,11 @@ public class MeetingService {
             throw new InvalidMeetingStateException("Dagordningspunkten tillhör inte detta sammanträde.");
         }
 
-        CaseFile caseFile = caseFileRepository.findById(caseFileId)
-                .orElseThrow(() -> new MeetingAgendaDocumentNotFoundException("Handlingen hittades inte."));
+        Long caseRecordId = agendaItem.getCaseRecord().getId();
+
+        CaseFile caseFile = caseFileRepository
+                .findByIdAndCaseRecordId(caseFileId, caseRecordId)
+                .orElseThrow(() -> new CaseFileNotFoundException(caseRecordId, caseFileId));
 
         validateCaseFileBelongsToAgendaItemCaseRecord(agendaItem, caseFile);
 

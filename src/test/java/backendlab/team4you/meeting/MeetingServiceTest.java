@@ -4,10 +4,7 @@ import backendlab.team4you.casefile.CaseFile;
 import backendlab.team4you.casefile.CaseFileRepository;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
-import backendlab.team4you.exceptions.DuplicateMeetingAgendaDocumentException;
-import backendlab.team4you.exceptions.DuplicateMeetingAgendaItemException;
-import backendlab.team4you.exceptions.InvalidMeetingStateException;
-import backendlab.team4you.exceptions.MeetingNotFoundException;
+import backendlab.team4you.exceptions.*;
 import backendlab.team4you.registry.Registry;
 import backendlab.team4you.registry.RegistryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -237,10 +234,12 @@ class MeetingServiceTest {
         setField(agendaItem, "id", 50L);
 
         when(caseFile.getCaseRecord()).thenReturn(caseRecord);
+        when(caseRecord.getId()).thenReturn(100L);
 
         when(meetingRepository.findById(10L)).thenReturn(Optional.of(meeting));
         when(meetingAgendaItemRepository.findById(50L)).thenReturn(Optional.of(agendaItem));
-        when(caseFileRepository.findById(1000L)).thenReturn(Optional.of(caseFile));
+        when(caseFileRepository.findByIdAndCaseRecordId(1000L, 100L))
+                .thenReturn(Optional.of(caseFile));
         when(meetingAgendaDocumentRepository.existsByAgendaItemAndCaseFile(agendaItem, caseFile)).thenReturn(false);
         when(meetingAgendaDocumentRepository.save(any(MeetingAgendaDocument.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -258,10 +257,12 @@ class MeetingServiceTest {
         setField(agendaItem, "id", 50L);
 
         when(caseFile.getCaseRecord()).thenReturn(caseRecord);
+        when(caseRecord.getId()).thenReturn(100L);
 
         when(meetingRepository.findById(10L)).thenReturn(Optional.of(meeting));
         when(meetingAgendaItemRepository.findById(50L)).thenReturn(Optional.of(agendaItem));
-        when(caseFileRepository.findById(1000L)).thenReturn(Optional.of(caseFile));
+        when(caseFileRepository.findByIdAndCaseRecordId(1000L, 100L))
+                .thenReturn(Optional.of(caseFile));
         when(meetingAgendaDocumentRepository.existsByAgendaItemAndCaseFile(agendaItem, caseFile)).thenReturn(true);
 
         assertThatThrownBy(() -> meetingService.addDocumentToAgendaItem(10L, 50L, 1000L))
@@ -270,22 +271,18 @@ class MeetingServiceTest {
     }
 
     @Test
-    @DisplayName("addDocumentToAgendaItem should throw InvalidMeetingStateException when file belongs to wrong case record")
-    void addDocumentToAgendaItem_shouldThrowInvalidMeetingStateException_whenFileBelongsToWrongCaseRecord() {
+    @DisplayName("addDocumentToAgendaItem should throw CaseFileNotFoundException when file does not belong to agenda item's case record")
+    void addDocumentToAgendaItem_shouldThrowCaseFileNotFoundException_whenFileBelongsToWrongCaseRecord() {
         MeetingAgendaItem agendaItem = new MeetingAgendaItem(meeting, caseRecord, 1, null);
         setField(agendaItem, "id", 50L);
 
         when(caseRecord.getId()).thenReturn(100L);
-        when(otherRegistryCaseRecord.getId()).thenReturn(200L);
-        when(wrongCaseFile.getCaseRecord()).thenReturn(otherRegistryCaseRecord);
-
         when(meetingRepository.findById(10L)).thenReturn(Optional.of(meeting));
         when(meetingAgendaItemRepository.findById(50L)).thenReturn(Optional.of(agendaItem));
-        when(caseFileRepository.findById(2000L)).thenReturn(Optional.of(wrongCaseFile));
 
         assertThatThrownBy(() -> meetingService.addDocumentToAgendaItem(10L, 50L, 2000L))
-                .isInstanceOf(InvalidMeetingStateException.class)
-                .hasMessage("Handlingen tillhör inte ärendet på denna dagordningspunkt.");
+                .isInstanceOf(CaseFileNotFoundException.class)
+                .hasMessage("File not found for case record. caseRecordId=100, fileId=2000");
     }
 
     @Test
