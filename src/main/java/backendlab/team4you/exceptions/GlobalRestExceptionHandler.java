@@ -207,8 +207,13 @@ public class GlobalRestExceptionHandler {
     }
 
     @ExceptionHandler(FileInUseException.class)
-    public ResponseEntity<String> handleFileInUse(FileInUseException ex) {
+    public ResponseEntity<ErrorResponseDto> handleFileInUse(FileInUseException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ex.getMessage());
+                .body(new ErrorResponseDto(
+                        HttpStatus.CONFLICT.value(),
+                        "conflict",
+                        ex.getMessage(),
+                        LocalDateTime.now()
+                ));
     }
 }
