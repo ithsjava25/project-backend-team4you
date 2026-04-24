@@ -5,6 +5,7 @@ import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
 import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.exceptions.*;
+import backendlab.team4you.meeting.MeetingAgendaDocumentRepository;
 import backendlab.team4you.s3.S3Service;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserRole;
@@ -45,6 +46,9 @@ class CaseFileServiceTest {
 
     @Mock
     private CaseFileAccessService caseFileAccessService;
+
+    @Mock
+    private MeetingAgendaDocumentRepository meetingAgendaDocumentRepository;
 
     @InjectMocks
     private CaseFileService caseFileService;
@@ -640,5 +644,28 @@ class CaseFileServiceTest {
         assertThat(result.get(0).displayName()).isEqualTo("offentlig.pdf");
         assertThat(result.get(0).canDownload()).isTrue();
         assertThat(result.get(0).confidential()).isFalse();
+    }
+
+    @Test
+    @DisplayName("delete file should throw FilInUseException when file is in use by a meeting")
+    void deleteFile_shouldThrowFileInUseException_whenFileIsUsedByMeetingAgendaDocument() {
+        CaseFile caseFile = new CaseFile();
+        caseFile.setId(100L);
+        caseFile.setCaseRecord(caseRecord);
+        caseFile.setS3Key("cases/1/uuid-test.pdf");
+
+        when(caseFileRepository.findByIdAndCaseRecordId(100L, 1L))
+                .thenReturn(Optional.of(caseFile));
+        when(caseFileAccessService.canDeleteFile(actor, caseFile))
+                .thenReturn(true);
+        when(meetingAgendaDocumentRepository.existsByCaseFileId(100L))
+                .thenReturn(true);
+
+        assertThatThrownBy(() -> caseFileService.deleteFile(1L, 100L, actor))
+                .isInstanceOf(FileInUseException.class)
+                .hasMessageContaining("mötesunderlag");
+
+        verify(caseFileRepository, never()).delete(any());
+        verify(s3Service, never()).deleteFile(anyString());
     }
 }
