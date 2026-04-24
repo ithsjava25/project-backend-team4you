@@ -1,10 +1,7 @@
 package backendlab.team4you.protocol;
 
 import backendlab.team4you.caserecord.CaseRecord;
-import backendlab.team4you.exceptions.InvalidMeetingStateException;
-import backendlab.team4you.exceptions.MeetingNotFoundException;
-import backendlab.team4you.exceptions.ProtocolAlreadyExistsException;
-import backendlab.team4you.exceptions.ProtocolNotFoundException;
+import backendlab.team4you.exceptions.*;
 import backendlab.team4you.meeting.Meeting;
 import backendlab.team4you.meeting.MeetingAgendaItem;
 import backendlab.team4you.meeting.MeetingRepository;
