@@ -56,7 +56,7 @@ public class Team4youApplication {
 						"caseofficer1"
 				);
 
-				officer1.setPasswordHash(encoder.encode("abcd"));
+				officer1.setPasswordHash(encoder.encode("officer1"));
 				officer1.setRole(UserRole.CASE_OFFICER);
 				officer1.setEmail("devcaseofficer@gmail.com");
 
@@ -69,7 +69,7 @@ public class Team4youApplication {
 						"caseofficer2"
 				);
 
-				officer2.setPasswordHash(encoder.encode("aaaa"));
+				officer2.setPasswordHash(encoder.encode("officer2"));
 				officer2.setRole(UserRole.CASE_OFFICER);
 				officer2.setEmail("devcaseofficer2@gmail.com");
 
