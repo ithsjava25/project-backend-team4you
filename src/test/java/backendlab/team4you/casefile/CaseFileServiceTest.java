@@ -322,6 +322,7 @@ class CaseFileServiceTest {
         when(caseFileRepository.findByIdAndCaseRecordId(100L, 1L))
                 .thenReturn(Optional.of(caseFile));
         when(caseFileAccessService.canDeleteFile(actor, caseFile)).thenReturn(true);
+        when(meetingAgendaDocumentRepository.existsByCaseFileId(100L)).thenReturn(false);
 
         caseFileService.deleteFile(1L, 100L, actor);
 
@@ -475,6 +476,8 @@ class CaseFileServiceTest {
         when(caseFileRepository.findByIdAndCaseRecordId(100L, 1L))
                 .thenReturn(Optional.of(caseFile));
         when(caseFileAccessService.canDeleteFile(actor, caseFile)).thenReturn(true);
+        when(meetingAgendaDocumentRepository.existsByCaseFileId(100L))
+                .thenReturn(false);
 
         doThrow(new RuntimeException("s3 delete failed"))
                 .when(s3Service)
@@ -647,7 +650,7 @@ class CaseFileServiceTest {
     }
 
     @Test
-    @DisplayName("delete file should throw FilInUseException when file is in use by a meeting")
+    @DisplayName("delete file should throw FileInUseException when file is in use by a meeting")
     void deleteFile_shouldThrowFileInUseException_whenFileIsUsedByMeetingAgendaDocument() {
         CaseFile caseFile = new CaseFile();
         caseFile.setId(100L);
