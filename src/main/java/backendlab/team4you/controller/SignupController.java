@@ -1,5 +1,6 @@
 package backendlab.team4you.controller;
 
+import backendlab.team4you.audit.AuditAction;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
 
@@ -47,6 +48,7 @@ public class SignupController {
 
     @PostMapping("/signup")
     @ResponseBody
+    @AuditAction(action = "SIGNUP", entity = "USER")
     public void signup(@RequestBody SignupRequest req, HttpServletRequest request, HttpServletResponse response) {
 
         UserEntity userEntity = userService.registerWebAuthnUser(

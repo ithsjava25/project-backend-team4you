@@ -54,17 +54,6 @@ public class AdminController {
         this.auditLogRepository = auditLogRepository;
     }
 
-    @GetMapping("/admin/logs")
-    public String logs(Model model) {
-        List<String> logs = List.of(
-                "User johndoe loggade in",
-                "Ny användare registrerad",
-                "Admin tog bort user #123"
-        );
-
-        model.addAttribute("logs", logs);
-        return "fragments/admin-logs :: content";
-    }
 
 
     @PostMapping("/admin/update-role")
@@ -190,8 +179,9 @@ public class AdminController {
         model.addAttribute("logs", logs);
 
         if (htmx != null) {
-            return "admin/logs :: content";
+            return "fragments/admin-logs :: content";
         }
-        return "admin/logs";
+        return "fragments/admin-logs";
     }
+
 }
