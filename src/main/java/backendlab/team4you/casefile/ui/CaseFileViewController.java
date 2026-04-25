@@ -78,7 +78,6 @@ public class CaseFileViewController {
     }
 
     @DeleteMapping("/case-records/{caseId}/files/{fileId}")
-    @ResponseBody
     @AuditAction(action = "FILE_DELETE_UI", entity = "CASE_FILE")
     public String deleteCaseFile(
             @PathVariable Long caseId,
