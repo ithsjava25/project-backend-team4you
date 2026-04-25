@@ -38,7 +38,7 @@ public class S3Controller {
             return ResponseEntity.ok("File uploaded: " + key);
         } catch (FileStorageConfigurationException e) {
             log.error("S3 upload failed for key={}", key, e);
-            return ResponseEntity.internalServerError().body("Kunde inte ladda upp filen: " + key);
+            return ResponseEntity.internalServerError().body("Could not upload file: " + key);
         }
     }
 
@@ -54,7 +54,7 @@ public class S3Controller {
                     .body(bytes);
         } catch (FileStorageConfigurationException e) {
             log.error("S3 download failed for key={}", key, e);
-            return ResponseEntity.internalServerError().body("Kunde inte ladda ner filen: " + key);
+            return ResponseEntity.internalServerError().body("Could not download file: " + key);
         }
     }
 
@@ -67,7 +67,7 @@ public class S3Controller {
             return ResponseEntity.ok("File deleted: " + key);
         } catch (FileStorageConfigurationException e) {
             log.error("S3 delete failed for key={}", key, e);
-            return ResponseEntity.internalServerError().body("Kunde inte radera filen: " + key);
+            return ResponseEntity.internalServerError().body("Could not delete file: " + key);
         }
     }
 }
