@@ -92,4 +92,15 @@ class S3ServiceTest {
         assertThrows(backendlab.team4you.exceptions.FileStorageConfigurationException.class,
                 () -> s3Service.downloadFile("test.txt"));
     }
+
+    @Test
+    void deleteFile_shouldThrowFileStorageConfigurationException_whenS3Fails() {
+        // Arrange
+        when(s3Client.deleteObject(any(DeleteObjectRequest.class)))
+                .thenThrow(S3Exception.builder().message("S3 error").build());
+
+        // Act & Assert
+        assertThrows(backendlab.team4you.exceptions.FileStorageConfigurationException.class,
+                () -> s3Service.deleteFile("test.txt"));
+    }
 }
