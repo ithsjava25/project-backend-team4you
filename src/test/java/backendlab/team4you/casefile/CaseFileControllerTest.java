@@ -48,11 +48,7 @@ class CaseFileControllerTest {
     @MockitoBean
     private UserService userService;
 
-    @MockitoBean
-    private AuditService auditService;
 
-    @MockitoBean
-    private AuditLogRepository auditLogRepository;
 
     @Test
     @DisplayName("uploadFile should return ok and response body when upload succeeds")

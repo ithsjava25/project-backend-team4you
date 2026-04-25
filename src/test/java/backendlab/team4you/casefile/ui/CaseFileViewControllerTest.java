@@ -1,5 +1,7 @@
 package backendlab.team4you.casefile.ui;
 
+import backendlab.team4you.audit.AuditLogRepository;
+import backendlab.team4you.audit.AuditService;
 import backendlab.team4you.casefile.CaseFileService;
 import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.exceptions.CaseFileNotFoundException;
@@ -35,6 +37,12 @@ class CaseFileViewControllerTest {
 
     @MockitoBean
     private UserService userService;
+
+    @MockitoBean
+    private AuditService auditService;
+
+    @MockitoBean
+    private AuditLogRepository auditLogRepository;
 
     @Test
     @DisplayName("uploadCaseFile should return fragment with success message when upload succeeds")
