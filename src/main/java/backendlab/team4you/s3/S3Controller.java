@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import backendlab.team4you.exceptions.FileStorageConfigurationException;
+
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,20 +32,26 @@ public class S3Controller {
         if (key == null || key.isBlank()) {
             return ResponseEntity.badRequest().body("Invalid filename");
         }
-        s3Service.uploadFile(key, file.getBytes(), file.getContentType());
-        return ResponseEntity.ok("File uploaded: " + key);
+        try {
+            s3Service.uploadFile(key, file.getBytes(), file.getContentType());
+            return ResponseEntity.ok("File uploaded: " + key);
+        } catch (FileStorageConfigurationException e) {
+            return ResponseEntity.internalServerError().body("Kunde inte ladda upp filen: " + key);
+        }
     }
 
     // GET /api/files/download/{key} — download a file
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/download/{key}")
-    public ResponseEntity<byte[]> downloadFile(@PathVariable String key) throws IOException {
+    public ResponseEntity<?> downloadFile(@PathVariable String key) throws IOException {
         try (InputStream stream = s3Service.downloadFile(key)) {
             byte[] bytes = stream.readAllBytes();
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + key + "\"")
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(bytes);
+        } catch (FileStorageConfigurationException e) {
+            return ResponseEntity.internalServerError().body("Kunde inte ladda ner filen: " + key);
         }
     }
 
@@ -51,7 +59,11 @@ public class S3Controller {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{key}")
     public ResponseEntity<String> deleteFile(@PathVariable String key) {
-        s3Service.deleteFile(key);
-        return ResponseEntity.ok("File deleted: " + key);
+        try {
+            s3Service.deleteFile(key);
+            return ResponseEntity.ok("File deleted: " + key);
+        } catch (FileStorageConfigurationException e) {
+            return ResponseEntity.internalServerError().body("Kunde inte radera filen: " + key);
+        }
     }
 }
