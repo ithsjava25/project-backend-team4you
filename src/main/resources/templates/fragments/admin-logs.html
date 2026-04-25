@@ -27,10 +27,24 @@
             padding:10px;
             font-size:14px;
         }
+        .btn-secondary {
+            padding: 12px;
+            background: black;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
 
 
     </style>
-
+    <button class="btn-secondary"
+            hx-post="/admin/logs/cleanup?days=30"
+            hx-target="#content-area"
+            hx-confirm="Är du säker på att du vill radera loggar äldre än 30 dagar?">
+        Rensa äldre än 30 dagar
+    </button>
+    <div class="log-actions" style="margin-bottom: 20px; display: flex; gap: 10px;">
 <table class="audit-table">
     <thead>
     <tr>
@@ -40,6 +54,10 @@
         <th>Entitet</th>
         <th>Detaljer</th> <th>IP</th> <th>Status</th>
     </tr>
+
+
+
+
     </thead>
     <tbody>
 
@@ -50,7 +68,9 @@
         <td><span class="method-tag" th:text="${log.httpMethod}"></span></td>
         <td><span class="badge" th:text="${log.action}"></span></td>
         <td th:text="${log.entityType}"></td>
-        <td th:text="${log.details}"></td>
+        <td th:text="${log.details}">
+            <span th:if="${log.details != null}" th:text="${log.details}"></span>
+        </td>
         <td th:text="${log.ipAddress}" ></td>
         <td>
                 <span th:class="${log.status == 'SUCCESS' ? 'status-ok' : 'status-fail'}"
@@ -59,5 +79,7 @@
     </tr>
     </tbody>
 
+
 </table>
+    </div>
 </div>

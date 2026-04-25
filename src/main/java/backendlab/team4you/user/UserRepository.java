@@ -25,5 +25,6 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
 
     Page<UserEntity> findByRole(UserRole role, Pageable pageable);
 
-    UserEntity findByDisplayName(String DisplayName);
+    Optional<UserEntity> findByDisplayName(String displayName);
+
 }

@@ -1,4 +1,18 @@
 <div th:fragment="content">
+<!--<style>-->
+<!--    .btn-admin-users{-->
+<!--        width: 100%;-->
+<!--        padding: 12px;-->
+<!--        background: var(&#45;&#45;color-primary);-->
+<!--        color: white;-->
+<!--        border: none;-->
+<!--        border-radius: 10px;-->
+<!--        cursor: pointer;-->
+<!--        transition: 0.2s;-->
+<!--    }-->
+<!--</style>-->
+
+
 
     <h2>Användare</h2>
 
@@ -7,21 +21,21 @@
     <ul>
         <li th:each="user : ${users}">
 
-            <span th:text="${user.displayName}"></span>
-            <span th:text="${user.email}"></span>
-             <span th:text="${user.role}"></span>
 
-            <button
-                    th:attr="hx-post=@{/admin/users/delete(id=${user.id})}"
-                    hx-target="closest li"
-                    hx-swap="outerHTML"
-                    hx-confirm="Är du säker?"
-            >
-                Ta bort
+            <button class="btn-admin-users">
+                <a th:href="@{/admin/users/authorize/{id}(id=${user.id})}">Användare: <span th:text="${user.name}"></span>
+                </a>
             </button>
-
         </li>
     </ul>
+    <div>
+        <label>
+            <select id="user-role-select">
+            <option th:each="user : ${users}" VALUE="ADMIN">Ändra användare till admin</option>
+            <option th:each="user : ${users}" VALUE="SEKRETERARE">Ändra användare till sekreterare</option>
+            </select>
+        </label>
+    </div>
 
     <div th:replace="fragments/pagination :: pagination('/admin/users')"></div>
 

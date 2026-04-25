@@ -4,6 +4,7 @@ import backendlab.team4you.audit.AuditService;
 import backendlab.team4you.dto.UserRegistrationDTO;
 import backendlab.team4you.exceptions.DuplicateEmailException;
 import backendlab.team4you.exceptions.UserNotFoundException;
+import backendlab.team4you.registryaccess.AdminUserCreateDTO;
 import jakarta.transaction.Transactional;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.security.SecureRandom;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -182,7 +185,7 @@ public class UserService {
     public Page<UserEntity> getAdmins(int page, int size) {
         return userRepository.findByRole(UserRole.ADMIN, PageRequest.of(page, size));
     }
-    public UserEntity findByUsername(String disPlayName) {
+    public Optional<UserEntity> findByUsername(String disPlayName) {
         return userRepository.findByDisplayName(disPlayName);
     }
 
@@ -196,6 +199,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + principal.getName()));
     }
 
+    @Transactional
     public void updateRole(Long userId, UserRole newRole) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -219,6 +223,50 @@ public class UserService {
 
         logger.info("User {} role updated from {} to {}", userId, oldRole, newRole);
 
+    }
+
+    public UserEntity updateRole(
+            String userId,
+            UserRole role
+    ) {
+
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "User not found"
+                        )
+                );
+
+        user.setRole(role);
+
+        return userRepository.save(user);
+    }
+
+    public UserEntity createUserAsAdmin(
+            AdminUserCreateDTO dto
+    ) {
+
+        if (userRepository.findByEmail(dto.email()).isPresent()) {
+            throw new DuplicateEmailException(
+                    "Email already exists"
+            );
+        }
+
+        UserEntity user = new UserEntity();
+
+        user.setEmail(dto.email());
+        user.setName(dto.name());
+        user.setFirstName(dto.firstName());
+        user.setLastName(dto.lastName());
+        user.setPhoneNumber(dto.phoneNumber());
+
+        String hashedPw = passwordEncoder.encode(dto.password());
+        user.setPasswordHash(hashedPw);
+
+        user.setRole(dto.role());
+
+        return userRepository.save(user);
     }
 
 

@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 
@@ -189,5 +190,38 @@ public class AdminController {
         }
         return "fragments/admin-logs";
     }
+
+    @PostMapping("/admin/logs/cleanup")
+    public String cleanupLogs(
+            @RequestParam(defaultValue = "30") int days,
+            Model model
+    ) {
+        ZonedDateTime limit = ZonedDateTime.now().minusDays(days);
+
+        auditLogRepository.deleteByTimestampBefore(limit);
+
+        var pageable = PageRequest.of(
+                0,
+                50,
+                Sort.by("timestamp").descending()
+        );
+
+        Page<AuditLog> logsPage = auditLogRepository.findAll(pageable);
+
+        model.addAttribute("logs", logsPage.getContent());
+
+
+        return "fragments/admin-logs :: content";
+    }
+
+    @PostMapping("/admin/users/authorize")
+    public String authorizeUser(@RequestParam String id) {
+
+
+
+
+        return "fragments/admin-users :: content";
+    }
+
 
 }
