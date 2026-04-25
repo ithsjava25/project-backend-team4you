@@ -73,10 +73,23 @@ class S3ServiceTest {
 
     @Test
     void uploadFile_shouldThrowFileStorageConfigurationException_whenS3Fails() {
+        // Arrange
         when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
                 .thenThrow(S3Exception.builder().message("S3 error").build());
 
+        // Act & Assert
         assertThrows(backendlab.team4you.exceptions.FileStorageConfigurationException.class,
                 () -> s3Service.uploadFile("test.txt", "Hello".getBytes(), "text/plain"));
+    }
+
+    @Test
+    void downloadFile_shouldThrowFileStorageConfigurationException_whenS3Fails() {
+        // Arrange
+        when(s3Client.getObject(any(GetObjectRequest.class)))
+                .thenThrow(S3Exception.builder().message("S3 error").build());
+
+        // Act & Assert
+        assertThrows(backendlab.team4you.exceptions.FileStorageConfigurationException.class,
+                () -> s3Service.downloadFile("test.txt"));
     }
 }
