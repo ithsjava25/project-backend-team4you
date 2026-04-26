@@ -4,6 +4,7 @@ import backendlab.team4you.registry.Registry;
 import backendlab.team4you.registry.RegistryRepository;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserRepository;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,6 +35,12 @@ public class RegistryAccessService {
                         registryId,
                         username
                 );
+    }
+
+    public List<RegistryAccessEntity> getRegistryPermissionsForUser(
+            String username
+    ) {
+        return registryAccessRepository.findByUserUsername(username);
     }
 
 

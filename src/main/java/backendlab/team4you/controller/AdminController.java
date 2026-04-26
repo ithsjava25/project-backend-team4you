@@ -7,6 +7,7 @@ import backendlab.team4you.audit.AuditAction;
 import backendlab.team4you.audit.AuditLog;
 import backendlab.team4you.audit.AuditLogRepository;
 import backendlab.team4you.booking.BookingService;
+import backendlab.team4you.registryaccess.AdminUserCreateDTO;
 import backendlab.team4you.service.LogService;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserRepository;
@@ -23,10 +24,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.ZonedDateTime;
@@ -48,13 +46,15 @@ public class AdminController {
     private final UserRepository userRepository;
     private final AuditLogRepository auditLogRepository;
 
-    public AdminController(UserService userService, BookingService bookingService, ApplicationService applicationService, ApplicationRepository applicationRepository, UserRepository userRepository, AuditLogRepository auditLogRepository) {
+
+    public AdminController(UserService userService, BookingService bookingService, ApplicationService applicationService, ApplicationRepository applicationRepository, UserRepository userRepository, AuditLogRepository auditLogRepository, AdminUserCreateDTO adminUserCreateDTO) {
         this.userService = userService;
         this.bookingService = bookingService;
         this.applicationService = applicationService;
         this.applicationRepository = applicationRepository;
         this.userRepository = userRepository;
         this.auditLogRepository = auditLogRepository;
+
     }
 
 
@@ -214,14 +214,41 @@ public class AdminController {
         return "fragments/admin-logs :: content";
     }
 
-    @PostMapping("/admin/users/authorize")
-    public String authorizeUser(@RequestParam String id) {
+    @PostMapping("/users/create")
+    @AuditAction(action = "CREATE_USER", entity = "USER")
+    public String createUser(
+            @ModelAttribute AdminUserCreateDTO dto,
+            Model model
+    ) {
 
+        userService.createUserAsAdmin(dto);
 
-
+        model.addAttribute(
+                "users",
+                userRepository.findAll()
+        );
 
         return "fragments/admin-users :: content";
     }
+
+    @PostMapping("/users/{id}/role")
+    public String updateUserRole(
+            @PathVariable String id,
+            @RequestParam UserRole role,
+            Model model
+    ) {
+
+        userService.updateRole(id, role);
+
+        model.addAttribute(
+                "users",
+                userRepository.findAll()
+        );
+
+        return "fragments/admin-users :: content";
+    }
+
+
 
 
 }

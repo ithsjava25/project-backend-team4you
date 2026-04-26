@@ -22,21 +22,33 @@
         <li th:each="user : ${users}">
 
 
-            <button class="btn-admin-users">
-                <a th:href="@{/admin/users/authorize/{id}(id=${user.id})}">Användare: <span th:text="${user.name}"></span>
-                </a>
-            </button>
+            <form
+                    th:action="@{/admin/users/{id}/role(id=${user.id})}"
+                    hx-post="@{/admin/users/{id}/role(id=${user.id})}"
+                    hx-target="#content-area"
+                    hx-swap="innerHTML"
+            >
+                <form
+                        hx-post="/admin/users/create"
+                        hx-target="#content-area"
+                        hx-swap="innerHTML"
+                >
+
+                    <label>
+                        <select name="role">
+                            <option value="USER">USER</option>
+                            <option value="ADMIN">ADMIN</option>
+                        </select>
+                    </label>
+
+
+                    <button type="submit">
+                    Uppdatera roll
+                </button>
+
+            </form>
         </li>
     </ul>
-    <div>
-        <label>
-            <select id="user-role-select">
-            <option th:each="user : ${users}" VALUE="ADMIN">Ändra användare till admin</option>
-            <option th:each="user : ${users}" VALUE="SEKRETERARE">Ändra användare till sekreterare</option>
-            </select>
-        </label>
-    </div>
 
     <div th:replace="fragments/pagination :: pagination('/admin/users')"></div>
 
-</div>
