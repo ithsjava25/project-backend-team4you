@@ -4,6 +4,7 @@ import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.exceptions.GlobalRestExceptionHandler;
 import backendlab.team4you.exceptions.RegistryNotFoundException;
 import backendlab.team4you.exceptions.UserNotFoundException;
+import backendlab.team4you.registryaccess.RegistryAccessService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ class CaseRecordControllerTest {
 
     @MockitoBean
     private CaseRecordService caseRecordService;
+
+    @MockitoBean
+    private RegistryAccessService registryAccessService;
 
     @Test
     @DisplayName("should create case record and return 201 created")
