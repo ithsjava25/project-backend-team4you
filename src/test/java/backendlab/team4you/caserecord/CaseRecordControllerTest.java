@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -32,8 +33,11 @@ class CaseRecordControllerTest {
     @MockitoBean
     private RegistryAccessService registryAccessService;
 
+
+
     @Test
     @DisplayName("should create case record and return 201 created")
+    @WithMockUser(username = "dev")
     void shouldCreateCaseRecordAndReturn201Created() throws Exception {
         String requestJson = """
                 {
@@ -68,6 +72,9 @@ class CaseRecordControllerTest {
         when(caseRecordService.createCaseRecord(any(CaseRecordRequestDto.class)))
                 .thenReturn(responseDto);
 
+        when(registryAccessService.canCreateCasesInRegistry(any(), any()))
+                .thenReturn(true);
+
         mockMvc.perform(post("/api/case-records")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
@@ -88,6 +95,7 @@ class CaseRecordControllerTest {
 
     @Test
     @DisplayName("should return 404 when registry does not exist")
+    @WithMockUser(username = "dev")
     void shouldReturn404WhenRegistryDoesNotExist() throws Exception {
         String requestJson = """
                 {
@@ -105,6 +113,9 @@ class CaseRecordControllerTest {
         when(caseRecordService.createCaseRecord(any(CaseRecordRequestDto.class)))
                 .thenThrow(new RegistryNotFoundException("registry not found: 99"));
 
+        when(registryAccessService.canCreateCasesInRegistry(any(), any()))
+                .thenReturn(true);
+
         mockMvc.perform(post("/api/case-records")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
@@ -114,6 +125,7 @@ class CaseRecordControllerTest {
 
     @Test
     @DisplayName("should return 404 when user does not exist")
+    @WithMockUser(username = "dev")
     void shouldReturn404WhenUserDoesNotExist() throws Exception {
         String requestJson = """
                 {
@@ -130,6 +142,8 @@ class CaseRecordControllerTest {
 
         when(caseRecordService.createCaseRecord(any(CaseRecordRequestDto.class)))
                 .thenThrow(new UserNotFoundException("user not found: missing-owner"));
+        when(registryAccessService.canCreateCasesInRegistry(any(), any()))
+                .thenReturn(true);
 
         mockMvc.perform(post("/api/case-records")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -140,6 +154,7 @@ class CaseRecordControllerTest {
 
     @Test
     @DisplayName("should return 400 when request body is invalid")
+    @WithMockUser(username = "dev")
     void shouldReturn400WhenRequestBodyIsInvalid() throws Exception {
         String invalidJson = """
                 {
@@ -153,6 +168,8 @@ class CaseRecordControllerTest {
                   "openedAt": "2026-04-09T10:30:00"
                 }
                 """;
+        when(registryAccessService.canCreateCasesInRegistry(any(), any()))
+                .thenReturn(true);
 
         mockMvc.perform(post("/api/case-records")
                         .contentType(MediaType.APPLICATION_JSON)
