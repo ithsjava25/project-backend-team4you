@@ -27,20 +27,20 @@ public class RegistryAccessService {
     }
 
     public boolean canCreateCasesInRegistry(
-            String username,
+            String name,
             Long registryId
     ) {
         return registryAccessRepository
-                .existsByRegistryIdAndUserUsernameAndCanCreateCasesTrue(
+                .existsByRegistryIdAndUserNameAndCanCreateCasesTrue(
                         registryId,
-                        username
+                        name
                 );
     }
 
     public List<RegistryAccessEntity> getRegistryPermissionsForUser(
-            String username
+            String name
     ) {
-        return registryAccessRepository.findByUserUsername(username);
+        return registryAccessRepository.findByUserName(name);
     }
 
 

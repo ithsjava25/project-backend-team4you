@@ -47,7 +47,8 @@ public class AdminController {
     private final AuditLogRepository auditLogRepository;
 
 
-    public AdminController(UserService userService, BookingService bookingService, ApplicationService applicationService, ApplicationRepository applicationRepository, UserRepository userRepository, AuditLogRepository auditLogRepository, AdminUserCreateDTO adminUserCreateDTO) {
+
+    public AdminController(UserService userService, BookingService bookingService, ApplicationService applicationService, ApplicationRepository applicationRepository, UserRepository userRepository, AuditLogRepository auditLogRepository) {
         this.userService = userService;
         this.bookingService = bookingService;
         this.applicationService = applicationService;

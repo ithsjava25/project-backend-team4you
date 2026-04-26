@@ -14,13 +14,18 @@ public class AdminRegistryAccessController {
 
     private final RegistryAccessService registryAccessService;
     private final UserRepository userRepository;
+    private final RegistryAccessAdminService registryAccessAdminService;
+
+
+
 
     public AdminRegistryAccessController(
             RegistryAccessService registryAccessService,
-            UserRepository userRepository
+            UserRepository userRepository, RegistryAccessAdminService registryAccessAdminService
     ) {
         this.registryAccessService = registryAccessService;
         this.userRepository = userRepository;
+        this.registryAccessAdminService = registryAccessAdminService;
     }
 
 
@@ -50,6 +55,61 @@ public class AdminRegistryAccessController {
             @PathVariable String userId,
             Model model
     ) {
+
+        model.addAttribute(
+                "permissions",
+                registryAccessService
+                        .getRegistryPermissionsForUser(userId)
+        );
+
+        model.addAttribute(
+                "selectedUser",
+                userRepository.findById(userId)
+                        .orElseThrow()
+        );
+
+        return "fragments/registry-user-permissions :: content";
+    }
+    @PostMapping("/grant")
+    public String grantAccess(
+            @RequestParam Long registryId,
+            @RequestParam String userId,
+            Model model
+    ) {
+
+        registryAccessAdminService
+                .grantCaseCreationAccess(
+                        registryId,
+                        userId
+                );
+
+        model.addAttribute(
+                "permissions",
+                registryAccessService
+                        .getRegistryPermissionsForUser(userId)
+        );
+
+        model.addAttribute(
+                "selectedUser",
+                userRepository.findById(userId)
+                        .orElseThrow()
+        );
+
+        return "fragments/registry-user-permissions :: content";
+    }
+
+    @PostMapping("/revoke")
+    public String revokeAccess(
+            @RequestParam Long registryId,
+            @RequestParam String userId,
+            Model model
+    ) {
+
+        registryAccessAdminService
+                .revokeCaseCreationAccess(
+                        registryId,
+                        userId
+                );
 
         model.addAttribute(
                 "permissions",

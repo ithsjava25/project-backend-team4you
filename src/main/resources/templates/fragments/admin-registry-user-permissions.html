@@ -1,0 +1,47 @@
+<form
+        hx-post="/admin/registry-access/grant"
+        hx-target="#content-area"
+        hx-swap="innerHTML"
+>
+
+    <input
+            type="hidden"
+            name="userId"
+            th:value="${selectedUser.id}"
+    >
+
+    <input
+            type="hidden"
+            name="registryId"
+            th:value="${registry.id}"
+    >
+
+    <button type="submit">
+        Ge access
+    </button>
+
+</form>
+
+<form
+        hx-post="/admin/registry-access/revoke"
+        hx-target="#content-area"
+        hx-swap="innerHTML"
+>
+
+    <input
+            type="hidden"
+            name="userId"
+            th:value="${selectedUser.id}"
+    >
+
+    <input
+            type="hidden"
+            name="registryId"
+            th:value="${registry.id}"
+    >
+
+    <button type="submit">
+        Ta bort access
+    </button>
+
+</form>

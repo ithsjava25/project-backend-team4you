@@ -7,21 +7,20 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RegistryAccessRepository extends JpaRepository<RegistryAccessEntity, Long> {
+public interface RegistryAccessRepository
+        extends JpaRepository<RegistryAccessEntity, Long> {
 
-    boolean existsByRegistryIdAndUserUsernameAndCanCreateCasesTrue(
+    boolean existsByRegistryIdAndUserNameAndCanCreateCasesTrue(
             Long registryId,
-            String username
+            String name
     );
 
-    Optional<RegistryAccessEntity> findByRegistryIdAndUserUsername(
+    Optional<RegistryAccessEntity> findByRegistryIdAndUserName(
             Long registryId,
-            String username
+            String name
     );
 
-    List<RegistryAccessEntity> findByUserUsername(String username);
-
-    Optional<RegistryAccessEntity> findByRegistryIdAndUserName(Long registryId, String username);
-
-    List<RegistryAccessEntity> findByUserName(String username);
+    List<RegistryAccessEntity> findByUserName(
+            String name
+    );
 }
