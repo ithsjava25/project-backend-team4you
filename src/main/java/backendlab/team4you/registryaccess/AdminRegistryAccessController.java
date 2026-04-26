@@ -50,21 +50,21 @@ public class AdminRegistryAccessController {
         return "fragments/admin-registry-access";
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/{name}")
     public String getUserRegistryPermissions(
-            @PathVariable String userId,
+            @PathVariable String name,
             Model model
     ) {
 
         model.addAttribute(
                 "permissions",
                 registryAccessService
-                        .getRegistryPermissionsForUser(userId)
+                        .getRegistryPermissionsForUser(name)
         );
 
         model.addAttribute(
                 "selectedUser",
-                userRepository.findById(userId)
+                userRepository.findById(name)
                         .orElseThrow()
         );
 

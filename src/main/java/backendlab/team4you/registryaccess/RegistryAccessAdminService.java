@@ -40,9 +40,9 @@ public class RegistryAccessAdminService {
     }
 
     public List<RegistryAccessEntity> getRegistryPermissionsForUser(
-            String username
+            String name
     ) {
-        return registryAccessRepository.findByUserName(username);
+        return registryAccessRepository.findByUserName(name);
     }
 
 

@@ -20,7 +20,7 @@ public interface RegistryAccessRepository
             String name
     );
 
-    List<RegistryAccessEntity> findByUserName(
-            String name
-    );
+    List<RegistryAccessEntity> findByUserName(String name);
+
+
 }

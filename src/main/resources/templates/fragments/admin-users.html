@@ -22,31 +22,29 @@
         <li th:each="user : ${users}">
 
 
+
+            <strong th:text="${user.displayName}"></strong>
+            -
+            <span th:text="${user.email}"></span>
+
             <form
                     th:action="@{/admin/users/{id}/role(id=${user.id})}"
-                    hx-post="@{/admin/users/{id}/role(id=${user.id})}"
+                    th:attr="hx-post=@{/admin/users/{id}/role(id=${user.id})}"
                     hx-target="#content-area"
                     hx-swap="innerHTML"
             >
-                <form
-                        hx-post="/admin/users/create"
-                        hx-target="#content-area"
-                        hx-swap="innerHTML"
-                >
 
-                    <label>
-                        <select name="role">
-                            <option value="USER">USER</option>
-                            <option value="ADMIN">ADMIN</option>
-                        </select>
-                    </label>
+                <select name="role">
+                    <option value="USER">USER</option>
+                    <option value="ADMIN">ADMIN</option>
+                </select>
 
-
-                    <button type="submit">
+                <button type="submit">
                     Uppdatera roll
                 </button>
 
             </form>
+
         </li>
     </ul>
 

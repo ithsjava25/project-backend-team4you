@@ -4,6 +4,21 @@
         hx-swap="innerHTML"
 >
 
+    <form
+            hx-post="/admin/registry-access/revoke"
+            hx-target="#content-area"
+            hx-swap="innerHTML"
+    >
+
+
+
+    <button type="submit">
+        Ge access
+    </button>
+
+</form>
+
+
     <input
             type="hidden"
             name="userId"
@@ -15,18 +30,6 @@
             name="registryId"
             th:value="${registry.id}"
     >
-
-    <button type="submit">
-        Ge access
-    </button>
-
-</form>
-
-<form
-        hx-post="/admin/registry-access/revoke"
-        hx-target="#content-area"
-        hx-swap="innerHTML"
->
 
     <input
             type="hidden"

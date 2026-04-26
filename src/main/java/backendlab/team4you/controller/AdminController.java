@@ -232,14 +232,14 @@ public class AdminController {
         return "fragments/admin-users :: content";
     }
 
-    @PostMapping("/users/{id}/role")
+    @PostMapping("/users/{name}/role")
     public String updateUserRole(
-            @PathVariable String id,
+            @PathVariable String name,
             @RequestParam UserRole role,
             Model model
     ) {
 
-        userService.updateRole(id, role);
+        userService.updateRole(name, role);
 
         model.addAttribute(
                 "users",
