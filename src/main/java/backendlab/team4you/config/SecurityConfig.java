@@ -43,6 +43,11 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/api/files/download/**").hasRole(ADMIN)
                                 .requestMatchers(HttpMethod.DELETE, "/api/files/delete/**").hasRole(ADMIN)
 
+                                .requestMatchers(HttpMethod.POST, "/case-officer/cases/**").hasRole(CASE_OFFICER)
+                                .requestMatchers(HttpMethod.GET, "/case-officer/cases/**").hasRole(CASE_OFFICER)
+                                .requestMatchers(HttpMethod.DELETE, "/case-officer/cases/**").hasRole(CASE_OFFICER)
+
+
                                 .requestMatchers("/webauthn/**").hasAnyRole("USER", ADMIN, CASE_OFFICER)
                                 .requestMatchers("/admin/**").hasRole(ADMIN)
                                 .requestMatchers("/case-officer/**").hasRole(CASE_OFFICER)

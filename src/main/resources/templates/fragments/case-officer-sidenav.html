@@ -9,7 +9,9 @@
         <li>
             <a th:href="@{/case-officer/cases}"
                hx-get="/case-officer/cases"
-               hx-target="#content-area">
+               hx-target="#content-area"
+               hx-swap="innerHTML"
+               hx-push-url="true">
                 <i class="fa-solid fa-file-invoice"></i>
                 <span>Hantera ärenden</span>
             </a>

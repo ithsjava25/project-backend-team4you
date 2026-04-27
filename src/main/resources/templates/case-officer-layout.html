@@ -10,7 +10,8 @@
     <link rel="stylesheet" th:href="@{/css/admin.css}">
     <link rel="stylesheet" th:href="@{/components/form.css}">
 
-
+    <meta name="_csrf"        th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 
 <body>
@@ -23,7 +24,17 @@
     </div>
 </main>
 
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
 
+<script>
+    document.addEventListener('htmx:configRequest', function (evt) {
+        var token  = document.querySelector('meta[name="_csrf"]');
+        var header = document.querySelector('meta[name="_csrf_header"]');
+        if (token && header) {
+            evt.detail.headers[header.content] = token.content;
+        }
+    });
+</script>
 
 </body>
 </html>
