@@ -11,6 +11,7 @@ import backendlab.team4you.meeting.Meeting;
 import backendlab.team4you.meeting.MeetingStatus;
 import backendlab.team4you.registry.Registry;
 import backendlab.team4you.user.UserEntity;
+import backendlab.team4you.user.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -151,6 +152,9 @@ class ProtocolArchiveServiceTest {
         assertThat(protocol.getArchivedPdfFile()).isSameAs(savedFile);
 
         verify(protocolRepository).save(protocol);
+        verify(protocolPdfService).generatePdf(eq(1L), argThat(user ->
+                user != null && user.getRole() == UserRole.ADMIN
+        ));
     }
 
     private void setField(Object target, String fieldName, Object value) {

@@ -19,6 +19,14 @@
                     <span>Dashboard</span>
                 </a>
             </li>
+
+            <li class="sidenav-item" sec:authorize="hasRole('CASE_OFFICER')">
+                <a th:href="@{/case-officer}">
+                    <i class="fa-solid fa-briefcase"></i>
+                    <span>Handläggarvy</span>
+                </a>
+            </li>
+
             <li class="sidenav-item">
                 <a th:href="@{/profile}">
                     <i class="fa-solid fa-right-from-bracket"></i>
