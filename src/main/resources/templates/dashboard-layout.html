@@ -29,6 +29,14 @@
                         <span>Dashboard Hem</span>
                     </a>
                 </li>
+
+                <li sec:authorize="hasRole('ADMIN')">
+                    <a class="a-dashboard" th:href="@{/admin}">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <span>Till admin dashboard</span>
+                    </a>
+                </li>
+
                 <li sec:authorize="hasRole('ADMIN')">
                     <a class="a-dashboard" hx-get="/admin/users" hx-target="#content-area" th:href="@{/admin}">
                         <i class="fa-solid fa-users-gear"></i>
@@ -65,6 +73,18 @@
                         <span>Ärenden</span>
                     </a>
                 </li>
+
+                <li sec:authorize="hasAnyRole('ADMIN','USER','CASE_OFFICER')">
+                    <a class="a-dashboard"
+                       hx-get="/dashboard/protocols"
+                       hx-target="#content-area"
+                       hx-swap="innerHTML"
+                       th:href="@{/dashboard/protocols-page}">
+                        <i class="fa-solid fa-file-signature"></i>
+                        <span>Protokoll</span>
+                    </a>
+                </li>
+
                 <li sec:authorize="hasRole('USER')">
                     <a  class="a-dashboard" hx-get="/user/my-bookings" hx-target="#content-area" th:href="@{/user/my-bookings}">
                         <i class="fa-solid fa-calendar-check"></i>

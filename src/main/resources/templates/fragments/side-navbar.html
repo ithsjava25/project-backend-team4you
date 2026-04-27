@@ -1,4 +1,7 @@
-<aside th:fragment="aside" class="main-sidebar">
+<aside th:fragment="aside"
+       class="main-sidebar"
+       xmlns:th="http://www.thymeleaf.org"
+       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <div class="sidenav-container">
         <div class="sidenav-header">
         </div>
@@ -8,6 +11,12 @@
                 <a th:href="@{/}">
                     <i class="fa-solid fa-house"></i>
                     <span>Hem</span>
+                </a>
+            </li>
+            <li class="sidenav-item" sec:authorize="isAuthenticated()">
+                <a th:href="@{/dashboard}">
+                    <i class="fa-solid fa-table-columns"></i>
+                    <span>Dashboard</span>
                 </a>
             </li>
             <li class="sidenav-item">

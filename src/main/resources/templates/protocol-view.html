@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="sv" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${protocol.title}">Protokoll</title>
+</head>
+<body>
+
+<h1 th:text="${protocol.title}">Protokoll</h1>
+
+<p>
+    <strong>Diarium:</strong>
+    <span th:text="${protocol.registry.name}">Kommunstyrelsen</span>
+</p>
+
+<p>
+    <strong>Sammanträde:</strong>
+    <span th:text="${protocol.meeting.title}">Sammanträde</span>
+</p>
+
+<p>
+    <strong>Datum:</strong>
+    <span th:text="${#temporals.format(protocol.meeting.startsAt, 'yyyy-MM-dd HH:mm')}">
+        2026-04-27 13:00
+    </span>
+</p>
+
+<hr>
+
+<h2>Paragrafer</h2>
+
+<div th:each="paragraph : ${paragraphs}">
+    <h3 th:text="${paragraph.heading}">§ 1 Ärende</h3>
+
+    <p>
+        <strong>Ärendenummer:</strong>
+        <span th:text="${paragraph.caseNumber}">KS26-1</span>
+    </p>
+
+    <p>
+        <strong>Beslut:</strong>
+
+        <span th:if="${paragraph.decisionRestricted}">
+            Beslutet omfattas av sekretess.
+        </span>
+
+        <span th:if="${!paragraph.decisionRestricted}"
+              th:text="${paragraph.decisionLabel}">
+            Bifall
+        </span>
+    </p>
+
+    <p th:if="${!paragraph.decisionRestricted and paragraph.decisionText != null}"
+       th:text="${paragraph.decisionText}">
+        Beslutstext
+    </p>
+
+    <hr>
+</div>
+
+</body>
+</html>
