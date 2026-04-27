@@ -1,2 +1,0 @@
-ALTER TABLE audit
-ADD COLUMN http_method VARCHAR(255);

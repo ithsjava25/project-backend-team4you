@@ -76,7 +76,6 @@ public class AdminController {
 
 
 
-
     @PostMapping("/admin/users")
     @AuditAction(action = "DELETE_USER", entity = "USER")
     public String deleteUser(@RequestParam String id, Model model){

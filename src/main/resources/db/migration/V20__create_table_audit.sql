@@ -7,6 +7,6 @@ CREATE TABLE audit (
                        endpoint VARCHAR(255),
                        http_method VARCHAR(255),
                        ip_address VARCHAR(255),
-                       timestamp TIMESTAMP,
+                       timestamp TIMESTAMP WITH TIME ZONE,
                        status VARCHAR(255)
 );
