@@ -34,6 +34,10 @@ public class ProtocolPdfService {
         Protocol protocol = protocolRepository.findById(protocolId)
                 .orElseThrow(() -> new ProtocolNotFoundException(protocolId));
 
+        if (!protocol.isReadyForPdf()) {
+            throw new IllegalStateException("Alla paragrafer måste ha beslut innan PDF kan skapas.");
+        }
+
         Meeting meeting = protocol.getMeeting();
         Registry registry = meeting.getRegistry();
 

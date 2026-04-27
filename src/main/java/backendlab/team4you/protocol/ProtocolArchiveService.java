@@ -41,6 +41,10 @@ public class ProtocolArchiveService {
             return protocol.getArchivedPdfFile();
         }
 
+        if (!protocol.isReadyForPdf()) {
+            throw new IllegalStateException("Alla paragrafer måste ha beslut innan protokollet kan sparas som PDF.");
+        }
+
         Meeting meeting = protocol.getMeeting();
         Registry registry = meeting.getRegistry();
         int year = meeting.getStartsAt().getYear();

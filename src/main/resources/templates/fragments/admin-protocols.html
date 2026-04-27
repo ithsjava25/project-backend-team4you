@@ -98,24 +98,38 @@
                 </p>
 
                 <div class="protocol-actions">
-                    <a th:href="@{/admin/protocols/{protocolId}/pdf(protocolId=${selectedProtocol.id})}"
-                       target="_blank"
-                       class="submit protocol-create-button">
-                        Visa PDF
-                    </a>
 
-                    <form th:attr="hx-post=@{/admin/protocols/{protocolId}/archive-pdf(protocolId=${selectedProtocol.id})}"
-                          hx-target="#content-area"
-                          hx-swap="innerHTML">
-                        <input type="hidden"
-                               th:if="${_csrf != null}"
-                               th:name="${_csrf.parameterName}"
-                               th:value="${_csrf.token}">
+                    <div th:if="${selectedProtocol.readyForPdf}">
+                        <a th:href="@{/admin/protocols/{protocolId}/pdf(protocolId=${selectedProtocol.id})}"
+                           target="_blank"
+                           class="submit protocol-create-button">
+                            Visa PDF
+                        </a>
 
-                        <button type="submit" class="submit protocol-create-button">
-                            Spara PDF i årsärende
-                        </button>
-                    </form>
+                        <p th:if="${selectedProtocol.archivedPdfFile != null}"
+                           class="feedback-message success-message">
+                            PDF redan sparad i årsärende.
+                        </p>
+
+                        <form th:if="${selectedProtocol.archivedPdfFile == null}"
+                              th:attr="hx-post=@{/admin/protocols/{protocolId}/archive-pdf(protocolId=${selectedProtocol.id})}"
+                              hx-target="#content-area"
+                              hx-swap="innerHTML">
+                            <input type="hidden"
+                                   th:if="${_csrf != null}"
+                                   th:name="${_csrf.parameterName}"
+                                   th:value="${_csrf.token}">
+
+                            <button type="submit" class="submit protocol-create-button">
+                                Spara PDF i årsärende
+                            </button>
+                        </form>
+                    </div>
+
+                    <p th:if="${!selectedProtocol.readyForPdf}"
+                       class="feedback-message error-message">
+                        Alla paragrafer måste ha beslut och beslutstext innan PDF kan skapas.
+                    </p>
 
                 </div>
 

@@ -77,6 +77,11 @@ public class Protocol {
         paragraph.setProtocol(this);
     }
 
+    public boolean isReadyForPdf() {
+        return !paragraphs.isEmpty()
+                && paragraphs.stream().allMatch(ProtocolParagraph::hasDecision);
+    }
+
     public Long getId() {
         return id;
     }

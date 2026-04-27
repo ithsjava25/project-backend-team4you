@@ -69,6 +69,12 @@ public class ProtocolParagraph {
         this.decisionText = decisionText.trim();
     }
 
+    public boolean hasDecision() {
+        return decisionType != null
+                && decisionText != null
+                && !decisionText.isBlank();
+    }
+
     void setProtocol(Protocol protocol) {
         this.protocol = Objects.requireNonNull(protocol, "protocol is required");
     }
