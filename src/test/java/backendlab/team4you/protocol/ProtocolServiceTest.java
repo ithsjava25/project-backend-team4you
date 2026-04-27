@@ -118,7 +118,7 @@ class ProtocolServiceTest {
                 );
 
         verify(protocolRepository).save(any(Protocol.class));
-        verify(sequenceRepository, times(2)).save(sequence);
+        verify(sequenceRepository, times(2)).saveAndFlush(sequence);
     }
 
     @Test

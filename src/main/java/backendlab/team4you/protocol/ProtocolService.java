@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
+import org.springframework.dao.DataIntegrityViolationException;
+
 @Service
 public class ProtocolService {
 
@@ -19,6 +21,7 @@ public class ProtocolService {
     private final ProtocolParagraphSequenceRepository sequenceRepository;
     private final MeetingRepository meetingRepository;
     private final ProtocolParagraphRepository paragraphRepository;
+    private static final int MAX_SEQUENCE_ALLOCATION_ATTEMPTS = 3;
 
     public ProtocolService(
             ProtocolRepository protocolRepository,
@@ -123,14 +126,25 @@ public class ProtocolService {
     }
 
     private Long allocateNextParagraphNumber(Registry registry, Integer year) {
-        ProtocolParagraphSequence sequence = sequenceRepository
-                .findByRegistryIdAndYear(registry.getId(), year)
-                .orElseGet(() -> new ProtocolParagraphSequence(registry, year, 0L));
+        for (int attempt = 1; attempt <= MAX_SEQUENCE_ALLOCATION_ATTEMPTS; attempt++) {
+            try {
+                ProtocolParagraphSequence sequence = sequenceRepository
+                        .findByRegistryIdAndYear(registry.getId(), year)
+                        .orElseGet(() -> new ProtocolParagraphSequence(registry, year, 0L));
 
-        sequence.increment();
-        sequenceRepository.save(sequence);
+                sequence.increment();
+                sequenceRepository.saveAndFlush(sequence);
 
-        return sequence.getLastValue();
+                return sequence.getLastValue();
+
+            } catch (DataIntegrityViolationException exception) {
+                if (attempt == MAX_SEQUENCE_ALLOCATION_ATTEMPTS) {
+                    throw exception;
+                }
+            }
+        }
+
+        throw new IllegalStateException("Could not allocate protocol paragraph number.");
     }
 
     private String buildProtocolTitle(Meeting meeting, Registry registry, Integer year) {
