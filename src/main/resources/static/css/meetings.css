@@ -85,6 +85,13 @@
     filter: brightness(1.05);
 }
 
+.meeting-form .submit:focus-visible,
+.danger-button:focus-visible,
+.secondary-button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(111, 26, 182, 0.25);
+}
+
 .meeting-list {
     list-style: none;
     padding: 0;

@@ -37,10 +37,11 @@ public class MeetingController {
     public String meetingsPage(
             @RequestParam(required = false) Long registryId,
             @RequestParam(required = false) Long selectedMeetingId,
+            @RequestHeader(value = "HX-Request", required = false) String htmx,
             Model model
     ) {
         populateMeetingsPage(model, registryId, selectedMeetingId);
-        return "fragments/admin-meetings :: content";
+        return meetingsView(htmx);
     }
 
     @PostMapping
@@ -69,7 +70,7 @@ public class MeetingController {
                     notes
             );
 
-            model.addAttribute("successMessage", "sammanträdet skapades.");
+            model.addAttribute("successMessage", "Sammanträdet skapades.");
             populateMeetingsPage(model, registryId, meeting.getId());
 
         } catch (InvalidMeetingStateException | MeetingNotFoundException | RegistryNotFoundException exception) {
@@ -81,11 +82,7 @@ public class MeetingController {
             populateMeetingsPage(model, safeRegistryId, null);
         }
 
-        if (htmx != null) {
-            return "fragments/admin-meetings :: content";
-        }
-
-        return "admin/meetings";
+        return meetingsView(htmx);
     }
 
     @PostMapping("/{meetingId}/update")
@@ -97,6 +94,7 @@ public class MeetingController {
             @RequestParam(required = false) String location,
             @RequestParam(required = false) String notes,
             @RequestParam MeetingStatus status,
+            @RequestHeader(value = "HX-Request", required = false) String htmx,
             Model model
     ) {
         try {
@@ -115,7 +113,7 @@ public class MeetingController {
                     status
             );
 
-            model.addAttribute("successMessage", "sammanträdet uppdaterades.");
+            model.addAttribute("successMessage", "Sammanträdet uppdaterades.");
             populateMeetingsPage(model, updatedMeeting.getRegistry().getId(), updatedMeeting.getId());
 
         } catch (InvalidMeetingStateException | MeetingNotFoundException | RegistryNotFoundException exception) {
@@ -129,12 +127,13 @@ public class MeetingController {
             populateMeetingsPage(model, registryId, registryId == null ? null : meetingId);
             }
 
-        return "fragments/admin-meetings :: content";
+        return meetingsView(htmx);
     }
 
     @PostMapping("/{meetingId}/delete")
     public String deleteMeeting(
             @PathVariable Long meetingId,
+            @RequestHeader(value = "HX-Request", required = false) String htmx,
             Model model
     ) {
         try {
@@ -143,7 +142,7 @@ public class MeetingController {
 
             meetingService.deleteMeeting(meetingId);
 
-            model.addAttribute("successMessage", "sammanträdet togs bort.");
+            model.addAttribute("successMessage", "Sammanträdet togs bort.");
             populateMeetingsPage(model, registryId, null);
 
         } catch (Exception exception) {
@@ -151,7 +150,7 @@ public class MeetingController {
             populateMeetingsPage(model, null, null);
         }
 
-        return "fragments/admin-meetings :: content";
+        return meetingsView(htmx);
     }
 
     @GetMapping("/{meetingId}")
@@ -167,7 +166,7 @@ public class MeetingController {
             return "fragments/admin-meetings :: content";
         }
 
-        return "admin/meetings";
+        return meetingsView(htmx);
     }
 
     @PostMapping("/{meetingId}/agenda-items")
@@ -192,17 +191,14 @@ public class MeetingController {
             populateMeetingsPageAfterMeetingAction(model, null, null);
         }
 
-        if (htmx != null) {
-            return "fragments/admin-meetings :: content";
-        }
-
-        return "admin/meetings";
+        return meetingsView(htmx);
     }
 
     @PostMapping("/{meetingId}/agenda-items/{agendaItemId}/move-up")
     public String moveAgendaItemUp(
             @PathVariable Long meetingId,
             @PathVariable Long agendaItemId,
+            @RequestHeader(value = "HX-Request", required = false) String htmx,
             Model model
     ) {
         try {
@@ -218,13 +214,14 @@ public class MeetingController {
             populateMeetingsPageAfterMeetingAction(model, null, null);
         }
 
-        return "fragments/admin-meetings :: content";
+        return meetingsView(htmx);
     }
 
     @PostMapping("/{meetingId}/agenda-items/{agendaItemId}/move-down")
     public String moveAgendaItemDown(
             @PathVariable Long meetingId,
             @PathVariable Long agendaItemId,
+            @RequestHeader(value = "HX-Request", required = false) String htmx,
             Model model
     ) {
         try {
@@ -240,7 +237,7 @@ public class MeetingController {
             populateMeetingsPageAfterMeetingAction(model, null, null);
         }
 
-        return "fragments/admin-meetings :: content";
+        return meetingsView(htmx);
     }
 
     @DeleteMapping("/{meetingId}/agenda-items/{agendaItemId}")
@@ -265,11 +262,7 @@ public class MeetingController {
             populateMeetingsPageAfterMeetingAction(model, null, null);
         }
 
-        if (htmx != null) {
-            return "fragments/admin-meetings :: content";
-        }
-
-        return "admin/meetings";
+        return meetingsView(htmx);
     }
 
     @PostMapping("/{meetingId}/agenda-items/{agendaItemId}/documents")
@@ -277,6 +270,7 @@ public class MeetingController {
             @PathVariable Long meetingId,
             @PathVariable Long agendaItemId,
             @RequestParam Long caseFileId,
+            @RequestHeader(value = "HX-Request", required = false) String htmx,
             Model model
     ) {
         try {
@@ -292,7 +286,7 @@ public class MeetingController {
             populateMeetingsPageAfterMeetingAction(model, null, null);
         }
 
-        return "fragments/admin-meetings :: content";
+        return meetingsView(htmx);
     }
 
     @PostMapping("/{meetingId}/agenda-items/{agendaItemId}/documents/{documentId}/remove")
@@ -300,6 +294,7 @@ public class MeetingController {
             @PathVariable Long meetingId,
             @PathVariable Long agendaItemId,
             @PathVariable Long documentId,
+            @RequestHeader(value = "HX-Request", required = false) String htmx,
             Model model
     ) {
         try {
@@ -315,7 +310,7 @@ public class MeetingController {
             populateMeetingsPageAfterMeetingAction(model, null, null);
         }
 
-        return "fragments/admin-meetings :: content";
+        return meetingsView(htmx);
     }
 
     private void populateMeetingsPageAfterMeetingAction(Model model, Long registryId, Long meetingId) {
@@ -371,4 +366,13 @@ public class MeetingController {
         model.addAttribute("documentsByAgendaItemId", documentsByAgendaItemId);
         model.addAttribute("availableFilesByAgendaItemId", availableFilesByAgendaItemId);
     }
+
+    private String meetingsView(String htmx) {
+        if (htmx != null) {
+            return "fragments/admin-meetings :: content";
+        }
+
+        return "admin/meetings";
+    }
+
 }

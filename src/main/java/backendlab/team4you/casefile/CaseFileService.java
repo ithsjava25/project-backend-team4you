@@ -180,16 +180,17 @@ public class CaseFileService {
         }
 
         String s3Key = caseFile.getS3Key();
+
         if (meetingAgendaDocumentRepository.existsByCaseFileId(fileId)) {
             throw new FileInUseException("Filen kan inte tas bort eftersom den används som mötesunderlag.");
         }
 
         caseFileRepository.delete(caseFile);
+
         try {
             s3Service.deleteFile(s3Key);
-        } catch (Exception e) {
-            log.error("Failed to delete S3 object after DB deletion: {}", s3Key, e);
-            throw e;
+        } catch (Exception exception) {
+            log.error("Failed to delete S3 object after DB deletion: {}", s3Key, exception);
         }
     }
 

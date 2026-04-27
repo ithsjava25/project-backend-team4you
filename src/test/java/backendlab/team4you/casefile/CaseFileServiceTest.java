@@ -468,8 +468,8 @@ class CaseFileServiceTest {
     }
 
     @Test
-    @DisplayName("deleteFile should delete metadata before attempting s3 delete")
-    void deleteFile_shouldDeleteMetadataBeforeAttemptingS3Delete() {
+    @DisplayName("deleteFile should not throw when s3 delete fails after metadata deletion")
+    void deleteFile_shouldNotThrowWhenS3DeleteFailsAfterMetadataDeletion() {
         CaseFile caseFile = new CaseFile();
         caseFile.setId(100L);
         caseFile.setCaseRecord(caseRecord);
@@ -485,9 +485,8 @@ class CaseFileServiceTest {
                 .when(s3Service)
                 .deleteFile("cases/1/uuid-test.pdf");
 
-        assertThatThrownBy(() -> caseFileService.deleteFile(1L, 100L, actor))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("s3 delete failed");
+        assertThatCode(() -> caseFileService.deleteFile(1L, 100L, actor))
+                .doesNotThrowAnyException();
 
         verify(caseFileRepository).delete(caseFile);
         verify(s3Service).deleteFile("cases/1/uuid-test.pdf");
