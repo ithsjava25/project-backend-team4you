@@ -11,12 +11,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import backendlab.team4you.meeting.Meeting;
+import backendlab.team4you.registry.Registry;
 
 @Service
 @Transactional(readOnly = true)
 public class ProtocolPdfService {
 
     private final ProtocolRepository protocolRepository;
+    private static final float MARGIN_LEFT = 50;
+    private static final float START_Y = 750;
+    private static final float BOTTOM_MARGIN = 60;
 
     public ProtocolPdfService(ProtocolRepository protocolRepository) {
         this.protocolRepository = protocolRepository;
@@ -26,27 +34,138 @@ public class ProtocolPdfService {
         Protocol protocol = protocolRepository.findById(protocolId)
                 .orElseThrow(() -> new ProtocolNotFoundException(protocolId));
 
+        Meeting meeting = protocol.getMeeting();
+        Registry registry = meeting.getRegistry();
+
         try (PDDocument document = new PDDocument();
              ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 
-            PDPage page = new PDPage();
-            document.addPage(page);
+            try (PdfWriter writer = new PdfWriter(document)) {
 
-            try (PDPageContentStream content = new PDPageContentStream(document, page)) {
+                writer.writeLine(protocol.getTitle(), Standard14Fonts.FontName.HELVETICA_BOLD, 16);
+                writer.addSpacing(12);
 
-                content.beginText();
-                content.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD), 16);
-                content.newLineAtOffset(50, 750);
+                writer.writeLine("Diarium: " + registry.getName(), Standard14Fonts.FontName.HELVETICA, 12);
+                writer.writeLine("Sammanträde: " + meeting.getTitle(), Standard14Fonts.FontName.HELVETICA, 12);
+                writer.writeLine("Datum: " + meeting.getStartsAt().toLocalDate(), Standard14Fonts.FontName.HELVETICA, 12);
+                writer.writeLine("Plats: " + (meeting.getLocation() != null ? meeting.getLocation() : "Ej angiven"),
+                        Standard14Fonts.FontName.HELVETICA, 12);
 
-                content.showText("Protokoll");
-                content.endText();
+                writer.addSpacing(16);
+
+                writer.writeLine("Paragrafer", Standard14Fonts.FontName.HELVETICA_BOLD, 14);
+                writer.addSpacing(8);
+
+                for (ProtocolParagraph paragraph : protocol.getParagraphs()) {
+                    writer.writeLine(paragraph.getHeading(), Standard14Fonts.FontName.HELVETICA_BOLD, 12);
+
+                    writer.writeLine("Ärendenummer: " + paragraph.getCaseRecord().getCaseNumber(),
+                            Standard14Fonts.FontName.HELVETICA, 12);
+
+                    if (paragraph.getDecisionType() != null) {
+                        writer.writeLine("Beslut: " + paragraph.getDecisionType().getLabel(),
+                                Standard14Fonts.FontName.HELVETICA, 12);
+                    }
+
+                    if (paragraph.getDecisionText() != null && !paragraph.getDecisionText().isBlank()) {
+                        writer.writeLine("Beslutstext:", Standard14Fonts.FontName.HELVETICA, 12);
+
+                        for (String line : splitText(paragraph.getDecisionText(), 85)) {
+                            writer.writeLine(line, Standard14Fonts.FontName.HELVETICA, 12);
+                        }
+                    }
+
+                    writer.addSpacing(12);
+                }
             }
-
             document.save(baos);
             return baos.toByteArray();
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to generate PDF", e);
+        }
+    }
+
+    private List<String> splitText(String text, int maxCharsPerLine) {
+        if (text == null || text.isBlank()) {
+            return List.of();
+        }
+
+        List<String> lines = new ArrayList<>();
+        StringBuilder currentLine = new StringBuilder();
+
+        for (String word : text.split("\\s+")) {
+            if (currentLine.length() + word.length() + 1 > maxCharsPerLine) {
+                lines.add(currentLine.toString());
+                currentLine = new StringBuilder(word);
+            } else {
+                if (!currentLine.isEmpty()) {
+                    currentLine.append(" ");
+                }
+                currentLine.append(word);
+            }
+        }
+
+        if (!currentLine.isEmpty()) {
+            lines.add(currentLine.toString());
+        }
+
+        return lines;
+    }
+
+    private static class PdfWriter implements AutoCloseable {
+
+        private final PDDocument document;
+        private PDPageContentStream content;
+        private float currentY;
+
+        PdfWriter(PDDocument document) throws IOException {
+            this.document = document;
+            addNewPage();
+        }
+
+        void addNewPage() throws IOException {
+            if (content != null) {
+                content.endText();
+                content.close();
+            }
+
+            PDPage page = new PDPage();
+            document.addPage(page);
+
+            content = new PDPageContentStream(document, page);
+            content.beginText();
+            content.newLineAtOffset(MARGIN_LEFT, START_Y);
+            currentY = START_Y;
+        }
+
+        void writeLine(String text, Standard14Fonts.FontName fontName, float fontSize) throws IOException {
+            if (currentY <= BOTTOM_MARGIN) {
+                addNewPage();
+            }
+
+            content.setFont(new PDType1Font(fontName), fontSize);
+            content.showText(text == null ? "" : text);
+            content.newLineAtOffset(0, -(fontSize + 6));
+            currentY -= (fontSize + 6);
+        }
+
+        void addSpacing(float spacing) throws IOException {
+            if (currentY - spacing <= BOTTOM_MARGIN) {
+                addNewPage();
+                return;
+            }
+
+            content.newLineAtOffset(0, -spacing);
+            currentY -= spacing;
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (content != null) {
+                content.endText();
+                content.close();
+            }
         }
     }
 }
