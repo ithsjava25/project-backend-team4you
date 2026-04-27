@@ -55,6 +55,7 @@ public class CaseOfficerController {
     @GetMapping("/case-officer/cases")
     public String listCases(
             @RequestParam(defaultValue = "0") int page,
+            @RequestHeader(value = "HX-Request", required = false) String htmxRequest,
             Authentication auth,
             Model model
     ) {
@@ -68,7 +69,10 @@ public class CaseOfficerController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", cases.getTotalPages());
 
-        return "fragments/case-officer-cases :: content";
+        if (htmxRequest != null) {
+            return "fragments/case-officer-cases :: content";
+        }
+        return "case-officer-cases";
     }
 
     @PostMapping("/case-officer/cases/close")

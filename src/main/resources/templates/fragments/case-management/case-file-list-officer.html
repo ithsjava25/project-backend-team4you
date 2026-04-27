@@ -18,6 +18,8 @@
           hx-target="closest .case-file-panel"
           hx-swap="outerHTML">
 
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
         <div class="form-group">
             <label for="case-file-upload">Ladda upp fil</label>
             <input id="case-file-upload" type="file" name="file" required>
@@ -65,7 +67,6 @@
                 <button type="button"
                         class="btn-danger"
                         th:attr="hx-delete=@{/case-officer/cases/{caseId}/files/{fileId}(caseId=${caseRecordId}, fileId=${file.id})}"
-                        th:hx-headers="${_csrf != null} ? '{&quot;' + ${_csrf.headerName} + '&quot;:&quot;' + ${_csrf.token} + '&quot;}' : null"
                         hx-target="closest .case-file-panel"
                         hx-swap="outerHTML"
                         hx-confirm="Är du säker på att du vill ta bort denna fil?">
