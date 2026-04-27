@@ -55,7 +55,7 @@ public class CaseFileViewController {
             Principal principal
     ) {
         UserEntity currentUser = userService.getCurrentUser(principal);
-        auditService.log("TEST_USER", "MANUAL_LOG", "CASE", caseId, "Testar loggning", "SUCCESS");
+       
 
         try {
             caseFileService.uploadFile(caseId, file, confidentialityLevel, currentUser);

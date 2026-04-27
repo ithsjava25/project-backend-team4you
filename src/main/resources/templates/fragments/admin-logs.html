@@ -1,8 +1,7 @@
 
 
-<div th:fragment="content">
+<section layout:fragment="content" xmlns:layout="">
     <style>
-
 
         .audit-table{
             background-color:
@@ -10,24 +9,48 @@
             width:100%;
             border-collapse: collapse;
             color:white;
+            table-layout: auto;
+        }
+
+        .audit-table th,
+        .audit-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #2d3748;
         }
 
 
-        td{
-            padding:25px;
+        .method-tag {
+            background-color: #2d3748;
+            color: #a0aec0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
         }
 
-        span{
-            font-size: 14px;
-            margin:20px;
+        .badge {
+            background-color: #4a5568;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
         }
 
-        th{
-            margin:20px;
-            padding:10px;
-            font-size:14px;
+
+        .status-ok {
+            color: #48bb78;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(72, 187, 120, 0.2);
         }
 
+        .status-fail {
+            color: #f56565;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(245, 101, 101, 0.2);
+        }
 
     </style>
 
@@ -44,20 +67,19 @@
     <tbody>
 
     <tr th:each="log : ${logs}">
-
         <td th:text="${log.timestamp != null ? #temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm') : 'N/A'}"></td>
         <td th:text="${log.username}"></td>
         <td><span class="method-tag" th:text="${log.httpMethod}"></span></td>
         <td><span class="badge" th:text="${log.action}"></span></td>
         <td th:text="${log.entityType}"></td>
-        <td th:text="${log.details}"></td>
-        <td th:text="${log.ipAddress}" ></td>
+        <td th:text="${log.details ?: 'Inga detaljer'}" style="color: #cbd5e0; font-size: 13px;"></td>
+        <td th:text="${log.ipAddress}" style="font-family: monospace;"></td>
         <td>
-                <span th:class="${log.status == 'SUCCESS' ? 'status-ok' : 'status-fail'}"
-                      th:text="${log.status}"></span>
+        <span th:class="${log.status == 'SUCCESS' ? 'status-ok' : 'status-fail'}"
+              th:text="${log.status}"></span>
         </td>
     </tr>
     </tbody>
 
 </table>
-</div>
+</section>

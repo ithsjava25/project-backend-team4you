@@ -60,11 +60,14 @@ public class AdminController {
 
     @PostMapping("/admin/update-role")
     @AuditAction(action = "UPDATE_USER_ROLE", entity = "USER")
-    public String changeRole(@RequestParam String id, @RequestParam String role) {
-
-        userService.updateRole(Long.parseLong(id), UserRole.valueOf(role));
-        return "redirect:/admin/users";
-    }
+    public String changeRole(@RequestParam Long id, @RequestParam String role) {
+               try {
+                        userService.updateRole(id, UserRole.valueOf(role));
+                    } catch (IllegalArgumentException ex) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role: " + role, ex);
+                    }
+                return "redirect:/admin/users";
+            }
 
 
 
