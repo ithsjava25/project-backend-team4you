@@ -103,6 +103,20 @@
                        class="submit protocol-create-button">
                         Visa PDF
                     </a>
+
+                    <form th:attr="hx-post=@{/admin/protocols/{protocolId}/archive-pdf(protocolId=${selectedProtocol.id})}"
+                          hx-target="#content-area"
+                          hx-swap="innerHTML">
+                        <input type="hidden"
+                               th:if="${_csrf != null}"
+                               th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}">
+
+                        <button type="submit" class="submit protocol-create-button">
+                            Spara PDF i årsärende
+                        </button>
+                    </form>
+
                 </div>
 
                 <hr>
