@@ -2,6 +2,7 @@ package backendlab.team4you.protocol;
 
 import backendlab.team4you.exceptions.ProtocolNotFoundException;
 import backendlab.team4you.exceptions.ProtocolNotReadyForPdfException;
+import backendlab.team4you.user.UserEntity;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -23,21 +24,30 @@ import backendlab.team4you.registry.Registry;
 public class ProtocolPdfService {
 
     private final ProtocolRepository protocolRepository;
+    private final ProtocolViewService protocolViewService;
+
     private static final float MARGIN_LEFT = 50;
     private static final float START_Y = 750;
     private static final float BOTTOM_MARGIN = 60;
 
-    public ProtocolPdfService(ProtocolRepository protocolRepository) {
+    public ProtocolPdfService(
+            ProtocolRepository protocolRepository,
+            ProtocolViewService protocolViewService
+    ) {
         this.protocolRepository = protocolRepository;
+        this.protocolViewService = protocolViewService;
     }
 
-    public byte[] generatePdf(Long protocolId) {
+    public byte[] generatePdf(Long protocolId, UserEntity viewer) {
         Protocol protocol = protocolRepository.findById(protocolId)
                 .orElseThrow(() -> new ProtocolNotFoundException(protocolId));
 
         if (!protocol.isReadyForPdf()) {
             throw new ProtocolNotReadyForPdfException(protocolId);
         }
+
+        List<ProtocolParagraphViewDto> paragraphViews =
+                protocolViewService.getParagraphsForViewer(protocolId, viewer);
 
         Meeting meeting = protocol.getMeeting();
         Registry registry = meeting.getRegistry();
@@ -61,25 +71,29 @@ public class ProtocolPdfService {
                 writer.writeLine("Paragrafer", Standard14Fonts.FontName.HELVETICA_BOLD, 14);
                 writer.addSpacing(8);
 
-                for (ProtocolParagraph paragraph : protocol.getParagraphs()) {
-                    writer.writeLine(paragraph.getHeading(), Standard14Fonts.FontName.HELVETICA_BOLD, 12);
+                for (ProtocolParagraphViewDto paragraph : paragraphViews) {
+                    writer.writeLine(paragraph.heading(), Standard14Fonts.FontName.HELVETICA_BOLD, 12);
 
-                    writer.writeLine("Ärendenummer: " + paragraph.getCaseRecord().getCaseNumber(),
+                    writer.writeLine("Ärendenummer: " + paragraph.caseNumber(),
                             Standard14Fonts.FontName.HELVETICA, 12);
 
-                    if (paragraph.getDecisionType() != null) {
-                        writer.writeLine("Beslut: " + paragraph.getDecisionType().getLabel(),
+                    if (paragraph.decisionRestricted()) {
+                        writer.writeLine("Beslut: Beslutet omfattas av sekretess.",
                                 Standard14Fonts.FontName.HELVETICA, 12);
-                    }
+                    } else {
+                        if (paragraph.decisionLabel() != null) {
+                            writer.writeLine("Beslut: " + paragraph.decisionLabel(),
+                                    Standard14Fonts.FontName.HELVETICA, 12);
+                        }
 
-                    if (paragraph.getDecisionText() != null && !paragraph.getDecisionText().isBlank()) {
-                        writer.writeLine("Beslutstext:", Standard14Fonts.FontName.HELVETICA, 12);
+                        if (paragraph.decisionText() != null && !paragraph.decisionText().isBlank()) {
+                            writer.writeLine("Beslutstext:", Standard14Fonts.FontName.HELVETICA, 12);
 
-                        for (String line : splitText(paragraph.getDecisionText(), 85)) {
-                            writer.writeLine(line, Standard14Fonts.FontName.HELVETICA, 12);
+                            for (String line : splitText(paragraph.decisionText(), 85)) {
+                                writer.writeLine(line, Standard14Fonts.FontName.HELVETICA, 12);
+                            }
                         }
                     }
-
                     writer.addSpacing(12);
                 }
             }

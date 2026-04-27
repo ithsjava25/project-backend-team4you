@@ -6,6 +6,8 @@ import backendlab.team4you.exceptions.ProtocolNotReadyForPdfException;
 import backendlab.team4you.meeting.Meeting;
 import backendlab.team4you.meeting.MeetingStatus;
 import backendlab.team4you.registry.Registry;
+import backendlab.team4you.user.UserEntity;
+import backendlab.team4you.user.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,6 +30,10 @@ class ProtocolPdfServiceTest {
 
     @Mock
     private ProtocolRepository protocolRepository;
+    private UserEntity viewer;
+
+    @Mock
+    private ProtocolViewService protocolViewService;
 
     private ProtocolPdfService protocolPdfService;
 
@@ -36,7 +43,7 @@ class ProtocolPdfServiceTest {
 
     @BeforeEach
     void setUp() {
-        protocolPdfService = new ProtocolPdfService(protocolRepository);
+        protocolPdfService = new ProtocolPdfService(protocolRepository, protocolViewService);
 
         registry = new Registry("Kommunstyrelsen", "KS");
         setField(registry, "id", 1L);
@@ -53,6 +60,10 @@ class ProtocolPdfServiceTest {
         setField(meeting, "id", 10L);
 
         caseRecord = mock(CaseRecord.class);
+
+        viewer = new UserEntity();
+        viewer.setName("admin");
+        viewer.setRole(UserRole.ADMIN);
     }
 
     @Test
@@ -60,7 +71,7 @@ class ProtocolPdfServiceTest {
     void generatePdf_shouldThrowProtocolNotFoundException_whenProtocolDoesNotExist() {
         when(protocolRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> protocolPdfService.generatePdf(999L))
+        assertThatThrownBy(() -> protocolPdfService.generatePdf(999L,viewer))
                 .isInstanceOf(ProtocolNotFoundException.class);
     }
 
@@ -84,7 +95,7 @@ class ProtocolPdfServiceTest {
 
         when(protocolRepository.findById(1L)).thenReturn(Optional.of(protocol));
 
-        assertThatThrownBy(() -> protocolPdfService.generatePdf(1L))
+        assertThatThrownBy(() -> protocolPdfService.generatePdf(1L, viewer))
                 .isInstanceOf(ProtocolNotReadyForPdfException.class)
                 .hasMessage("Alla paragrafer måste ha beslut innan PDF kan skapas.");
     }
@@ -114,8 +125,18 @@ class ProtocolPdfServiceTest {
         protocol.addParagraph(paragraph);
 
         when(protocolRepository.findById(1L)).thenReturn(Optional.of(protocol));
+        when(protocolViewService.getParagraphsForViewer(1L, viewer))
+                .thenReturn(List.of(new ProtocolParagraphViewDto(
+                        1L,
+                        "§ 1 Provärendet",
+                        "KS26-1",
+                        false,
+                        ProtocolDecisionType.APPROVED,
+                        "Bifall",
+                        "Kommunstyrelsen beslutar att bifalla ärendet."
+                )));
 
-        byte[] result = protocolPdfService.generatePdf(1L);
+        byte[] result = protocolPdfService.generatePdf(1L, viewer);
 
         assertThat(result).isNotEmpty();
         assertThat(result[0]).isEqualTo((byte) '%');

@@ -12,6 +12,7 @@ import backendlab.team4you.registry.Registry;
 import backendlab.team4you.user.UserEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import backendlab.team4you.user.UserRole;
 
 @Service
 public class ProtocolArchiveService {
@@ -56,7 +57,7 @@ public class ProtocolArchiveService {
                 currentUser
         );
 
-        byte[] pdfBytes = protocolPdfService.generatePdf(protocolId);
+        byte[] pdfBytes = protocolPdfService.generatePdf(protocolId, createSystemAdminUser());
 
         String filename = "protokoll-"
                 + registry.getCode().toLowerCase()
@@ -79,5 +80,12 @@ public class ProtocolArchiveService {
         protocolRepository.save(protocol);
 
         return archivedFile;
+    }
+
+    private UserEntity createSystemAdminUser() {
+        UserEntity systemUser = new UserEntity();
+        systemUser.setName("system");
+        systemUser.setRole(UserRole.ADMIN);
+        return systemUser;
     }
 }

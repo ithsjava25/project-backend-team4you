@@ -132,7 +132,8 @@ class ProtocolArchiveServiceTest {
         when(annualCase.getId()).thenReturn(20L);
 
         byte[] pdfBytes = "pdf".getBytes();
-        when(protocolPdfService.generatePdf(1L)).thenReturn(pdfBytes);
+        when(protocolPdfService.generatePdf(eq(1L), any(UserEntity.class)))
+                .thenReturn(pdfBytes);
 
         CaseFile savedFile = mock(CaseFile.class);
         when(caseFileService.uploadGeneratedFile(
