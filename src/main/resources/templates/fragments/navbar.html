@@ -45,6 +45,9 @@
                 <li sec:authorize="hasRole('ADMIN')" class="nav-buttons">
                     <a th:href="@{/admin}" class="nav-menu">Admin</a>
                 </li>
+                <li sec:authorize="hasRole('CASE_OFFICER')" class="nav-buttons">
+                    <a th:href="@{/case-officer}" class="nav-menu">Case Officer</a>
+                </li>
                 <li sec:authorize="isAuthenticated()">
                     <form th:action="@{/logout}" method="post">
                         <button>Logga ut</button>
