@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ControllerAdvice(basePackages = "backendlab.team4you.casefile.ui")
+@ControllerAdvice(basePackages = { "backendlab.team4you.casefile.ui","backendlab.team4you.meeting"})
 public class GlobalViewExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalViewExceptionHandler.class);
@@ -31,7 +31,9 @@ public class GlobalViewExceptionHandler {
     @ExceptionHandler({
             CaseRecordNotFoundException.class,
             RegistryNotFoundException.class,
-            CaseFileNotFoundException.class
+            CaseFileNotFoundException.class,
+            MeetingNotFoundException.class,
+            MeetingAgendaDocumentNotFoundException.class,
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleNotFound(RuntimeException ex, Model model) {

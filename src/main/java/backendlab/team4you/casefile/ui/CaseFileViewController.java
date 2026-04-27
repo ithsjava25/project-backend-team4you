@@ -4,11 +4,7 @@ import backendlab.team4you.audit.AuditAction;
 import backendlab.team4you.audit.AuditService;
 import backendlab.team4you.casefile.CaseFileService;
 import backendlab.team4you.common.ConfidentialityLevel;
-import backendlab.team4you.exceptions.CaseFileNotFoundException;
-import backendlab.team4you.exceptions.CaseRecordNotFoundException;
-import backendlab.team4you.exceptions.FileStorageConfigurationException;
-import backendlab.team4you.exceptions.FileTooLargeException;
-import backendlab.team4you.exceptions.InvalidFileNameException;
+import backendlab.team4you.exceptions.*;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
 import org.slf4j.Logger;
@@ -96,6 +92,8 @@ public class CaseFileViewController {
             model.addAttribute("errorMessage", "Filen kunde inte hittas.");
         } catch (org.springframework.security.access.AccessDeniedException ex) {
             model.addAttribute("errorMessage", "Du har inte behörighet att ta bort den här filen.");
+        } catch (FileInUseException ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
         } catch (Exception ex) {
             log.error("Unexpected error while deleting fileId={} for caseId={}", fileId, caseId, ex);
             model.addAttribute("errorMessage", "Något gick fel när filen skulle tas bort.");
