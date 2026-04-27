@@ -1,5 +1,6 @@
 package backendlab.team4you.protocol;
 
+import backendlab.team4you.casefile.CaseFile;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import backendlab.team4you.meeting.MeetingRepository;
 import backendlab.team4you.user.UserEntity;
@@ -44,11 +45,14 @@ public class ProtocolArchiveController {
         UserEntity currentUser = userRepository.findByName(authentication.getName())
                 .orElseThrow(() -> new UserNotFoundException("user not found: " + authentication.getName()));
 
-        protocolArchiveService.archiveProtocolPdf(protocolId, currentUser);
+        CaseFile archivedFile = protocolArchiveService.archiveProtocolPdf(protocolId, currentUser);
 
         Protocol protocol = protocolService.getProtocol(protocolId);
 
-        model.addAttribute("successMessage", "Protokollet sparades som PDF i årsärendet.");
+        model.addAttribute(
+                "successMessage",
+                "Protokollet sparades som PDF i årsärendet som " + archivedFile.getDocumentReference() + "."
+        );
         model.addAttribute("selectedProtocol", protocol);
         model.addAttribute(
                 "completedMeetingsWithoutProtocol",

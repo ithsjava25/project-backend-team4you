@@ -37,6 +37,10 @@ public class ProtocolArchiveService {
         Protocol protocol = protocolRepository.findById(protocolId)
                 .orElseThrow(() -> new ProtocolNotFoundException(protocolId));
 
+        if (protocol.getArchivedPdfFile() != null) {
+            return protocol.getArchivedPdfFile();
+        }
+
         Meeting meeting = protocol.getMeeting();
         Registry registry = meeting.getRegistry();
         int year = meeting.getStartsAt().getYear();
@@ -57,7 +61,7 @@ public class ProtocolArchiveService {
                 + protocol.getId()
                 + ".pdf";
 
-        return caseFileService.uploadGeneratedFile(
+        CaseFile archivedFile = caseFileService.uploadGeneratedFile(
                 annualCase.getId(),
                 filename,
                 "application/pdf",
@@ -65,5 +69,10 @@ public class ProtocolArchiveService {
                 ConfidentialityLevel.OPEN,
                 currentUser
         );
+
+        protocol.setArchivedPdfFile(archivedFile);
+        protocolRepository.save(protocol);
+
+        return archivedFile;
     }
 }
