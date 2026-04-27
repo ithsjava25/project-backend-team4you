@@ -12,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
-import org.springframework.dao.DataIntegrityViolationException;
-
 @Service
 public class ProtocolService {
 
@@ -21,7 +19,6 @@ public class ProtocolService {
     private final ProtocolParagraphSequenceRepository sequenceRepository;
     private final MeetingRepository meetingRepository;
     private final ProtocolParagraphRepository paragraphRepository;
-    private static final int MAX_SEQUENCE_ALLOCATION_ATTEMPTS = 3;
 
     public ProtocolService(
             ProtocolRepository protocolRepository,
@@ -58,7 +55,7 @@ public class ProtocolService {
         Protocol protocol = new Protocol(
                 meeting,
                 registry,
-                buildProtocolTitle(meeting, registry, year),
+                buildProtocolTitle(registry, year),
                 year
         );
 
@@ -126,28 +123,19 @@ public class ProtocolService {
     }
 
     private Long allocateNextParagraphNumber(Registry registry, Integer year) {
-        for (int attempt = 1; attempt <= MAX_SEQUENCE_ALLOCATION_ATTEMPTS; attempt++) {
-            try {
-                ProtocolParagraphSequence sequence = sequenceRepository
-                        .findByRegistryIdAndYear(registry.getId(), year)
-                        .orElseGet(() -> new ProtocolParagraphSequence(registry, year, 0L));
+        sequenceRepository.insertIfMissing(registry.getId(), year);
 
-                sequence.increment();
-                sequenceRepository.saveAndFlush(sequence);
+        ProtocolParagraphSequence sequence = sequenceRepository
+                .findByRegistryIdAndYear(registry.getId(), year)
+                .orElseThrow(() -> new IllegalStateException("Protocol paragraph sequence could not be initialized."));
 
-                return sequence.getLastValue();
+        sequence.increment();
+        sequenceRepository.saveAndFlush(sequence);
 
-            } catch (DataIntegrityViolationException exception) {
-                if (attempt == MAX_SEQUENCE_ALLOCATION_ATTEMPTS) {
-                    throw exception;
-                }
-            }
-        }
-
-        throw new IllegalStateException("Could not allocate protocol paragraph number.");
+        return sequence.getLastValue();
     }
 
-    private String buildProtocolTitle(Meeting meeting, Registry registry, Integer year) {
+    private String buildProtocolTitle(Registry registry, Integer year) {
         return "Protokoll - " + registry.getName() + " - " + year;
     }
 
