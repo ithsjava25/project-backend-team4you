@@ -1,0 +1,62 @@
+<div th:fragment="content">
+
+    <h2 class="mb-4">Mina ärenden</h2>
+
+    <div id="alert-area"></div>
+
+    <div class="row">
+        <div th:each="case : ${cases}" class="col-12 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge bg-primary me-2" th:text="${case.caseNumber}">Case Number</span>
+                        <strong th:text="${case.title}">Title</strong>
+                    </div>
+                    <div>
+                        <span class="badge"
+                              th:classappend="${case.status.name() == 'OPEN' ? 'bg-success' : 'bg-secondary'}"
+                              th:text="${case.status}">Status</span>
+
+                        <span class="badge bg-info text-dark ms-1"
+                              th:text="${case.confidentialityLevel}">OPEN</span>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6 class="card-subtitle mb-2 text-muted">Beskrivning</h6>
+                            <p class="card-text" th:text="${case.description}">
+                            </p>
+                        </div>
+                        <div class="col-md-4 border-start">
+                            <p class="mb-1 small"><strong>Registry:</strong> <span th:text="${case.registry.name}">KS</span></p>
+                            <p class="mb-1 small"><strong>Skapad:</strong> <span th:text="${#temporals.format(case.createdAt, 'yyyy-MM-dd HH:mm')}">2026-04-23</span></p>
+                            <p class="mb-1 small"><strong>Ägare:</strong> <span th:text="${case.owner.displayName}">Admin Name</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-transparent border-top-0">
+                    <button
+                            class="btn btn-outline-secondary btn-sm float-end"
+                            th:if="${case.status.name() == 'OPEN'}"
+                            th:attr="hx-post=@{/case-officer/cases/close(id=${case.id})}"
+                            hx-target="closest .col-12"
+                            hx-swap="outerHTML"
+                            hx-confirm="Är du säker på att du vill stänga detta ärende?"
+                    >
+                        <i class="bi bi-x-circle"></i> Stäng ärende
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(cases)}" class="alert alert-info mt-3">
+        Inga ärenden tilldelade dig än.
+    </div>
+
+    <div th:replace="~{fragments/pagination :: pagination('/case-officer/cases')}"></div>
+
+</div>
