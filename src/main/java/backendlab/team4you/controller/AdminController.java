@@ -7,12 +7,15 @@ import backendlab.team4you.audit.AuditAction;
 import backendlab.team4you.audit.AuditLog;
 import backendlab.team4you.audit.AuditLogRepository;
 import backendlab.team4you.booking.BookingService;
+import backendlab.team4you.caserecord.CaseRecord;
+import backendlab.team4you.caserecord.CaseRecordRepository;
+import backendlab.team4you.exceptions.CaseRecordNotFoundException;
+import backendlab.team4you.exceptions.UserNotFoundException;
 import backendlab.team4you.service.LogService;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserRepository;
 import backendlab.team4you.user.UserRole;
 import backendlab.team4you.user.UserService;
-import groovy.util.logging.Slf4j;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,43 +34,39 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+import static backendlab.team4you.user.UserRole.CASE_OFFICER;
 
-@Slf4j
+
+
 @Controller
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     private final LogService logService = new LogService();
     private final List<String> logs = logService.getLogs();
+    private final AuditLogRepository auditLogRepository;
 
     private final UserService userService;
     private final BookingService bookingService;
     private final ApplicationService applicationService;
     private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
-    private final AuditLogRepository auditLogRepository;
+    private final CaseRecordRepository caseRecordRepository;
 
-    public AdminController(UserService userService, BookingService bookingService, ApplicationService applicationService, ApplicationRepository applicationRepository, UserRepository userRepository, AuditLogRepository auditLogRepository) {
+    public AdminController(AuditLogRepository auditLogRepository, UserService userService,
+                           BookingService bookingService,
+                           ApplicationService applicationService,
+                           ApplicationRepository applicationRepository,
+                           UserRepository userRepository,
+                           CaseRecordRepository caseRecordRepository) {
+        this.auditLogRepository = auditLogRepository;
         this.userService = userService;
         this.bookingService = bookingService;
         this.applicationService = applicationService;
         this.applicationRepository = applicationRepository;
         this.userRepository = userRepository;
-        this.auditLogRepository = auditLogRepository;
+        this.caseRecordRepository = caseRecordRepository;
     }
-
-
-
-    @PostMapping("/admin/update-role")
-    @AuditAction(action = "UPDATE_USER_ROLE", entity = "USER")
-    public String changeRole(@RequestParam Long id, @RequestParam String role) {
-               try {
-                        userService.updateRole(id, UserRole.valueOf(role));
-                    } catch (IllegalArgumentException ex) {
-                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role: " + role, ex);
-                    }
-                return "redirect:/admin/users";
-            }
 
 
 
@@ -88,9 +87,6 @@ public class AdminController {
         return "";
     }
 
-
-
-
     @GetMapping("/admin")
     public String admin(Authentication auth) {
         System.out.println(auth.getAuthorities());
@@ -98,14 +94,11 @@ public class AdminController {
         return "admin";
     }
 
-
     @GetMapping("/admin/applications")
     public String adminApplications(
             @RequestParam(defaultValue = "0") int page,
             Model model
     ) {
-
-
         Page<ApplicationEntity> applications =
                 applicationRepository.findAll(PageRequest.of(page, 5));
 
@@ -115,7 +108,6 @@ public class AdminController {
 
         return "fragments/admin-applications :: content";
     }
-
 
     @GetMapping("/admin/bookings")
     public String adminBookings(Model model){
@@ -178,6 +170,7 @@ public class AdminController {
         return "fragments/alert :: success";
     }
 
+
     @GetMapping("/admin/logs")
     public String viewLogs(Model model, @RequestHeader(value = "HX-Request", required = false) String htmx) {
 
@@ -191,6 +184,46 @@ public class AdminController {
             return "fragments/admin-logs :: content";
         }
         return "fragments/admin-logs";
+    }
+
+
+    @GetMapping("/admin/cases")
+    public String listCases(
+            @RequestParam(defaultValue = "0") int page,
+            Model model
+    ) {
+        Page<CaseRecord> cases = caseRecordRepository.findAll(PageRequest.of(page, 10));
+        List<UserEntity> officers = userRepository.findByRole(UserRole.CASE_OFFICER);
+
+        model.addAttribute("cases", cases.getContent());
+        model.addAttribute("officers", officers);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", cases.getTotalPages());
+
+        return "fragments/admin-cases :: content";
+    }
+
+    @PostMapping("/admin/cases/assign")
+    public String assignCase(
+            @RequestParam Long caseId,
+            @RequestParam String officerId,
+            Model model
+    ) {
+        CaseRecord caseRecord = caseRecordRepository.findById(caseId)
+                .orElseThrow(() -> new CaseRecordNotFoundException(caseId));
+
+        UserEntity officer = userRepository.findById(officerId)
+                .orElseThrow(() -> new UserNotFoundException("Officer not found"));
+
+        if (officer.getRole() != UserRole.CASE_OFFICER) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selected user is not a case officer");
+        }
+
+        caseRecord.setAssignedUser(officer);
+        caseRecordRepository.save(caseRecord);
+
+        model.addAttribute("message", "Ärende tilldelat till " + officer.getDisplayName());
+        return "fragments/alert :: success";
     }
 
 }
