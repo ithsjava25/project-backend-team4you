@@ -70,7 +70,7 @@ public class MeetingController {
                     notes
             );
 
-            model.addAttribute("successMessage", "sammanträdet skapades.");
+            model.addAttribute("successMessage", "Sammanträdet skapades.");
             populateMeetingsPage(model, registryId, meeting.getId());
 
         } catch (InvalidMeetingStateException | MeetingNotFoundException | RegistryNotFoundException exception) {
@@ -113,7 +113,7 @@ public class MeetingController {
                     status
             );
 
-            model.addAttribute("successMessage", "sammanträdet uppdaterades.");
+            model.addAttribute("successMessage", "Sammanträdet uppdaterades.");
             populateMeetingsPage(model, updatedMeeting.getRegistry().getId(), updatedMeeting.getId());
 
         } catch (InvalidMeetingStateException | MeetingNotFoundException | RegistryNotFoundException exception) {
@@ -142,7 +142,7 @@ public class MeetingController {
 
             meetingService.deleteMeeting(meetingId);
 
-            model.addAttribute("successMessage", "sammanträdet togs bort.");
+            model.addAttribute("successMessage", "Sammanträdet togs bort.");
             populateMeetingsPage(model, registryId, null);
 
         } catch (Exception exception) {
