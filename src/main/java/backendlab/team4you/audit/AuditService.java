@@ -24,6 +24,7 @@ public class AuditService {
                                  String httpMethod,
                                  String ipAddress,
                                  String status,
+                         String details,
                          String entityType,
                          int entityId) {
 
@@ -35,6 +36,7 @@ public class AuditService {
         log.setEndpoint(endpoint);
         log.setIpAddress(ipAddress);
         log.setTimestamp(ZonedDateTime.now());
+        log.setDetails(details);
         log.setStatus(status);
         log.setHttpMethod(httpMethod);
                 log.setEntityType(entityType);

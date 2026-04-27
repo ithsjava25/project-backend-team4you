@@ -76,8 +76,10 @@ public class AuditAspect {
                     httpMethod,
                     ip,
                     status,
+                    details,
                     auditAction.entity(),
                     entityId
+
             );
 
         } catch (Exception e) {
