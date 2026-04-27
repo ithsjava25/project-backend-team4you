@@ -4,6 +4,7 @@ import backendlab.team4you.meeting.Meeting;
 import backendlab.team4you.meeting.MeetingRepository;
 import backendlab.team4you.meeting.MeetingStatus;
 import backendlab.team4you.registry.Registry;
+import backendlab.team4you.user.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,12 @@ class ProtocolControllerTest {
 
     @MockitoBean
     private MeetingRepository meetingRepository;
+
+    @MockitoBean
+    private ProtocolViewService protocolViewService;
+
+    @MockitoBean
+    private UserService userService;
 
     @Test
     @WithMockUser(roles = "ADMIN")

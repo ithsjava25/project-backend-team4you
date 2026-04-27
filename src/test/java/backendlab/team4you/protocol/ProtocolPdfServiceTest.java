@@ -103,7 +103,6 @@ class ProtocolPdfServiceTest {
     @Test
     @DisplayName("generatePdf should return pdf bytes when protocol is ready")
     void generatePdf_shouldReturnPdfBytes_whenProtocolIsReady() {
-        when(caseRecord.getCaseNumber()).thenReturn("KS26-1");
 
         Protocol protocol = new Protocol(
                 meeting,
