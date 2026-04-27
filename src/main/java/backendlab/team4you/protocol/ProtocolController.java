@@ -50,13 +50,19 @@ public class ProtocolController {
     @PostMapping("/meetings/{meetingId}")
     public String createProtocol(
             @PathVariable Long meetingId,
+            Principal principal,
             RedirectAttributes redirectAttributes,
             Model model
     ) {
+        UserEntity currentUser = userService.getCurrentUser(principal);
         Protocol protocol = protocolService.createProtocolForCompletedMeeting(meetingId);
 
         model.addAttribute("successMessage", "Protokoll skapades.");
         model.addAttribute("selectedProtocol", protocol);
+        model.addAttribute(
+                "paragraphViews",
+                protocolViewService.getParagraphsForViewer(protocol.getId(), currentUser)
+        );
         model.addAttribute(
                 "completedMeetingsWithoutProtocol",
                 meetingRepository.findCompletedMeetingsWithoutProtocol()
@@ -91,8 +97,11 @@ public class ProtocolController {
             @PathVariable Long paragraphId,
             @RequestParam ProtocolDecisionType decisionType,
             @RequestParam String decisionText,
+            Principal principal,
             Model model
     ) {
+        UserEntity currentUser = userService.getCurrentUser(principal);
+
         Protocol protocol = protocolService.updateParagraphDecision(
                 paragraphId,
                 decisionType,
@@ -101,6 +110,10 @@ public class ProtocolController {
 
         model.addAttribute("successMessage", "Beslut sparades.");
         model.addAttribute("selectedProtocol", protocol);
+        model.addAttribute(
+                "paragraphViews",
+                protocolViewService.getParagraphsForViewer(protocol.getId(), currentUser)
+        );
         model.addAttribute(
                 "completedMeetingsWithoutProtocol",
                 meetingRepository.findCompletedMeetingsWithoutProtocol()

@@ -213,6 +213,9 @@ public class CaseFileService {
             throw new AccessDeniedException("Du har inte behörighet att ladda upp denna fil.");
         }
 
+        if (bytes == null) {
+            throw new IllegalArgumentException("Filinnehåll saknas.");
+            }
         if (bytes.length > MAX_FILE_SIZE_BYTES) {
             throw new FileTooLargeException(MAX_FILE_SIZE_BYTES);
         }

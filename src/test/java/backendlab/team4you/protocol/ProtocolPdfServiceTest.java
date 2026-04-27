@@ -97,7 +97,7 @@ class ProtocolPdfServiceTest {
 
         assertThatThrownBy(() -> protocolPdfService.generatePdf(1L, viewer))
                 .isInstanceOf(ProtocolNotReadyForPdfException.class)
-                .hasMessage("Alla paragrafer måste ha beslut innan PDF kan skapas.");
+                .hasMessage("Alla paragrafer måste ha beslut och beslutstext innan PDF kan skapas.");
     }
 
     @Test

@@ -4,7 +4,7 @@ public class ProtocolNotReadyForPdfException extends RuntimeException {
     private final Long protocolId;
 
     public ProtocolNotReadyForPdfException(Long protocolId) {
-        super("Alla paragrafer måste ha beslut innan PDF kan skapas.");
+        super("Alla paragrafer måste ha beslut och beslutstext innan PDF kan skapas.");
         this.protocolId = protocolId;
     }
 

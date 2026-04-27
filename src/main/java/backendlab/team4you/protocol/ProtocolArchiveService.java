@@ -36,7 +36,7 @@ public class ProtocolArchiveService {
 
     @Transactional
     public CaseFile archiveProtocolPdf(Long protocolId, UserEntity currentUser) {
-        Protocol protocol = protocolRepository.findById(protocolId)
+        Protocol protocol = protocolRepository.findWithLockById(protocolId)
                 .orElseThrow(() -> new ProtocolNotFoundException(protocolId));
 
         if (protocol.getArchivedPdfFile() != null) {
@@ -58,6 +58,10 @@ public class ProtocolArchiveService {
         );
 
         byte[] pdfBytes = protocolPdfService.generatePdf(protocolId, createSystemAdminUser());
+        ConfidentialityLevel archiveLevel = protocol.getParagraphs().stream()
+                .anyMatch(p -> p.getCaseRecord().getConfidentialityLevel() == ConfidentialityLevel.CONFIDENTIAL)
+                ? ConfidentialityLevel.CONFIDENTIAL
+                : ConfidentialityLevel.OPEN;
 
         String filename = "protokoll-"
                 + registry.getCode().toLowerCase()
@@ -72,7 +76,7 @@ public class ProtocolArchiveService {
                 filename,
                 "application/pdf",
                 pdfBytes,
-                ConfidentialityLevel.OPEN,
+                archiveLevel,
                 currentUser
         );
 

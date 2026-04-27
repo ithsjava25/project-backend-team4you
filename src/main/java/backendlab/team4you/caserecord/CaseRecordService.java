@@ -150,7 +150,7 @@ public class CaseRecordService {
             int year,
             UserEntity currentUser
     ) {
-        String title = "Protokoll för " + registry.getName() + " år " + year;
+        String title = "Protokoll för " + registry.getCode() + " år " + year;
 
         return caseRecordRepository
                 .findByRegistryAndTitle(registry, title)
@@ -181,7 +181,7 @@ public class CaseRecordService {
         CaseRecord caseRecord = new CaseRecord(
                 registry,
                 title,
-                "Årsärende för protokoll inom " + registry.getName() + " år " + year,
+                "Årsärende för protokoll inom " + registry.getCode() + " år " + year,
                 CaseStatus.OPEN,
                 currentUser,
                 null,

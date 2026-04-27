@@ -77,7 +77,7 @@ class ProtocolArchiveServiceTest {
     @Test
     @DisplayName("archiveProtocolPdf should throw when protocol does not exist")
     void archiveProtocolPdf_shouldThrow_whenProtocolNotFound() {
-        when(protocolRepository.findById(1L)).thenReturn(Optional.empty());
+        when(protocolRepository.findWithLockById(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> protocolArchiveService.archiveProtocolPdf(1L, currentUser))
                 .isInstanceOf(ProtocolNotFoundException.class);
@@ -89,7 +89,7 @@ class ProtocolArchiveServiceTest {
         CaseFile existingFile = mock(CaseFile.class);
         protocol.setArchivedPdfFile(existingFile);
 
-        when(protocolRepository.findById(1L)).thenReturn(Optional.of(protocol));
+        when(protocolRepository.findWithLockById(1L)).thenReturn(Optional.of(protocol));
 
         CaseFile result = protocolArchiveService.archiveProtocolPdf(1L, currentUser);
 
@@ -103,7 +103,7 @@ class ProtocolArchiveServiceTest {
     @Test
     @DisplayName("archiveProtocolPdf should throw when protocol is not ready")
     void archiveProtocolPdf_shouldThrow_whenProtocolNotReady() {
-        when(protocolRepository.findById(1L)).thenReturn(Optional.of(protocol));
+        when(protocolRepository.findWithLockById(1L)).thenReturn(Optional.of(protocol));
 
         assertThatThrownBy(() -> protocolArchiveService.archiveProtocolPdf(1L, currentUser))
                 .isInstanceOf(ProtocolNotReadyForPdfException.class);
@@ -125,7 +125,7 @@ class ProtocolArchiveServiceTest {
         );
         protocol.addParagraph(paragraph);
 
-        when(protocolRepository.findById(1L)).thenReturn(Optional.of(protocol));
+        when(protocolRepository.findWithLockById(1L)).thenReturn(Optional.of(protocol));
 
         when(caseRecordService.findOrCreateAnnualProtocolCase(eq(registry), eq(2026), eq(currentUser)))
                 .thenReturn(annualCase);

@@ -394,6 +394,9 @@ public class MeetingService {
     }
 
     private void ensureMeetingHasNoProtocol(Long meetingId) {
+        if (meetingId == null) {
+            throw new InvalidMeetingStateException("Meeting-id måste anges.");
+        }
         if (protocolRepository.existsByMeetingId(meetingId)) {
             throw new MeetingHasProtocolException(meetingId);
         }

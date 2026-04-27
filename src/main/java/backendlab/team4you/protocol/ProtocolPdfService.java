@@ -3,6 +3,7 @@ package backendlab.team4you.protocol;
 import backendlab.team4you.exceptions.ProtocolNotFoundException;
 import backendlab.team4you.exceptions.ProtocolNotReadyForPdfException;
 import backendlab.team4you.user.UserEntity;
+import backendlab.team4you.user.UserRole;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -114,6 +115,11 @@ public class ProtocolPdfService {
         StringBuilder currentLine = new StringBuilder();
 
         for (String word : text.split("\\s+")) {
+            if (currentLine.isEmpty()) {
+                currentLine.append(word);
+                continue;
+                }
+
             if (currentLine.length() + word.length() + 1 > maxCharsPerLine) {
                 lines.add(currentLine.toString());
                 currentLine = new StringBuilder(word);
@@ -130,6 +136,17 @@ public class ProtocolPdfService {
         }
 
         return lines;
+    }
+
+    public byte[] generateFullPdf(Long protocolId) {
+        return generatePdf(protocolId, createSystemAdminUser());
+    }
+
+    private UserEntity createSystemAdminUser() {
+        UserEntity systemUser = new UserEntity();
+        systemUser.setName("system");
+        systemUser.setRole(UserRole.ADMIN);
+        return systemUser;
     }
 
     private static class PdfWriter implements AutoCloseable {

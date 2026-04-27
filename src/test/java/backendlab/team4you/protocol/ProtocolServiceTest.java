@@ -171,11 +171,14 @@ class ProtocolServiceTest {
     @DisplayName("updateParagraphDecision should update decision")
     void updateParagraphDecision_shouldUpdateDecision() {
         Protocol protocol = new Protocol(completedMeeting, registry, "Protokoll - Kommunstyrelsen - 2026", 2026);
+        setField(protocol, "id", 1L);
+
         ProtocolParagraph paragraph = new ProtocolParagraph(firstCaseRecord, 1L, "§ 1 Första ärendet");
         protocol.addParagraph(paragraph);
         setField(paragraph, "id", 100L);
 
         when(paragraphRepository.findById(100L)).thenReturn(Optional.of(paragraph));
+        when(protocolRepository.findWithLockById(1L)).thenReturn(Optional.of(protocol));
 
         Protocol result = protocolService.updateParagraphDecision(
                 100L,
@@ -243,6 +246,8 @@ class ProtocolServiceTest {
     @DisplayName("updateParagraphDecision should throw ProtocolAlreadyArchivedException when protocol is archived")
     void updateParagraphDecision_shouldThrowProtocolAlreadyArchivedException_whenProtocolIsArchived() {
         Protocol protocol = new Protocol(completedMeeting, registry, "Protokoll - Kommunstyrelsen - 2026", 2026);
+        setField(protocol, "id", 1L);
+
         ProtocolParagraph paragraph = new ProtocolParagraph(firstCaseRecord, 1L, "§ 1 Första ärendet");
         protocol.addParagraph(paragraph);
         setField(paragraph, "id", 100L);
@@ -251,6 +256,7 @@ class ProtocolServiceTest {
         protocol.setArchivedPdfFile(archivedPdfFile);
 
         when(paragraphRepository.findById(100L)).thenReturn(Optional.of(paragraph));
+        when(protocolRepository.findWithLockById(1L)).thenReturn(Optional.of(protocol));
 
         assertThatThrownBy(() -> protocolService.updateParagraphDecision(
                 100L,
