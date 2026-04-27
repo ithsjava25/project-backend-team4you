@@ -62,16 +62,16 @@ public class CaseFileService {
         ConfidentialityLevel effectiveConfidentialityLevel =
                 confidentialityLevel != null ? confidentialityLevel : ConfidentialityLevel.OPEN;
 
-        if (!caseFileAccessService.canUploadFile(actor, caseRecordId, effectiveConfidentialityLevel)) {
+        CaseRecord caseRecord = caseRecordRepository.findByIdWithLock(caseRecordId)
+                .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
+
+        if (!caseFileAccessService.canUploadFile(actor, caseRecord, effectiveConfidentialityLevel)) {
             throw new AccessDeniedException("Du har inte behörighet att ladda upp denna fil.");
         }
 
         if (file.getSize() > MAX_FILE_SIZE_BYTES) {
             throw new FileTooLargeException(MAX_FILE_SIZE_BYTES);
         }
-
-        CaseRecord caseRecord = caseRecordRepository.findByIdWithLock(caseRecordId)
-                .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
 
         int nextDocumentNumber = allocateNextDocumentNumber(caseRecord.getId());
         String documentReference = caseRecord.getCaseNumber() + "-" + nextDocumentNumber;
