@@ -97,6 +97,14 @@
                     <span th:text="${selectedProtocol.meeting.location ?: 'Ej angiven'}">Sessionssalen</span>
                 </p>
 
+                <div class="protocol-actions">
+                    <a th:href="@{/admin/protocols/{protocolId}/pdf(protocolId=${selectedProtocol.id})}"
+                       target="_blank"
+                       class="submit protocol-create-button">
+                        Visa PDF
+                    </a>
+                </div>
+
                 <hr>
 
                 <h4>Paragrafer</h4>
