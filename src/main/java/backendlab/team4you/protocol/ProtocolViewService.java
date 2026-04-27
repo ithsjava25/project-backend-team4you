@@ -40,6 +40,7 @@ public class ProtocolViewService {
                 paragraph.getHeading(),
                 caseRecord.getCaseNumber(),
                 restricted && !canViewDecision,
+                canViewDecision ? paragraph.getDecisionType() : null,
                 canViewDecision && paragraph.getDecisionType() != null
                         ? paragraph.getDecisionType().getLabel()
                         : null,

@@ -5,6 +5,7 @@ public record ProtocolParagraphViewDto(
         String heading,
         String caseNumber,
         boolean decisionRestricted,
+        ProtocolDecisionType decisionType,
         String decisionLabel,
         String decisionText
 ) {
