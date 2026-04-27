@@ -185,8 +185,8 @@ public class UserService {
     public Page<UserEntity> getAdmins(int page, int size) {
         return userRepository.findByRole(UserRole.ADMIN, PageRequest.of(page, size));
     }
-    public Optional<UserEntity> findByUsername(String disPlayName) {
-        return userRepository.findByDisplayName(disPlayName);
+    public Optional<UserEntity> findByUsername(String name) {
+        return userRepository.findByName(name);
     }
 
     @Transactional
