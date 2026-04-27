@@ -7,16 +7,19 @@ import backendlab.team4you.audit.AuditAction;
 import backendlab.team4you.audit.AuditLog;
 import backendlab.team4you.audit.AuditLogRepository;
 import backendlab.team4you.booking.BookingService;
-import backendlab.team4you.registryaccess.AdminUserCreateDTO;
+import backendlab.team4you.caserecord.CaseRecord;
+import backendlab.team4you.caserecord.CaseRecordRepository;
+import backendlab.team4you.exceptions.CaseRecordNotFoundException;
+import backendlab.team4you.exceptions.UserNotFoundException;
 import backendlab.team4you.service.LogService;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserRepository;
 import backendlab.team4you.user.UserRole;
 import backendlab.team4you.user.UserService;
-import groovy.util.logging.Slf4j;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,59 +27,47 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 
+import static backendlab.team4you.user.UserRole.CASE_OFFICER;
 
-@Slf4j
+
+
 @Controller
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     private final LogService logService = new LogService();
     private final List<String> logs = logService.getLogs();
+    private final AuditLogRepository auditLogRepository;
 
     private final UserService userService;
     private final BookingService bookingService;
     private final ApplicationService applicationService;
     private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
-    private final AuditLogRepository auditLogRepository;
+    private final CaseRecordRepository caseRecordRepository;
 
-
-
-    public AdminController(UserService userService, BookingService bookingService, ApplicationService applicationService, ApplicationRepository applicationRepository, UserRepository userRepository, AuditLogRepository auditLogRepository) {
+    public AdminController(AuditLogRepository auditLogRepository, UserService userService,
+                           BookingService bookingService,
+                           ApplicationService applicationService,
+                           ApplicationRepository applicationRepository,
+                           UserRepository userRepository,
+                           CaseRecordRepository caseRecordRepository) {
+        this.auditLogRepository = auditLogRepository;
         this.userService = userService;
         this.bookingService = bookingService;
         this.applicationService = applicationService;
         this.applicationRepository = applicationRepository;
         this.userRepository = userRepository;
-        this.auditLogRepository = auditLogRepository;
-
+        this.caseRecordRepository = caseRecordRepository;
     }
-
-
-
-    @PostMapping("/admin/users/{id}/role")
-    @AuditAction(action = "UPDATE_USER_ROLE", entity = "USER")
-    public String updateUserRoleFromAdminUsers(
-            @PathVariable String id,
-            @RequestParam UserRole role,
-            Model model
-    ) {
-        userService.updateRole(id, role);
-
-        model.addAttribute(
-                "users",
-                userRepository.findAll()
-        );
-
-        return "fragments/admin-users :: content";
-    }
-
 
 
 
@@ -97,9 +88,6 @@ public class AdminController {
         return "";
     }
 
-
-
-
     @GetMapping("/admin")
     public String admin(Authentication auth) {
         System.out.println(auth.getAuthorities());
@@ -107,14 +95,11 @@ public class AdminController {
         return "admin";
     }
 
-
     @GetMapping("/admin/applications")
     public String adminApplications(
             @RequestParam(defaultValue = "0") int page,
             Model model
     ) {
-
-
         Page<ApplicationEntity> applications =
                 applicationRepository.findAll(PageRequest.of(page, 5));
 
@@ -124,7 +109,6 @@ public class AdminController {
 
         return "fragments/admin-applications :: content";
     }
-
 
     @GetMapping("/admin/bookings")
     public String adminBookings(Model model){
@@ -187,6 +171,7 @@ public class AdminController {
         return "fragments/alert :: success";
     }
 
+
     @GetMapping("/admin/logs")
     public String viewLogs(Model model, @RequestHeader(value = "HX-Request", required = false) String htmx) {
 
@@ -202,64 +187,45 @@ public class AdminController {
         return "fragments/admin-logs";
     }
 
-    @PostMapping("/admin/logs/cleanup")
-    public String cleanupLogs(
-            @RequestParam(defaultValue = "30") int days,
+
+    @GetMapping("/admin/cases")
+    public String listCases(
+            @RequestParam(defaultValue = "0") int page,
             Model model
     ) {
-        ZonedDateTime limit = ZonedDateTime.now().minusDays(days);
-
-        auditLogRepository.deleteByTimestampBefore(limit);
-
-        var pageable = PageRequest.of(
-                0,
-                50,
-                Sort.by("timestamp").descending()
-        );
-
-        Page<AuditLog> logsPage = auditLogRepository.findAll(pageable);
-
-        model.addAttribute("logs", logsPage.getContent());
+        Page<CaseRecord> cases = caseRecordRepository.findAll(PageRequest.of(page, 10));
+        List<UserEntity> officers = userRepository.findByRole(UserRole.CASE_OFFICER, Pageable.unpaged()).getContent();
 
 
-        return "fragments/admin-logs :: content";
+        model.addAttribute("cases", cases.getContent());
+        model.addAttribute("officers", officers);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", cases.getTotalPages());
+
+        return "fragments/admin-cases :: content";
     }
 
-    @PostMapping("/users/create")
-    @AuditAction(action = "CREATE_USER", entity = "USER")
-    public String createUser(
-            @ModelAttribute AdminUserCreateDTO dto,
+    @PostMapping("/admin/cases/assign")
+    public String assignCase(
+            @RequestParam Long caseId,
+            @RequestParam String officerId,
             Model model
     ) {
+        CaseRecord caseRecord = caseRecordRepository.findById(caseId)
+                .orElseThrow(() -> new CaseRecordNotFoundException(caseId));
 
-        userService.createUserAsAdmin(dto);
+        UserEntity officer = userRepository.findById(officerId)
+                .orElseThrow(() -> new UserNotFoundException("Officer not found"));
 
-        model.addAttribute(
-                "users",
-                userRepository.findAll()
-        );
+        if (officer.getRole() != UserRole.CASE_OFFICER) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selected user is not a case officer");
+        }
 
-        return "fragments/admin-users :: content";
+        caseRecord.setAssignedUser(officer);
+        caseRecordRepository.save(caseRecord);
+
+        model.addAttribute("message", "Ärende tilldelat till " + officer.getDisplayName());
+        return "fragments/alert :: success";
     }
-
-    @PostMapping("/users/{name}/role")
-    public String updateUserRole(
-            @PathVariable String name,
-            @RequestParam UserRole role,
-            Model model
-    ) {
-
-        userService.updateRole(name, role);
-
-        model.addAttribute(
-                "users",
-                userRepository.findAll()
-        );
-
-        return "fragments/admin-users :: content";
-    }
-
-
-
 
 }
