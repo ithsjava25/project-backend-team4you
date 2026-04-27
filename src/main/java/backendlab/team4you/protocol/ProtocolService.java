@@ -9,6 +9,7 @@ import backendlab.team4you.meeting.MeetingStatus;
 import backendlab.team4you.registry.Registry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Objects;
 
@@ -73,7 +74,11 @@ public class ProtocolService {
             protocol.addParagraph(paragraph);
         }
 
-        return protocolRepository.save(protocol);
+        try {
+            return protocolRepository.save(protocol);
+        } catch (DataIntegrityViolationException e) {
+            throw new ProtocolAlreadyExistsException(meetingId);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -97,6 +102,7 @@ public class ProtocolService {
             String decisionText
     ) {
         Objects.requireNonNull(paragraphId, "paragraphId is required");
+        Objects.requireNonNull(decisionType, "decisionType is required");
 
         ProtocolParagraph paragraph = paragraphRepository.findById(paragraphId)
                 .orElseThrow(() -> new ProtocolParagraphNotFoundException(paragraphId));
