@@ -6,6 +6,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -34,10 +36,10 @@ public class CaseRecordController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<CaseRecordResponseDto> createCaseRecord(
             @Valid @RequestBody CaseRecordRequestDto requestDto,
-            Authentication authentication
+            @AuthenticationPrincipal UserDetails user
     ) {
 
-        String username = authentication.getName();
+        String username = user.getUsername();
 
         boolean allowed = registryAccessService
                 .canCreateCasesInRegistry(

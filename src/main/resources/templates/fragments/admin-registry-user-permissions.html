@@ -1,50 +1,26 @@
-<form
-        hx-post="/admin/registry-access/grant"
-        hx-target="#content-area"
-        hx-swap="innerHTML"
->
+<div th:fragment="content">
+    <style>
+        .admin-registry-permissions{
 
-    <form
-            hx-post="/admin/registry-access/revoke"
-            hx-target="#content-area"
-            hx-swap="innerHTML"
-    >
+        }
+    </style>
 
+    <div class="admin-registry-permissions"></div>
+    <form hx-post="/admin/registry-access/grant"
+          hx-target="#permission-area"
+          hx-swap="innerHTML">
+        <input type="hidden" name="userId"     th:value="${selectedUser.idAsString}">
+        <input type="hidden" name="registryId" th:value="${registry.id}">
+        <button type="submit">Ge access</button>
+    </form>
 
+    <form class="admin-registry-permissions"
+          hx-post="/admin/registry-access/revoke"
+          hx-target="#permission-area"
+          hx-swap="innerHTML">
+        <input type="hidden" name="userId"     th:value="${selectedUser.idAsString}">
+        <input type="hidden" name="registryId" th:value="${registry.id}">
+        <button type="submit">Ta bort access</button>
+    </form>
 
-    <button type="submit">
-        Ge access
-    </button>
-
-</form>
-
-
-    <input
-            type="hidden"
-            name="userId"
-            th:value="${selectedUser.id}"
-    >
-
-    <input
-            type="hidden"
-            name="registryId"
-            th:value="${registry.id}"
-    >
-
-    <input
-            type="hidden"
-            name="userId"
-            th:value="${selectedUser.id}"
-    >
-
-    <input
-            type="hidden"
-            name="registryId"
-            th:value="${registry.id}"
-    >
-
-    <button type="submit">
-        Ta bort access
-    </button>
-
-</form>
+</div>

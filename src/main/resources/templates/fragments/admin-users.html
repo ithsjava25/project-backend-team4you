@@ -1,18 +1,7 @@
 <div th:fragment="content">
-<!--<style>-->
-<!--    .btn-admin-users{-->
-<!--        width: 100%;-->
-<!--        padding: 12px;-->
-<!--        background: var(&#45;&#45;color-primary);-->
-<!--        color: white;-->
-<!--        border: none;-->
-<!--        border-radius: 10px;-->
-<!--        cursor: pointer;-->
-<!--        transition: 0.2s;-->
-<!--    }-->
-<!--</style>-->
+    <style>
 
-
+    </style>
 
     <h2>Användare</h2>
 
@@ -21,25 +10,23 @@
     <ul>
         <li th:each="user : ${users}">
 
-
-
             <strong th:text="${user.displayName}"></strong>
             -
             <span th:text="${user.email}"></span>
 
             <form
-                    th:action="@{/admin/users/{id}/role(id=${user.id})}"
-                    th:attr="hx-post=@{/admin/users/{id}/role(id=${user.id})}"
+                    th:action="@{/admin/users/{id}/role(id=${user.idAsString})}"
+                    th:attr="hx-post=@{/admin/users/{id}/role(id=${user.idAsString})}"
                     hx-target="#content-area"
                     hx-swap="innerHTML"
             >
 
-                <select name="role">
+                <select class="admin-users-select" name="role">
                     <option value="USER">USER</option>
                     <option value="ADMIN">ADMIN</option>
                 </select>
 
-                <button type="submit">
+                <button type="submit" class="btn-admin-users">
                     Uppdatera roll
                 </button>
 
@@ -48,5 +35,7 @@
         </li>
     </ul>
 
-    <div th:replace="fragments/pagination :: pagination('/admin/users')"></div>
+    <div th:replace="fragments/pagination :: pagination('/admin/users')">
+    </div>
 
+</div>
