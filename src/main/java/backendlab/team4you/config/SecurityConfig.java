@@ -31,7 +31,7 @@ public class SecurityConfig {
                                             CustomAuthenticationSuccessHandler successHandler) throws Exception {
 
         return http
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/webauthn/**", "/api/files/**", "/case-officer/cases/**"))
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/webauthn/**", "/api/files/**"))
                 .authorizeHttpRequests(
                         authorizeHttp -> authorizeHttp
                                 // Public endpoints
