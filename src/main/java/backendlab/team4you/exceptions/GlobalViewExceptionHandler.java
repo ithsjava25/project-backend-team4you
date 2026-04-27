@@ -73,7 +73,7 @@ public class GlobalViewExceptionHandler {
     @ExceptionHandler(ProtocolAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public String handleProtocolAlreadyExists(ProtocolAlreadyExistsException ex, Model model) {
-        model.addAttribute("errorMessage", ex.getMessage());
+        model.addAttribute("errorMessage", "Ett protokoll finns redan för det här sammanträdet.");
         return "error";
     }
 }

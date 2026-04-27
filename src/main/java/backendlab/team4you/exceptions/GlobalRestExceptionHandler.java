@@ -64,7 +64,6 @@ public class GlobalRestExceptionHandler {
     @ExceptionHandler({
             InvalidFileNameException.class,
             IllegalArgumentException.class,
-            IllegalStateException.class,
             InvalidMeetingStateException.class
     })
     public ResponseEntity<ErrorResponseDto> handleBadRequest(RuntimeException ex) {
