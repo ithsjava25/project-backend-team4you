@@ -54,12 +54,16 @@ public class AdminController {
     private final UserRepository userRepository;
     private final CaseRecordRepository caseRecordRepository;
 
-    public AdminController(AuditLogRepository auditLogRepository, UserService userService,
+
+                           public AdminController(
+                                   AuditLogRepository auditLogRepository,
+                                   UserService userService,
                            BookingService bookingService,
                            ApplicationService applicationService,
                            ApplicationRepository applicationRepository,
                            UserRepository userRepository,
                            CaseRecordRepository caseRecordRepository) {
+
         this.auditLogRepository = auditLogRepository;
         this.userService = userService;
         this.bookingService = bookingService;
@@ -69,6 +73,19 @@ public class AdminController {
         this.caseRecordRepository = caseRecordRepository;
     }
 
+
+
+    @GetMapping("/admin/logs")
+    public String logs(Model model) {
+        List<String> logs = List.of(
+                "User johndoe loggade in",
+                "Ny användare registrerad",
+                "Admin tog bort user #123"
+        );
+
+        model.addAttribute("logs", logs);
+        return "fragments/admin-logs :: content";
+    }
 
 
     @PostMapping("/admin/users")
@@ -172,6 +189,7 @@ public class AdminController {
     }
 
 
+
     @GetMapping("/admin/logs")
     public String viewLogs(Model model, @RequestHeader(value = "HX-Request", required = false) String htmx) {
 
@@ -188,13 +206,17 @@ public class AdminController {
     }
 
 
+
     @GetMapping("/admin/cases")
     public String listCases(
             @RequestParam(defaultValue = "0") int page,
             Model model
     ) {
         Page<CaseRecord> cases = caseRecordRepository.findAll(PageRequest.of(page, 10));
+
         List<UserEntity> officers = userRepository.findByRole(UserRole.CASE_OFFICER, Pageable.unpaged()).getContent();
+
+
 
 
         model.addAttribute("cases", cases.getContent());
