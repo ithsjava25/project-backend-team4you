@@ -27,10 +27,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -236,6 +233,23 @@ public class AdminController {
 
         model.addAttribute("message", "Ärende tilldelat till " + officer.getDisplayName());
         return "fragments/alert :: success";
+    }
+
+    @PostMapping("/users/{name}/role")
+    public String updateUserRole(
+            @PathVariable String name,
+            @RequestParam UserRole role,
+            Model model
+    ) {
+
+        userService.updateRole(name, role);
+
+        model.addAttribute("success",
+                "Rollen uppdaterades för " + name);
+
+        model.addAttribute("users", userService.findAll());
+
+        return "fragments/admin-users :: content";
     }
 
 }
