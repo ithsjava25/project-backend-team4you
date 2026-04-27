@@ -121,6 +121,7 @@ class MeetingControllerTest {
                 any(),
                 any()
         )).thenThrow(new InvalidMeetingStateException("Titel måste anges."));
+        when(registryRepository.existsById(1L)).thenReturn(true);
         when(meetingService.getMeetingsForRegistry(1L)).thenReturn(List.of());
 
         mockMvc.perform(post("/admin/meetings")
