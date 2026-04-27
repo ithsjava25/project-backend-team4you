@@ -1,10 +1,8 @@
 package backendlab.team4you.protocol;
 
+import backendlab.team4you.casefile.CaseFile;
 import backendlab.team4you.caserecord.CaseRecord;
-import backendlab.team4you.exceptions.InvalidMeetingStateException;
-import backendlab.team4you.exceptions.MeetingNotFoundException;
-import backendlab.team4you.exceptions.ProtocolAlreadyExistsException;
-import backendlab.team4you.exceptions.ProtocolParagraphNotFoundException;
+import backendlab.team4you.exceptions.*;
 import backendlab.team4you.meeting.Meeting;
 import backendlab.team4you.meeting.MeetingAgendaItem;
 import backendlab.team4you.meeting.MeetingRepository;
@@ -239,5 +237,30 @@ class ProtocolServiceTest {
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
+    }
+
+    @Test
+    @DisplayName("updateParagraphDecision should throw ProtocolAlreadyArchivedException when protocol is archived")
+    void updateParagraphDecision_shouldThrowProtocolAlreadyArchivedException_whenProtocolIsArchived() {
+        Protocol protocol = new Protocol(completedMeeting, registry, "Protokoll - Kommunstyrelsen - 2026", 2026);
+        ProtocolParagraph paragraph = new ProtocolParagraph(firstCaseRecord, 1L, "§ 1 Första ärendet");
+        protocol.addParagraph(paragraph);
+        setField(paragraph, "id", 100L);
+
+        CaseFile archivedPdfFile = mock(CaseFile.class);
+        protocol.setArchivedPdfFile(archivedPdfFile);
+
+        when(paragraphRepository.findById(100L)).thenReturn(Optional.of(paragraph));
+
+        assertThatThrownBy(() -> protocolService.updateParagraphDecision(
+                100L,
+                ProtocolDecisionType.APPROVED,
+                "Kommunstyrelsen beslutar att bifalla ärendet."
+        ))
+                .isInstanceOf(ProtocolAlreadyArchivedException.class)
+                .hasMessage("Protokollet är redan arkiverat och kan inte längre ändras.");
+
+        assertThat(paragraph.getDecisionType()).isNull();
+        assertThat(paragraph.getDecisionText()).isNull();
     }
 }

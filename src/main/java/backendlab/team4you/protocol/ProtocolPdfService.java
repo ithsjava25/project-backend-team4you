@@ -1,6 +1,7 @@
 package backendlab.team4you.protocol;
 
 import backendlab.team4you.exceptions.ProtocolNotFoundException;
+import backendlab.team4you.exceptions.ProtocolNotReadyForPdfException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -35,7 +36,7 @@ public class ProtocolPdfService {
                 .orElseThrow(() -> new ProtocolNotFoundException(protocolId));
 
         if (!protocol.isReadyForPdf()) {
-            throw new IllegalStateException("Alla paragrafer måste ha beslut innan PDF kan skapas.");
+            throw new ProtocolNotReadyForPdfException(protocolId);
         }
 
         Meeting meeting = protocol.getMeeting();
