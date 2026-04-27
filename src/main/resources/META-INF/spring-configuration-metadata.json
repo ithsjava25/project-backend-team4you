@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "aws.create-bucket-if-missing",
+      "type": "java.lang.Boolean",
+      "description": "Whether to create S3 bucket automatically if missing."
+    }
+  ]
+}

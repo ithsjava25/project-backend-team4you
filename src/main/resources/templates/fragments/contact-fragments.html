@@ -6,7 +6,7 @@
 </head>
 <body>
 <div th:fragment="contact-form" id="contact-section">
-    <form hx-post="/contact/send" hx-target="#contact-section" hx-swap="outerHTML">
+    <form hx-post="/contact/send" hx-target="#contact-section" hx-swap="outerHTML" th:object="${contactForm}">
         <input type="text" th:field="*{firstName}">
         <p th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}" class="error"></p>
 
