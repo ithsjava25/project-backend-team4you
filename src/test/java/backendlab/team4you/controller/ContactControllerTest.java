@@ -7,7 +7,6 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -36,7 +35,7 @@ class ContactControllerTest {
                         .param("lastName", "Svensson")
                         .param("email", "sven@test.com")
                         .param("phone", "0701234567")
-                        .param("message", "Hello"))
+                        .param("message", "Hello i am Sven"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("fragments/contact-fragments :: success-message"));
 
@@ -51,6 +50,7 @@ class ContactControllerTest {
                         .param("email", "")
                         .param("phone", "")
                         .param("message", ""))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(view().name("fragments/contact-fragments :: contact-form"));
     }
 }

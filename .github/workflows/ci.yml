@@ -15,13 +15,13 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_DB: team4you
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: team4you_test
+          POSTGRES_USER: team4you
+          POSTGRES_PASSWORD: team4you
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U team4you -d team4you_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -45,7 +45,7 @@ jobs:
       - name: Build and test
         run: ./mvnw verify
         env:
-          DB_URL: jdbc:postgresql://localhost:5432/team4you
-          DB_USERNAME: postgres
-          DB_PASSWORD: postgres
+          DB_URL: jdbc:postgresql://localhost:5432/team4you_test
+          DB_USERNAME: team4you
+          DB_PASSWORD: team4you
           SPRING_DOCKER_COMPOSE_ENABLED: false

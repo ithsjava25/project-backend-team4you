@@ -12,4 +12,5 @@ public interface CaseFileRepository extends JpaRepository<CaseFile, Long> {
     Optional<CaseFile> findByIdAndCaseRecordId(Long id, Long caseRecordId);
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<CaseFile> findTopByCaseRecordIdOrderByDocumentNumberDesc(Long caseRecordId);
+    List<CaseFile> findByCaseRecordIdOrderByUploadedAtDesc(Long caseRecordId);
 }

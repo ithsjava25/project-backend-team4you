@@ -4,11 +4,8 @@ import backendlab.team4you.casefile.access.CaseFileAccessService;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
 import backendlab.team4you.common.ConfidentialityLevel;
-import backendlab.team4you.exceptions.CaseFileNotFoundException;
-import backendlab.team4you.exceptions.CaseRecordNotFoundException;
-import backendlab.team4you.exceptions.FileStorageConfigurationException;
-import backendlab.team4you.exceptions.FileTooLargeException;
-import backendlab.team4you.exceptions.InvalidFileNameException;
+import backendlab.team4you.exceptions.*;
+import backendlab.team4you.meeting.MeetingAgendaDocumentRepository;
 import backendlab.team4you.s3.S3Service;
 import backendlab.team4you.user.UserEntity;
 import org.slf4j.Logger;
@@ -38,17 +35,20 @@ public class CaseFileService {
     private final CaseFileRepository caseFileRepository;
     private final CaseFileAccessService caseFileAccessService;
     private final S3Service s3Service;
+    private final MeetingAgendaDocumentRepository meetingAgendaDocumentRepository;
 
     public CaseFileService(
             CaseRecordRepository caseRecordRepository,
             CaseFileRepository caseFileRepository,
             CaseFileAccessService caseFileAccessService,
-            S3Service s3Service
+            S3Service s3Service,
+            MeetingAgendaDocumentRepository meetingAgendaDocumentRepository
     ) {
         this.caseRecordRepository = caseRecordRepository;
         this.caseFileRepository = caseFileRepository;
         this.caseFileAccessService = caseFileAccessService;
         this.s3Service = s3Service;
+        this.meetingAgendaDocumentRepository = meetingAgendaDocumentRepository;
     }
 
     @Transactional
@@ -180,6 +180,10 @@ public class CaseFileService {
         }
 
         String s3Key = caseFile.getS3Key();
+        if (meetingAgendaDocumentRepository.existsByCaseFileId(fileId)) {
+            throw new FileInUseException("Filen kan inte tas bort eftersom den används som mötesunderlag.");
+        }
+
         caseFileRepository.delete(caseFile);
         try {
             s3Service.deleteFile(s3Key);
