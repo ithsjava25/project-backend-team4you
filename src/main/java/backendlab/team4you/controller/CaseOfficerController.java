@@ -108,14 +108,14 @@ public class CaseOfficerController {
             @RequestParam("confidentialityLevel") ConfidentialityLevel confidentialityLevel,
             Principal principal,
             Model model
-    ) throws IOException {
+    ) {
         UserEntity currentUser = userService.getCurrentUser(principal);
 
         try {
             caseFileService.uploadFile(caseRecordId, file, confidentialityLevel, currentUser);
-            model.addAttribute("successMessage", "File uploaded");
+            model.addAttribute("successMessage", "Filen laddades upp");
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Error to upload: " + e.getMessage());
+            model.addAttribute("errorMessage", "Kunde inte ladda upp filen: " + e.getMessage());
         }
 
         return getCaseFiles(caseRecordId, principal, model);
@@ -154,16 +154,20 @@ public class CaseOfficerController {
     }
 
     @DeleteMapping("/case-officer/cases/{caseRecordId}/files/{fileId}")
-    @ResponseBody
-    public ResponseEntity<Void> deleteFile(
+    public String deleteFile(
             @PathVariable Long caseRecordId,
             @PathVariable Long fileId,
-            Principal principal
+            Principal principal,
+            Model model
     ) {
 
         UserEntity currentUser = userService.getCurrentUser(principal);
-        caseFileService.deleteFile(caseRecordId, fileId, currentUser);
-
-        return ResponseEntity.ok().build();
+        try {
+            caseFileService.deleteFile(caseRecordId, fileId, currentUser);
+            model.addAttribute("successMessage", "Filen togs bort");
+            } catch (Exception e) {
+                model.addAttribute("errorMessage", "Kunde inte ta bort filen: " + e.getMessage());
+            }
+            return getCaseFiles(caseRecordId, principal, model);
     }
 }
