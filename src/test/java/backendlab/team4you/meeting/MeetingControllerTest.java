@@ -94,7 +94,7 @@ class MeetingControllerTest {
                         .param("notes", "Anteckning"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("fragments/admin-meetings :: content"))
-                .andExpect(model().attribute("successMessage", "sammanträdet skapades."));
+                .andExpect(model().attribute("successMessage", "Sammanträdet skapades."));
 
         verify(meetingService).createMeeting(
                 1L,
@@ -121,6 +121,7 @@ class MeetingControllerTest {
                 any(),
                 any()
         )).thenThrow(new InvalidMeetingStateException("Titel måste anges."));
+        when(registryRepository.existsById(1L)).thenReturn(true);
         when(meetingService.getMeetingsForRegistry(1L)).thenReturn(List.of());
 
         mockMvc.perform(post("/admin/meetings")
@@ -214,7 +215,7 @@ class MeetingControllerTest {
                         .param("status", "PREPARING"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("fragments/admin-meetings :: content"))
-                .andExpect(model().attribute("successMessage", "sammanträdet uppdaterades."));
+                .andExpect(model().attribute("successMessage", "Sammanträdet uppdaterades."));
     }
 
     @Test
@@ -233,7 +234,7 @@ class MeetingControllerTest {
                         .header("HX-Request", "true"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("fragments/admin-meetings :: content"))
-                .andExpect(model().attribute("successMessage", "sammanträdet togs bort."));
+                .andExpect(model().attribute("successMessage", "Sammanträdet togs bort."));
 
         verify(meetingService).deleteMeeting(10L);
     }

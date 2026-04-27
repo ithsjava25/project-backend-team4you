@@ -111,7 +111,7 @@ public class MeetingService {
         }
 
         Meeting meeting = meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new MeetingNotFoundException("Sammanträdet hittades inte."));
+                .orElseThrow(() -> new MeetingNotFoundException(meetingId));
 
         meeting.setTitle(title.trim());
         meeting.setStartsAt(startsAt);
@@ -130,7 +130,7 @@ public class MeetingService {
         }
 
         Meeting meeting = meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new MeetingNotFoundException("Sammanträdet hittades inte."));
+                .orElseThrow(() -> new MeetingNotFoundException(meetingId));
 
         meetingRepository.delete(meeting);
     }
@@ -146,7 +146,7 @@ public class MeetingService {
     @Transactional(readOnly = true)
     public Meeting getMeetingById(Long meetingId) {
         return meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new MeetingNotFoundException("Sammanträdet hittades inte."));
+                .orElseThrow(() -> new MeetingNotFoundException(meetingId));
     }
 
     @Transactional(readOnly = true)
