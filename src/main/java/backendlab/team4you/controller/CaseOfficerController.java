@@ -1,25 +1,35 @@
 package backendlab.team4you.controller;
 
+import backendlab.team4you.casefile.CaseFile;
+import backendlab.team4you.casefile.CaseFileListItemDto;
+import backendlab.team4you.casefile.CaseFileService;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
 import backendlab.team4you.caserecord.CaseRecordService;
 import backendlab.team4you.caserecord.CaseStatus;
+import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.exceptions.CaseRecordNotFoundException;
 import backendlab.team4you.exceptions.UserNotFoundException;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserRepository;
+import backendlab.team4you.user.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.Principal;
+import java.util.List;
 
 @Controller
 @PreAuthorize("hasRole('CASE_OFFICER')")
@@ -27,10 +37,14 @@ public class CaseOfficerController {
 
     private final CaseRecordRepository caseRecordRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
+    private final CaseFileService caseFileService;
 
-    public CaseOfficerController(CaseRecordRepository caseRecordRepository, UserRepository userRepository) {
+    public CaseOfficerController(CaseRecordRepository caseRecordRepository, UserRepository userRepository, UserService userService, CaseFileService caseFileService) {
         this.caseRecordRepository = caseRecordRepository;
         this.userRepository = userRepository;
+        this.userService = userService;
+        this.caseFileService = caseFileService;
     }
 
     @GetMapping("/case-officer")
@@ -74,5 +88,82 @@ public class CaseOfficerController {
         caseRecordRepository.save(caseRecord);
 
         return "";
+    }
+    @GetMapping("/case-officer/cases/{caseRecordId}/files")
+    public String getCaseFiles(@PathVariable Long caseRecordId, Principal principal, Model model) {
+        UserEntity currentUser = userService.getCurrentUser(principal);
+        List<CaseFileListItemDto> files = caseFileService.listFileItemsForViewer(caseRecordId, currentUser);
+
+        model.addAttribute("files", files);
+        model.addAttribute("caseRecordId", caseRecordId);
+
+        return "fragments/case-management/case-file-list-officer :: caseFileList";
+    }
+
+
+    @PostMapping("/case-officer/cases/{caseRecordId}/files")
+    public String uploadFile(
+            @PathVariable Long caseRecordId,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("confidentialityLevel") ConfidentialityLevel confidentialityLevel,
+            Principal principal,
+            Model model
+    ) throws IOException {
+        UserEntity currentUser = userService.getCurrentUser(principal);
+
+        try {
+            caseFileService.uploadFile(caseRecordId, file, confidentialityLevel, currentUser);
+            model.addAttribute("successMessage", "File uploaded");
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Error to upload: " + e.getMessage());
+        }
+
+        return getCaseFiles(caseRecordId, principal, model);
+    }
+
+    @GetMapping("/case-officer/cases/{caseRecordId}/files/{fileId}")
+    public ResponseEntity<StreamingResponseBody> downloadFile(
+            @PathVariable Long caseRecordId,
+            @PathVariable Long fileId,
+            Principal principal
+    ) {
+        UserEntity currentUser = userService.getCurrentUser(principal);
+        CaseFile caseFile = caseFileService.getCaseFileForViewer(caseRecordId, fileId, currentUser);
+
+        MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
+        if (caseFile.getContentType() != null && !caseFile.getContentType().isBlank()) {
+            mediaType = MediaType.parseMediaType(caseFile.getContentType());
+        }
+
+        StreamingResponseBody body = outputStream -> {
+            try (InputStream stream = caseFileService.downloadFile(caseRecordId, fileId, currentUser)) {
+                stream.transferTo(outputStream);
+            }
+        };
+
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.attachment()
+                                .filename(caseFile.getOriginalFilename(), StandardCharsets.UTF_8)
+                                .build()
+                                .toString()
+                )
+                .contentType(mediaType)
+                .body(body);
+    }
+
+    @DeleteMapping("/case-officer/cases/{caseRecordId}/files/{fileId}")
+    @ResponseBody
+    public ResponseEntity<Void> deleteFile(
+            @PathVariable Long caseRecordId,
+            @PathVariable Long fileId,
+            Principal principal
+    ) {
+
+        UserEntity currentUser = userService.getCurrentUser(principal);
+        caseFileService.deleteFile(caseRecordId, fileId, currentUser);
+
+        return ResponseEntity.ok().build();
     }
 }

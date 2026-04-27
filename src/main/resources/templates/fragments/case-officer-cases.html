@@ -25,9 +25,8 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-8">
-                            <h6 class="card-subtitle mb-2 text-muted">Beskrivning</h6>
-                            <p class="card-text" th:text="${case.description}">
-                            </p>
+                            <h3 class="card-subtitle mb-2 text-muted">Beskrivning</h3>
+                            <p class="card-text" th:text="${case.description}"></p>
                         </div>
                         <div class="col-md-4 border-start">
                             <p class="mb-1 small"><strong>Registry:</strong> <span th:text="${case.registry.name}">KS</span></p>
@@ -35,17 +34,29 @@
                             <p class="mb-1 small"><strong>Ägare:</strong> <span th:text="${case.owner.displayName}">Admin Name</span></p>
                         </div>
                     </div>
-                </div>
 
-                <div class="card-footer bg-transparent border-top-0">
+                    <div class="mt-3 file-section">
+                        <button type="button"
+                                class="btn btn-outline-primary btn-sm"
+                                th:attr="hx-get=@{/case-officer/cases/{id}/files(id=${case.id})}"
+                                hx-target="next .file-container"
+                                hx-swap="innerHTML">
+                            <i class="fa-solid fa-folder"></i> Ser Filer
+                        </button>
+
+                        <div th:id="'files-' + ${case.id}" class="mt-2 file-container"></div>
+                        </div>
+                    </div>
+
+
+                    <div class="card-footer bg-transparent border-top-0">
                     <button
                             class="btn btn-outline-secondary btn-sm float-end"
                             th:if="${case.status.name() == 'OPEN'}"
                             th:attr="hx-post=@{/case-officer/cases/close(id=${case.id})}"
                             hx-target="closest .col-12"
                             hx-swap="outerHTML"
-                            hx-confirm="Är du säker på att du vill stänga detta ärende?"
-                    >
+                            hx-confirm="Är du säker på att du vill stänga detta ärende?">
                         <i class="bi bi-x-circle"></i> Stäng ärende
                     </button>
                 </div>

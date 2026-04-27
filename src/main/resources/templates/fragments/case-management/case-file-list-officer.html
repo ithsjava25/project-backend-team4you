@@ -1,0 +1,77 @@
+<div th:fragment="caseFileList" class="case-file-panel">
+
+    <h3>Filer</h3>
+
+    <p th:if="${successMessage}"
+       th:text="${successMessage}"
+       class="feedback-message success-message"></p>
+
+    <p th:if="${errorMessage}"
+       th:text="${errorMessage}"
+       class="feedback-message error-message"></p>
+
+    <form th:action="@{/case-officer/cases/{caseId}/files(caseId=${caseRecordId})}"
+          th:attr="hx-post=@{/case-officer/cases/{caseId}/files(caseId=${caseRecordId})}"
+          method="post"
+          enctype="multipart/form-data"
+          hx-encoding="multipart/form-data"
+          hx-target="closest .case-file-panel"
+          hx-swap="outerHTML">
+
+        <div class="form-group">
+            <label for="case-file-upload">Ladda upp fil</label>
+            <input id="case-file-upload" type="file" name="file" required>
+        </div>
+
+        <div class="form-group">
+            <label for="file-confidentiality-officer">Sekretessnivå</label>
+            <select id="file-confidentiality-officer" name="confidentialityLevel">
+                <option value="OPEN">Ingen sekretess</option>
+                <option value="CONFIDENTIAL">Sekretess</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn-primary">Ladda upp</button>
+    </form>
+
+    <ul class="case-file-list">
+        <li th:if="${#lists.isEmpty(files)}">Inga filer uppladdade ännu.</li>
+
+        <li th:each="file : ${files}" class="case-file-item file-row">
+            <div class="case-file-info">
+                <span class="case-file-reference"
+                      th:text="${file.documentReference}">KS26-1-1</span>
+
+                <span class="case-file-name"
+                      th:text="${file.displayName}">dokument.pdf</span>
+
+                <span class="case-file-lock"
+                      th:if="${file.confidential}"
+                      title="Sekretessbelagd fil">🔒</span>
+            </div>
+
+            <div class="case-file-actions file-actions">
+                <a th:if="${file.canDownload}"
+                   th:href="@{/case-officer/cases/{caseId}/files/{fileId}(caseId=${caseRecordId}, fileId=${file.id})}"
+                   class="btn-secondary">
+                    Ladda ner
+                </a>
+
+                <span th:unless="${file.canDownload}"
+                      class="case-file-restricted-text">
+                    Ingen behörighet
+                </span>
+
+                <button type="button"
+                        class="btn-danger"
+                        th:attr="hx-delete=@{/case-officer/cases/{caseId}/files/{fileId}(caseId=${caseRecordId}, fileId=${file.id})}"
+                        th:hx-headers="${_csrf != null} ? '{&quot;' + ${_csrf.headerName} + '&quot;:&quot;' + ${_csrf.token} + '&quot;}' : null"
+                        hx-target="closest .case-file-panel"
+                        hx-swap="outerHTML"
+                        hx-confirm="Är du säker på att du vill ta bort denna fil?">
+                    Ta bort
+                </button>
+            </div>
+        </li>
+    </ul>
+</div>

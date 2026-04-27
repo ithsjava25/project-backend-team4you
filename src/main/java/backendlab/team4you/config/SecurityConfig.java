@@ -31,7 +31,7 @@ public class SecurityConfig {
                                             CustomAuthenticationSuccessHandler successHandler) throws Exception {
 
         return http
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/webauthn/**", "/api/files/**"))
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/webauthn/**", "/api/files/**", "/case-officer/cases/**"))
                 .authorizeHttpRequests(
                         authorizeHttp -> authorizeHttp
                                 // Public endpoints
@@ -42,6 +42,11 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/api/files/upload").hasAnyRole("USER", ADMIN)
                                 .requestMatchers(HttpMethod.GET, "/api/files/download/**").hasRole(ADMIN)
                                 .requestMatchers(HttpMethod.DELETE, "/api/files/delete/**").hasRole(ADMIN)
+
+                                .requestMatchers(HttpMethod.POST, "/case-officer/cases/**").hasRole(CASE_OFFICER)
+                                .requestMatchers(HttpMethod.GET, "/case-officer/cases/**").hasRole(CASE_OFFICER)
+                                .requestMatchers(HttpMethod.DELETE, "/case-officer/cases/**").hasRole(CASE_OFFICER)
+
 
                                 .requestMatchers("/webauthn/**").hasAnyRole("USER", ADMIN, CASE_OFFICER)
                                 .requestMatchers("/admin/**").hasRole(ADMIN)
