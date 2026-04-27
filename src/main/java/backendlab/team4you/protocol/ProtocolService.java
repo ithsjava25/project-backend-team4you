@@ -104,7 +104,7 @@ public class ProtocolService {
         Protocol protocol = paragraph.getProtocol();
 
         if (protocol.getArchivedPdfFile() != null) {
-            throw new IllegalStateException("Beslut kan inte ändras eftersom protokollet redan är arkiverat.");
+            throw new ProtocolAlreadyArchivedException(protocol.getId());
         }
 
         paragraph.updateDecision(decisionType, decisionText);

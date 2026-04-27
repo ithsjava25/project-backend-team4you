@@ -6,6 +6,7 @@ import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordService;
 import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.exceptions.ProtocolNotFoundException;
+import backendlab.team4you.exceptions.ProtocolNotReadyForPdfException;
 import backendlab.team4you.meeting.Meeting;
 import backendlab.team4you.registry.Registry;
 import backendlab.team4you.user.UserEntity;
@@ -42,7 +43,7 @@ public class ProtocolArchiveService {
         }
 
         if (!protocol.isReadyForPdf()) {
-            throw new IllegalStateException("Alla paragrafer måste ha beslut innan protokollet kan sparas som PDF.");
+            throw new ProtocolNotReadyForPdfException(protocol.getId());
         }
 
         Meeting meeting = protocol.getMeeting();
