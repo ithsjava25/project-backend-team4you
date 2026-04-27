@@ -101,9 +101,15 @@ public class ProtocolService {
         ProtocolParagraph paragraph = paragraphRepository.findById(paragraphId)
                 .orElseThrow(() -> new ProtocolParagraphNotFoundException(paragraphId));
 
+        Protocol protocol = paragraph.getProtocol();
+
+        if (protocol.getArchivedPdfFile() != null) {
+            throw new IllegalStateException("Beslut kan inte ändras eftersom protokollet redan är arkiverat.");
+        }
+
         paragraph.updateDecision(decisionType, decisionText);
 
-        return paragraph.getProtocol();
+        return protocol;
     }
 
     @Transactional(readOnly = true)

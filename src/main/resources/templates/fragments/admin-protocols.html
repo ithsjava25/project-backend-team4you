@@ -108,7 +108,7 @@
 
                         <p th:if="${selectedProtocol.archivedPdfFile != null}"
                            class="feedback-message success-message">
-                            PDF redan sparad i årsärende.
+                            PDF redan sparad i årsärende. Protokollet är låst för ändringar.
                         </p>
 
                         <form th:if="${selectedProtocol.archivedPdfFile == null}"
@@ -167,10 +167,16 @@
                             </p>
                         </div>
 
-                        <form th:attr="hx-post=@{/admin/protocols/paragraphs/{paragraphId}/decision(paragraphId=${paragraph.id})}"
+                        <form th:if="${selectedProtocol.archivedPdfFile == null}"
+                              th:attr="hx-post=@{/admin/protocols/paragraphs/{paragraphId}/decision(paragraphId=${paragraph.id})}"
                               hx-target="#content-area"
                               hx-swap="innerHTML"
                               class="meeting-form protocol-decision-form">
+
+                        <p th:if="${selectedProtocol.archivedPdfFile != null}"
+                               class="feedback-message success-message">
+                                Protokollet är arkiverat och besluten kan inte längre ändras.
+                        </p>
 
                             <input type="hidden"
                                    th:if="${_csrf != null}"
