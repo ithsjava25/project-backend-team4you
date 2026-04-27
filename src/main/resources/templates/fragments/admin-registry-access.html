@@ -18,13 +18,14 @@
             <li th:each="user : ${users}">
 
                 <a
-                        th:href="@{/admin/registry-access/user/{id}(id=${user.idAsString})}"
-                        th:attr="hx-get=@{/admin/registry-access/user/{id}(id=${user.idAsString})}"
+                        th:href="@{/admin/registry-access/user/{name}(name=${user.name})}"
+                        th:attr="hx-get=@{/admin/registry-access/user/{name}(name=${user.name})}"
                         hx-target="#permission-area"
                         hx-swap="innerHTML"
                 >
 
-                    <strong th:text="${user.displayName}"></strong>
+
+                <strong th:text="${user.displayName}"></strong>
                     -
                     <span th:text="${user.email}"></span>
 

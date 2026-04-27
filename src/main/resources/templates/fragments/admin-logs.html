@@ -3,39 +3,53 @@
 <div th:fragment="content">
     <style>
 
-
         .audit-table{
             background-color:
                     #161a2d;
             width:100%;
             border-collapse: collapse;
             color:white;
+            table-layout: auto;
+        }
+
+        .audit-table th,
+        .audit-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #2d3748;
         }
 
 
-        td{
-            padding:25px;
+        .method-tag {
+            background-color: #2d3748;
+            color: #a0aec0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
         }
 
-        span{
-            font-size: 14px;
-            margin:20px;
-        }
-
-        th{
-            margin:20px;
-            padding:10px;
-            font-size:14px;
-        }
-        .btn-secondary {
-            padding: 12px;
-            background: black;
+        .badge {
+            background-color: #4a5568;
             color: white;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: 0.2s;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
         }
 
+        .status-ok {
+            color: #48bb78;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(72, 187, 120, 0.2);
+        }
+
+        .status-fail {
+            color: #f56565;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(245, 101, 101, 0.2);
+        }
 
     </style>
     <button class="btn-secondary"

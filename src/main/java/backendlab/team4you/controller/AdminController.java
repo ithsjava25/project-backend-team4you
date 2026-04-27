@@ -60,13 +60,23 @@ public class AdminController {
 
 
 
-    @PostMapping("/admin/update-role")
+    @PostMapping("/admin/users/{id}/role")
     @AuditAction(action = "UPDATE_USER_ROLE", entity = "USER")
-    public String changeRole(@RequestParam String id, @RequestParam String role) {
+    public String updateUserRoleFromAdminUsers(
+            @PathVariable String id,
+            @RequestParam UserRole role,
+            Model model
+    ) {
+        userService.updateRole(id, role);
 
-        userService.updateRole(Long.parseLong(id), UserRole.valueOf(role));
-        return "redirect:/admin/users";
+        model.addAttribute(
+                "users",
+                userRepository.findAll()
+        );
+
+        return "fragments/admin-users :: content";
     }
+
 
 
 

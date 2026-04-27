@@ -1,22 +1,68 @@
 <div th:fragment="content">
-    <style>
 
+<style>
+    .admin-users{
+    background-color:
+    #161a2d;
+
+    border-collapse: collapse;
+    color:white;
+    }
+
+    .admin-users-select{
+
+    padding: 10px;
+    border-radius:20px;
+    border: 1px solid purple;
+    margin-bottom: 20px;
+    font-family: sans-serif;
+    font-weight: 100;
+    background: white;
+    cursor: pointer;
+    color:purple;
+
+    }
+
+    .btn-admin-users{
+    padding: 10px;
+    border-radius:20px;
+    border: 1px solid purple;
+    margin-bottom: 20px;
+    font-family: sans-serif;
+    font-weight: 100;
+    background: white;
+    cursor: pointer;
+    color:green;
+
+    }
+
+    .admin-users-ul{
+    font-size:20px;
+    list-style-type: none;
+
+    }
+
+    h2{
+    font-size:30px;
+    font-weight: 200;
+    }
     </style>
 
-    <h2>Användare</h2>
+    <div class="admin-users">
+    <h2 class="admin-users-h2">Användare</h2>
 
     <div id="alert-area"></div>
 
-    <ul>
-        <li th:each="user : ${users}">
+    <ul class="admin-users-ul">
+        <li class="admin-users-li" th:each="user : ${users}">
 
             <strong th:text="${user.displayName}"></strong>
-            -
-            <span th:text="${user.email}"></span>
 
-            <form
-                    th:action="@{/admin/users/{id}/role(id=${user.idAsString})}"
-                    th:attr="hx-post=@{/admin/users/{id}/role(id=${user.idAsString})}"
+            <span class="admin-users-span" th:text="${user.email}"></span>
+
+            <form class="admin-users-form"
+                    th:action="@{/admin/users/{name}/role(name=${user.name})}"
+                    th:attr="hx-post=@{/admin/users/{name}/role(name=${user.name})}"
                     hx-target="#content-area"
                     hx-swap="innerHTML"
             >
@@ -38,4 +84,5 @@
     <div th:replace="fragments/pagination :: pagination('/admin/users')">
     </div>
 
+</div>
 </div>
