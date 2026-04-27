@@ -96,7 +96,8 @@ public class GlobalRestExceptionHandler {
             DuplicateMeetingAgendaItemException.class,
             DuplicateMeetingAgendaDocumentException.class,
             ProtocolAlreadyExistsException.class,
-            ProtocolAlreadyArchivedException.class
+            ProtocolAlreadyArchivedException.class,
+            MeetingHasProtocolException.class
     })
     public ResponseEntity<ErrorResponseDto> handleConflict(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)

@@ -5,6 +5,7 @@ import backendlab.team4you.casefile.CaseFileRepository;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
 import backendlab.team4you.exceptions.*;
+import backendlab.team4you.protocol.ProtocolRepository;
 import backendlab.team4you.registry.Registry;
 import backendlab.team4you.registry.RegistryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +47,9 @@ class MeetingServiceTest {
 
     @Mock
     private CaseFileRepository caseFileRepository;
+
+    @Mock
+    private ProtocolRepository protocolRepository;
 
     @InjectMocks
     private MeetingService meetingService;
@@ -357,5 +361,24 @@ class MeetingServiceTest {
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
+    }
+
+    @Test
+    @DisplayName("updateMeeting should throw MeetingHasProtocolException when meeting has protocol")
+    void updateMeeting_shouldThrowMeetingHasProtocolException_whenMeetingHasProtocol() {
+        when(protocolRepository.existsByMeetingId(10L)).thenReturn(true);
+
+        assertThatThrownBy(() -> meetingService.updateMeeting(
+                10L,
+                "Nytt mötesnamn",
+                LocalDateTime.of(2026, 5, 1, 9, 0),
+                LocalDateTime.of(2026, 5, 1, 11, 0),
+                "Nya salen",
+                "Nya anteckningar",
+                MeetingStatus.PREPARING
+        ))
+                .isInstanceOf(MeetingHasProtocolException.class);
+
+        verifyNoInteractions(meetingRepository);
     }
 }

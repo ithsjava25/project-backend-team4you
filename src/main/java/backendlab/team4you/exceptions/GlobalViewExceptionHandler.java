@@ -90,4 +90,11 @@ public class GlobalViewExceptionHandler {
         model.addAttribute("errorMessage", ex.getMessage());
         return "error";
     }
+
+    @ExceptionHandler(MeetingHasProtocolException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleMeetingHasProtocol(MeetingHasProtocolException ex, Model model) {
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "error";
+    }
 }
