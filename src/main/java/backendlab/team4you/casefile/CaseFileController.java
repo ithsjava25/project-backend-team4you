@@ -86,6 +86,38 @@ public class CaseFileController {
                 .body(body);
     }
 
+    @GetMapping("/{fileId}/preview")
+    public ResponseEntity<StreamingResponseBody> previewFile(
+            @PathVariable Long caseRecordId,
+            @PathVariable Long fileId,
+            Principal principal
+    ) {
+        UserEntity currentUser = userService.getCurrentUser(principal);
+        CaseFile caseFile = caseFileService.getCaseFileForViewer(caseRecordId, fileId, currentUser);
+
+        MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
+        if (caseFile.getContentType() != null && !caseFile.getContentType().isBlank()) {
+            mediaType = MediaType.parseMediaType(caseFile.getContentType());
+        }
+
+        StreamingResponseBody body = outputStream -> {
+            try (InputStream stream = caseFileService.downloadFile(caseRecordId, fileId, currentUser)) {
+                stream.transferTo(outputStream);
+            }
+        };
+
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.inline()
+                                .filename(caseFile.getOriginalFilename(), StandardCharsets.UTF_8)
+                                .build()
+                                .toString()
+                )
+                .contentType(mediaType)
+                .body(body);
+    }
+
     @DeleteMapping("/{fileId}")
     public ResponseEntity<Void> deleteFile(
             @PathVariable Long caseRecordId,
