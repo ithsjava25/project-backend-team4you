@@ -114,14 +114,17 @@ public class CaseFileController {
             }
         };
 
+        boolean safeInline = isSafeInlinePreview(mediaType);
+
+        ContentDisposition disposition = (safeInline
+                ? ContentDisposition.inline()
+                : ContentDisposition.attachment())
+                .filename(caseFile.getOriginalFilename(), StandardCharsets.UTF_8)
+                .build();
+
         return ResponseEntity.ok()
-                .header(
-                        HttpHeaders.CONTENT_DISPOSITION,
-                        ContentDisposition.inline()
-                                .filename(caseFile.getOriginalFilename(), StandardCharsets.UTF_8)
-                                .build()
-                                .toString()
-                )
+                .header("X-Content-Type-Options", "nosniff")
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
                 .contentType(mediaType)
                 .body(body);
     }
@@ -135,5 +138,11 @@ public class CaseFileController {
         UserEntity currentUser = userService.getCurrentUser(principal);
         caseFileService.deleteFile(caseRecordId, fileId, currentUser);
         return ResponseEntity.noContent().build();
+    }
+
+    private boolean isSafeInlinePreview(MediaType mediaType) {
+        return mediaType.isCompatibleWith(MediaType.APPLICATION_PDF)
+                || "image".equalsIgnoreCase(mediaType.getType())
+                || mediaType.isCompatibleWith(MediaType.TEXT_PLAIN);
     }
 }
