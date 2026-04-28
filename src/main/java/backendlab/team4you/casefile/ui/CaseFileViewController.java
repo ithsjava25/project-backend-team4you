@@ -37,6 +37,17 @@ public class CaseFileViewController {
         return "fragments/case-management/case-file-list :: caseFileList";
     }
 
+    @GetMapping("/case-records/{caseId}/files/{fileId}/preview-frame")
+    public String previewFrame(
+            @PathVariable Long caseId,
+            @PathVariable Long fileId,
+            Model model
+    ) {
+        model.addAttribute("caseId", caseId);
+        model.addAttribute("fileId", fileId);
+        return "fragments/case-management/file-preview-frame :: frame";
+    }
+
     @PostMapping("/case-records/{caseId}/files")
     public String uploadCaseFile(
             @PathVariable Long caseId,

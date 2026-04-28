@@ -39,8 +39,8 @@
 
         <li th:each="file : ${files}" class="case-file-item file-row">
             <div class="case-file-info">
-        <span class="case-file-reference"
-              th:text="${file.documentReference}">KS26-1-1</span>
+                <span class="case-file-reference"
+                      th:text="${file.documentReference}">KS26-1-1</span>
 
                 <span class="case-file-name"
                       th:text="${file.displayName}">dokument.pdf</span>
@@ -56,15 +56,16 @@
                     Ladda ner
                 </a>
 
-                <a th:if="${file.canDownload}"
-                   th:href="@{/api/cases/{caseId}/files/{fileId}/preview(caseId=${caseRecordId}, fileId=${file.id})}"
-                   target="_blank"
-                   title="Öppna fil">👁</a>
+                <button th:if="${file.canDownload}"
+                        type="button"
+                        th:data-preview-url="@{/dashboard/case-management/case-records/{caseId}/files/{fileId}/preview-frame(caseId=${caseRecordId}, fileId=${file.id})}"
+                        title="Öppna fil"
+                        onclick="togglePreview(this)">👁</button>
 
                 <span th:unless="${file.canDownload}"
                       class="case-file-restricted-text">
-        Ingen behörighet
-    </span>
+                    Ingen behörighet
+                </span>
 
                 <button type="button"
                         th:attr="hx-delete=@{/dashboard/case-management/case-records/{caseId}/files/{fileId}(caseId=${caseRecordId}, fileId=${file.id})}"
@@ -74,3 +75,24 @@
                     Ta bort
                 </button>
             </div>
+        </li>
+    </ul>
+
+    <script>
+        function togglePreview(btn) {
+            const item = btn.closest('.case-file-item');
+            const existing = item.querySelector('.file-preview-frame');
+            if (existing) {
+                existing.remove();
+                return;
+            }
+            const url = btn.getAttribute('data-preview-url');
+            fetch(url)
+                .then(res => res.text())
+                .then(html => {
+                    item.insertAdjacentHTML('beforeend', html);
+                });
+        }
+    </script>
+
+</div>
