@@ -207,14 +207,15 @@ public class ProtocolPdfService {
         }
 
         void writeLine(String text, boolean bold, float fontSize) throws IOException {
-            if (currentY <= BOTTOM_MARGIN) {
+            float lineHeight = fontSize + 6;
+            if (currentY - lineHeight <= BOTTOM_MARGIN) {
                 addNewPage();
             }
 
             content.setFont(bold ? boldFont : regularFont, fontSize);
             content.showText(text == null ? "" : text);
-            content.newLineAtOffset(0, -(fontSize + 6));
-            currentY -= (fontSize + 6);
+            content.newLineAtOffset(0, -lineHeight);
+            currentY -= lineHeight;
         }
 
         void addSpacing(float spacing) throws IOException {
