@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import org.springframework.http.InvalidMediaTypeException;
+
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,7 +67,10 @@ public class CaseFileController {
 
         MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
         if (caseFile.getContentType() != null && !caseFile.getContentType().isBlank()) {
-            mediaType = MediaType.parseMediaType(caseFile.getContentType());
+            try {
+                mediaType = MediaType.parseMediaType(caseFile.getContentType());
+            } catch (InvalidMediaTypeException e) {
+            }
         }
 
         StreamingResponseBody body = outputStream -> {
@@ -86,6 +91,44 @@ public class CaseFileController {
                 .body(body);
     }
 
+    @GetMapping("/{fileId}/preview")
+    public ResponseEntity<StreamingResponseBody> previewFile(
+            @PathVariable Long caseRecordId,
+            @PathVariable Long fileId,
+            Principal principal
+    ) {
+        UserEntity currentUser = userService.getCurrentUser(principal);
+        CaseFile caseFile = caseFileService.getCaseFileForViewer(caseRecordId, fileId, currentUser);
+
+        MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
+        if (caseFile.getContentType() != null && !caseFile.getContentType().isBlank()) {
+            try {
+                mediaType = MediaType.parseMediaType(caseFile.getContentType());
+            } catch (InvalidMediaTypeException e) {
+            }
+        }
+
+        StreamingResponseBody body = outputStream -> {
+            try (InputStream stream = caseFileService.downloadFile(caseRecordId, fileId, currentUser)) {
+                stream.transferTo(outputStream);
+            }
+        };
+
+        boolean safeInline = isSafeInlinePreview(mediaType);
+
+        ContentDisposition disposition = (safeInline
+                ? ContentDisposition.inline()
+                : ContentDisposition.attachment())
+                .filename(caseFile.getOriginalFilename(), StandardCharsets.UTF_8)
+                .build();
+
+        return ResponseEntity.ok()
+                .header("X-Content-Type-Options", "nosniff")
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
+                .contentType(mediaType)
+                .body(body);
+    }
+
     @DeleteMapping("/{fileId}")
     public ResponseEntity<Void> deleteFile(
             @PathVariable Long caseRecordId,
@@ -95,5 +138,11 @@ public class CaseFileController {
         UserEntity currentUser = userService.getCurrentUser(principal);
         caseFileService.deleteFile(caseRecordId, fileId, currentUser);
         return ResponseEntity.noContent().build();
+    }
+
+    private boolean isSafeInlinePreview(MediaType mediaType) {
+        return mediaType.isCompatibleWith(MediaType.APPLICATION_PDF)
+                || "image".equalsIgnoreCase(mediaType.getType())
+                || mediaType.isCompatibleWith(MediaType.TEXT_PLAIN);
     }
 }
