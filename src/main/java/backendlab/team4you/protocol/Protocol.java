@@ -1,5 +1,6 @@
 package backendlab.team4you.protocol;
 
+import backendlab.team4you.casefile.CaseFile;
 import backendlab.team4you.meeting.Meeting;
 import backendlab.team4you.registry.Registry;
 import jakarta.persistence.*;
@@ -43,6 +44,10 @@ public class Protocol {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "archived_pdf_file_id")
+    private CaseFile archivedPdfFile;
+
     protected Protocol() {
     }
 
@@ -72,6 +77,11 @@ public class Protocol {
         paragraph.setProtocol(this);
     }
 
+    public boolean isReadyForPdf() {
+        return !paragraphs.isEmpty()
+                && paragraphs.stream().allMatch(ProtocolParagraph::hasDecision);
+    }
+
     public Long getId() {
         return id;
     }
@@ -98,5 +108,13 @@ public class Protocol {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public CaseFile getArchivedPdfFile() {
+        return archivedPdfFile;
+    }
+
+    public void setArchivedPdfFile(CaseFile archivedPdfFile) {
+        this.archivedPdfFile = archivedPdfFile;
     }
 }

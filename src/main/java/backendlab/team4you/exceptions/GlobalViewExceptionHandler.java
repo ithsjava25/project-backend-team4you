@@ -76,4 +76,25 @@ public class GlobalViewExceptionHandler {
         model.addAttribute("errorMessage", "Ett protokoll finns redan för det här sammanträdet.");
         return "error";
     }
+
+    @ExceptionHandler(ProtocolAlreadyArchivedException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleProtocolAlreadyArchived(ProtocolAlreadyArchivedException ex, Model model) {
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "error";
+    }
+
+    @ExceptionHandler(ProtocolNotReadyForPdfException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleProtocolNotReady(ProtocolNotReadyForPdfException ex, Model model) {
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "error";
+    }
+
+    @ExceptionHandler(MeetingHasProtocolException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleMeetingHasProtocol(MeetingHasProtocolException ex, Model model) {
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "error";
+    }
 }

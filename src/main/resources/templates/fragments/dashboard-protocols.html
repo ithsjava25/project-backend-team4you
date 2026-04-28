@@ -1,0 +1,95 @@
+<div th:fragment="content" class="admin-protocols-page">
+
+    <h2>Protokoll</h2>
+
+    <div class="admin-meetings-layout">
+
+        <section class="meeting-sidebar">
+            <h3>Publicerade protokoll</h3>
+
+            <p th:if="${#lists.isEmpty(protocols)}">
+                Inga protokoll finns ännu.
+            </p>
+
+            <ul class="meeting-list" th:if="${not #lists.isEmpty(protocols)}">
+                <li th:each="protocol : ${protocols}">
+                    <a th:href="@{/dashboard/protocols/{id}(id=${protocol.id})}"
+                       th:attr="hx-get=@{/dashboard/protocols/{id}(id=${protocol.id})}"
+                       hx-target="#content-area"
+                       hx-swap="innerHTML"
+                       class="meeting-list-link">
+                        <strong th:text="${protocol.title}">Protokoll</strong>
+                        <span th:text="${protocol.registry.name}">Diarium</span>
+                        <span th:text="${protocol.year}">2026</span>
+                    </a>
+                </li>
+            </ul>
+        </section>
+
+        <section class="meeting-detail">
+
+            <div th:if="${selectedProtocol == null}">
+                <h3>Välj ett protokoll</h3>
+                <p>Välj ett protokoll i listan.</p>
+            </div>
+
+            <div th:if="${selectedProtocol != null}">
+                <h3 th:text="${selectedProtocol.title}">Protokoll</h3>
+
+                <p>
+                    <strong>Diarium:</strong>
+                    <span th:text="${selectedProtocol.registry.name}">Kommunstyrelsen</span>
+                </p>
+
+                <p>
+                    <strong>Sammanträde:</strong>
+                    <span th:text="${selectedProtocol.meeting.title}">Sammanträde</span>
+                </p>
+
+                <p>
+                    <strong>Datum:</strong>
+                    <span th:text="${#temporals.format(selectedProtocol.meeting.startsAt, 'yyyy-MM-dd HH:mm')}">
+                        2026-05-10 13:00
+                    </span>
+                </p>
+
+                <hr>
+
+                <h4>Paragrafer</h4>
+
+                <div th:each="paragraph : ${paragraphViews}"
+                     class="agenda-item-card protocol-paragraph">
+
+                    <div class="agenda-item-main">
+                        <strong th:text="${paragraph.heading}">§ 1 Ärende</strong>
+
+                        <span>
+                            Ärendenummer:
+                            <span th:text="${paragraph.caseNumber}">KS26-1</span>
+                        </span>
+
+                        <div class="protocol-decision-display">
+                            <strong>Beslut:</strong>
+
+                            <span th:if="${paragraph.decisionRestricted}"
+                                  class="case-file-restricted-text">
+                                🔒 Beslutet omfattas av sekretess.
+                            </span>
+
+                            <span th:if="${!paragraph.decisionRestricted}"
+                                  th:text="${paragraph.decisionLabel ?: 'Ej valt'}">
+                                Bifall
+                            </span>
+
+                            <p th:if="${!paragraph.decisionRestricted and paragraph.decisionText != null}"
+                               th:text="${paragraph.decisionText}">
+                                Beslutstext
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+</div>

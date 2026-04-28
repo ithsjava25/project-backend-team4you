@@ -97,6 +97,42 @@
                     <span th:text="${selectedProtocol.meeting.location ?: 'Ej angiven'}">Sessionssalen</span>
                 </p>
 
+                <div class="protocol-actions">
+
+                    <div th:if="${selectedProtocol.readyForPdf}">
+                        <a th:href="@{/admin/protocols/{protocolId}/pdf(protocolId=${selectedProtocol.id})}"
+                           target="_blank"
+                           class="submit protocol-create-button">
+                            Visa PDF
+                        </a>
+
+                        <p th:if="${selectedProtocol.archivedPdfFile != null}"
+                           class="feedback-message success-message">
+                            PDF redan sparad i årsärende. Protokollet är låst för ändringar.
+                        </p>
+
+                        <form th:if="${selectedProtocol.archivedPdfFile == null}"
+                              th:attr="hx-post=@{/admin/protocols/{protocolId}/archive-pdf(protocolId=${selectedProtocol.id})}"
+                              hx-target="#content-area"
+                              hx-swap="innerHTML">
+                            <input type="hidden"
+                                   th:if="${_csrf != null}"
+                                   th:name="${_csrf.parameterName}"
+                                   th:value="${_csrf.token}">
+
+                            <button type="submit" class="submit protocol-create-button">
+                                Spara PDF i årsärende
+                            </button>
+                        </form>
+                    </div>
+
+                    <p th:if="${!selectedProtocol.readyForPdf}"
+                       class="feedback-message error-message">
+                        Alla paragrafer måste ha beslut och beslutstext innan PDF kan skapas.
+                    </p>
+
+                </div>
+
                 <hr>
 
                 <h4>Paragrafer</h4>
@@ -105,7 +141,7 @@
                     <p>Protokollet saknar paragrafer.</p>
                 </div>
 
-                <div th:each="paragraph : ${selectedProtocol.paragraphs}"
+                <div th:each="paragraph : ${paragraphViews}"
                      class="agenda-item-card protocol-paragraph">
 
                     <div class="agenda-item-main">
@@ -113,25 +149,30 @@
 
                         <span>
                             Ärendenummer:
-                            <span th:text="${paragraph.caseRecord.caseNumber}">KS26-1</span>
+                        <span th:text="${paragraph.caseNumber}">KS26-1</span>
                         </span>
 
-                        <span th:if="${paragraph.caseRecord.description}"
-                              th:text="${paragraph.caseRecord.description}">
-                            Ärendebeskrivning
-                        </span>
-
-                        <div class="protocol-decision-display" th:if="${paragraph.decisionType != null}">
+                        <div class="protocol-decision-display">
                             <strong>Beslut:</strong>
-                            <span th:text="${paragraph.decisionType.label}">Bifall</span>
 
-                            <p th:if="${paragraph.decisionText != null}"
+                            <span th:if="${paragraph.decisionRestricted}"
+                                  class="case-file-restricted-text">
+                                Beslutet omfattas av sekretess.
+                            </span>
+
+                            <span th:if="${!paragraph.decisionRestricted}"
+                                  th:text="${paragraph.decisionLabel ?: 'Ej valt'}">
+                                Bifall
+                            </span>
+
+                            <p th:if="${!paragraph.decisionRestricted and paragraph.decisionText != null}"
                                th:text="${paragraph.decisionText}">
                                 Beslutstext
                             </p>
                         </div>
 
-                        <form th:attr="hx-post=@{/admin/protocols/paragraphs/{paragraphId}/decision(paragraphId=${paragraph.id})}"
+                        <form th:if="${selectedProtocol.archivedPdfFile == null}"
+                              th:attr="hx-post=@{/admin/protocols/paragraphs/{paragraphId}/decision(paragraphId=${paragraph.id})}"
                               hx-target="#content-area"
                               hx-swap="innerHTML"
                               class="meeting-form protocol-decision-form">
@@ -177,6 +218,12 @@
                                 Spara beslut
                             </button>
                         </form>
+
+                        <p th:if="${selectedProtocol.archivedPdfFile != null}"
+                           class="feedback-message success-message">
+                            Protokollet är arkiverat och besluten kan inte längre ändras.
+                        </p>
+
                     </div>
                 </div>
 

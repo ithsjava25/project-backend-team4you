@@ -1,5 +1,6 @@
 package backendlab.team4you.caserecord;
 
+import backendlab.team4you.registry.Registry;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +21,12 @@ public interface CaseRecordRepository extends JpaRepository<CaseRecord, Long> {
     Optional<CaseRecord> findByIdWithLock(Long id);
     boolean existsByCaseNumber(String caseNumber);
 
-    @Query("SELECT c FROM CaseRecord c WHERE c.assignedUser.id = :officerId")
+    @Query("""
+       SELECT c FROM CaseRecord c
+       WHERE c.assignedUser.id = :officerId
+       ORDER BY c.createdAt DESC, c.id DESC
+    """)
     Page<CaseRecord> findByAssignedUserId(String officerId, Pageable pageable);
+
+    Optional<CaseRecord> findByRegistryAndTitle(Registry registry, String title);
 }
