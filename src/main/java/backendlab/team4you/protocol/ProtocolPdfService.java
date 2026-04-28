@@ -122,7 +122,21 @@ public class ProtocolPdfService {
 
             if (currentLine.length() + word.length() + 1 > maxCharsPerLine) {
                 lines.add(currentLine.toString());
-                currentLine = new StringBuilder(word);
+                if (word.length() <= maxCharsPerLine) {
+                    currentLine = new StringBuilder(word);
+                    } else {
+                    int start = 0;
+                    while (start < word.length()) {
+                        int end = Math.min(start + maxCharsPerLine, word.length());
+                        String chunk = word.substring(start, end);
+                        if (end < word.length()) {
+                            lines.add(chunk);
+                            } else {
+                            currentLine = new StringBuilder(chunk);
+                            }
+                        start = end;
+                        }
+                    }
             } else {
                 if (!currentLine.isEmpty()) {
                     currentLine.append(" ");

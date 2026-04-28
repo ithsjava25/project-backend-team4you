@@ -376,6 +376,9 @@ when(protocolRepository.existsByMeetingId(10L)).thenReturn(false);
     @Test
     @DisplayName("updateMeeting should throw MeetingHasProtocolException when meeting has protocol")
     void updateMeeting_shouldThrowMeetingHasProtocolException_whenMeetingHasProtocol() {
+        when(meetingRepository.findByIdWithLock(10L)).thenReturn(Optional.of(meeting));
+        when(protocolRepository.existsByMeetingId(10L)).thenReturn(true);
+
         assertThatThrownBy(() -> meetingService.updateMeeting(
                 10L,
                 "Nytt mötesnamn",
@@ -385,9 +388,10 @@ when(protocolRepository.existsByMeetingId(10L)).thenReturn(false);
                 "Nya anteckningar",
                 MeetingStatus.PREPARING
         ))
-                .isInstanceOf(MeetingNotFoundException.class);
+                .isInstanceOf(MeetingHasProtocolException.class);
 
         verify(meetingRepository).findByIdWithLock(10L);
+        verify(protocolRepository).existsByMeetingId(10L);
         verify(meetingRepository, never()).save(any());
     }
 }
