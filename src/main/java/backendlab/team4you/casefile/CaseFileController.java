@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import org.springframework.http.InvalidMediaTypeException;
+
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,7 +67,10 @@ public class CaseFileController {
 
         MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
         if (caseFile.getContentType() != null && !caseFile.getContentType().isBlank()) {
-            mediaType = MediaType.parseMediaType(caseFile.getContentType());
+            try {
+                mediaType = MediaType.parseMediaType(caseFile.getContentType());
+            } catch (InvalidMediaTypeException e) {
+            }
         }
 
         StreamingResponseBody body = outputStream -> {
@@ -97,7 +102,10 @@ public class CaseFileController {
 
         MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
         if (caseFile.getContentType() != null && !caseFile.getContentType().isBlank()) {
-            mediaType = MediaType.parseMediaType(caseFile.getContentType());
+            try {
+                mediaType = MediaType.parseMediaType(caseFile.getContentType());
+            } catch (InvalidMediaTypeException e) {
+            }
         }
 
         StreamingResponseBody body = outputStream -> {

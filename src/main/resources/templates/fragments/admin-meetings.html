@@ -365,9 +365,15 @@
             }
             const url = btn.getAttribute('data-preview-url');
             fetch(url)
-                .then(res => res.text())
+                .then(res => {
+                    if (!res.ok) throw new Error('Preview failed');
+                    return res.text();
+                })
                 .then(html => {
                     item.insertAdjacentHTML('beforeend', html);
+                })
+                .catch(err => {
+                    console.error('Failed to load preview:', err);
                 });
         }
     </script>
