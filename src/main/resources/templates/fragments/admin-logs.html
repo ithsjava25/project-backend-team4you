@@ -1,27 +1,105 @@
+
+
 <div th:fragment="content">
-    <h2>Systemlogg</h2>
+    <style>
 
-    <div id="alert-area"></div>
+        .audit-table{
+            background-color:
+                    #161a2d;
+            width:100%;
+            border-collapse: collapse;
+            color:white;
+            table-layout: auto;
+        }
 
-    <ul>
-        <li th:each="log : ${logs}" th:text="${log}"></li>
-    </ul>
+        .audit-table th,
+        .audit-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #2d3748;
+        }
 
-    <button
-            hx-get="/admin/logs?page=2"
-            hx-target="#logs-container"
-            hx-swap="beforeend"
-    >
-        Ladda fler
+
+        .method-tag {
+            background-color: #2d3748;
+            color: #a0aec0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .badge {
+            background-color: #4a5568;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .status-ok {
+            color: #48bb78;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(72, 187, 120, 0.2);
+        }
+
+        .status-fail {
+            color: #f56565;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(245, 101, 101, 0.2);
+        }
+        .entity-security {
+            color: #f6ad55;
+            font-weight: bold;
+        }
+
+    </style>
+    <button class="btn-secondary"
+            hx-post="/admin/logs/cleanup?days=30"
+            hx-target="#content-area"
+            hx-confirm="Är du säker på att du vill radera loggar äldre än 30 dagar?">
+        Rensa äldre än 30 dagar
     </button>
-    <button
-            class="btn btn-danger"
-            hx-delete="/admin/users/123"
-            hx-confirm="Är du säker?"
-            hx-target="closest tr"
-            hx-swap="outerHTML"
-    >
-        Ta bort
-    </button>
-    <div th:replace="fragments/pagination :: pagination('/admin/users')"></div>
+    <div class="log-actions" style="margin-bottom: 20px; display: flex; gap: 10px;">
+<table class="audit-table">
+    <thead>
+    <tr>
+        <th>Tid</th>
+        <th>Användare</th>
+        <th>Metod</th> <th>Handling</th>
+        <th>Entitet</th>
+        <th>Detaljer</th> <th>IP</th> <th>Status</th>
+    </tr>
+
+
+
+
+    </thead>
+    <tbody>
+
+    <tr th:each="log : ${logs}">
+
+        <td th:text="${log.timestamp != null ? #temporals.format(log.timestamp, 'yyyy-MM-dd HH:mm') : 'N/A'}"></td>
+        <td th:text="${log.username}"></td>
+        <td><span class="method-tag" th:text="${log.httpMethod}"></span></td>
+        <td><span class="badge" th:text="${log.action}"></span></td>
+        <td th:text="${log.entityType}"></td>
+        <td style="max-width: 250px; font-size: 13px; color: #e2e8f0;">
+            <span th:text="${log.details != null ? log.details : '—'}"></span>
+        </td>
+        <td th:text="${log.ipAddress}" ></td>
+        <td>
+                <span th:class="${log.status == 'SUCCESS' ? 'status-ok' : 'status-fail'}"
+                      th:text="${log.status}"></span>
+        </td>
+        <td th:text="${log.entityType}"
+            th:class="${log.entityType == 'SECURITY' ? 'entity-security' : ''}"></td>
+    </tr>
+    </tbody>
+
+
+</table>
+    </div>
 </div>

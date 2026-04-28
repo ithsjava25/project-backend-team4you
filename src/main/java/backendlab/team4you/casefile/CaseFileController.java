@@ -1,5 +1,6 @@
 package backendlab.team4you.casefile;
 
+import backendlab.team4you.audit.AuditAction;
 import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
@@ -32,6 +33,7 @@ public class CaseFileController {
     }
 
     @PostMapping
+    @AuditAction(action = "FILE_UPLOADED", entity = "CASE_FILE")
     public ResponseEntity<CaseFileResponseDto> uploadFile(
             @PathVariable Long caseRecordId,
             @RequestParam("file") MultipartFile file,
@@ -44,6 +46,8 @@ public class CaseFileController {
     }
 
     @GetMapping
+    @ResponseBody
+    @AuditAction(action = "FILE_LIST_VIEWED", entity = "CASE_FILE")
     public ResponseEntity<List<CaseFileListItemDto>> listFiles(
             @PathVariable Long caseRecordId,
             Principal principal
@@ -57,6 +61,8 @@ public class CaseFileController {
     }
 
     @GetMapping("/{fileId}")
+    @ResponseBody
+    @AuditAction(action = "FILE_DOWNLOADED", entity = "CASE_FILE")
     public ResponseEntity<StreamingResponseBody> downloadFile(
             @PathVariable Long caseRecordId,
             @PathVariable Long fileId,
@@ -130,6 +136,7 @@ public class CaseFileController {
     }
 
     @DeleteMapping("/{fileId}")
+    @AuditAction(action = "FILE_DELETED", entity = "CASE_FILE")
     public ResponseEntity<Void> deleteFile(
             @PathVariable Long caseRecordId,
             @PathVariable Long fileId,

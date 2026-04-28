@@ -1,5 +1,7 @@
 package backendlab.team4you.casefile;
 
+import backendlab.team4you.audit.AuditLogRepository;
+import backendlab.team4you.audit.AuditService;
 import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.exceptions.*;
 import backendlab.team4you.user.UserEntity;
@@ -45,6 +47,8 @@ class CaseFileControllerTest {
 
     @MockitoBean
     private UserService userService;
+
+
 
     @Test
     @DisplayName("uploadFile should return ok and response body when upload succeeds")

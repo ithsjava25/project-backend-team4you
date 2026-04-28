@@ -1,5 +1,6 @@
 package backendlab.team4you.meeting;
 
+import backendlab.team4you.audit.AuditAction;
 import backendlab.team4you.casefile.CaseFile;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
@@ -45,6 +46,7 @@ public class MeetingController {
     }
 
     @PostMapping
+    @AuditAction(action = "CREATE_MEETING", entity = "MEETING")
     public String createMeeting(
             @RequestParam Long registryId,
             @RequestParam String title,
@@ -86,6 +88,7 @@ public class MeetingController {
     }
 
     @PostMapping("/{meetingId}/update")
+    @AuditAction(action = "UPDATE_MEETING", entity = "MEETING")
     public String updateMeeting(
             @PathVariable Long meetingId,
             @RequestParam String title,
@@ -131,6 +134,7 @@ public class MeetingController {
     }
 
     @PostMapping("/{meetingId}/delete")
+    @AuditAction(action = "DELETE_MEETING", entity = "MEETING")
     public String deleteMeeting(
             @PathVariable Long meetingId,
             @RequestHeader(value = "HX-Request", required = false) String htmx,
@@ -170,6 +174,7 @@ public class MeetingController {
     }
 
     @PostMapping("/{meetingId}/agenda-items")
+    @AuditAction(action = "CREATE_MEETING_AGENDA_ITEM", entity = "MEETING_AGENDA_ITEM")
     public String addAgendaItem(
             @PathVariable Long meetingId,
             @RequestParam Long caseRecordId,
@@ -195,6 +200,7 @@ public class MeetingController {
     }
 
     @PostMapping("/{meetingId}/agenda-items/{agendaItemId}/move-up")
+    @AuditAction(action = "MOVE_MEETING_AGENDA_ITEM_UP", entity = "MEETING_AGENDA_ITEM")
     public String moveAgendaItemUp(
             @PathVariable Long meetingId,
             @PathVariable Long agendaItemId,
@@ -218,6 +224,7 @@ public class MeetingController {
     }
 
     @PostMapping("/{meetingId}/agenda-items/{agendaItemId}/move-down")
+    @AuditAction(action = "MOVE_MEETING_AGENDA_ITEM_DOWN", entity = "MEETING_AGENDA_ITEM")
     public String moveAgendaItemDown(
             @PathVariable Long meetingId,
             @PathVariable Long agendaItemId,
@@ -241,6 +248,7 @@ public class MeetingController {
     }
 
     @DeleteMapping("/{meetingId}/agenda-items/{agendaItemId}")
+    @AuditAction(action = "DELETE_MEETING_AGENDA_ITEM", entity = "MEETING_AGENDA_ITEM")
     public String removeAgendaItem(
             @PathVariable Long meetingId,
             @PathVariable Long agendaItemId,
@@ -266,6 +274,7 @@ public class MeetingController {
     }
 
     @PostMapping("/{meetingId}/agenda-items/{agendaItemId}/documents")
+    @AuditAction(action = "ADD_MEETING_AGENDA_ITEM_DOCUMENT", entity = "MEETING_AGENDA_ITEM_DOCUMENT")
     public String addAgendaDocument(
             @PathVariable Long meetingId,
             @PathVariable Long agendaItemId,
@@ -290,6 +299,7 @@ public class MeetingController {
     }
 
     @PostMapping("/{meetingId}/agenda-items/{agendaItemId}/documents/{documentId}/remove")
+    @AuditAction(action = "REMOVE_MEETING_AGENDA_ITEM_DOCUMENT", entity = "MEETING_AGENDA_ITEM_DOCUMENT")
     public String removeAgendaDocument(
             @PathVariable Long meetingId,
             @PathVariable Long agendaItemId,

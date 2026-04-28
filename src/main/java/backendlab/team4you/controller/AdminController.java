@@ -3,6 +3,9 @@ package backendlab.team4you.controller;
 import backendlab.team4you.application.ApplicationEntity;
 import backendlab.team4you.application.ApplicationRepository;
 import backendlab.team4you.application.ApplicationService;
+import backendlab.team4you.audit.AuditAction;
+import backendlab.team4you.audit.AuditLog;
+import backendlab.team4you.audit.AuditLogRepository;
 import backendlab.team4you.booking.BookingService;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
@@ -16,6 +19,7 @@ import backendlab.team4you.user.UserService;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +27,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -39,6 +41,8 @@ import static backendlab.team4you.user.UserRole.CASE_OFFICER;
 public class AdminController {
 
     private final LogService logService = new LogService();
+    private final List<String> logs = logService.getLogs();
+    private final AuditLogRepository auditLogRepository;
 
     private final UserService userService;
     private final BookingService bookingService;
@@ -47,12 +51,17 @@ public class AdminController {
     private final UserRepository userRepository;
     private final CaseRecordRepository caseRecordRepository;
 
-    public AdminController(UserService userService,
+
+                           public AdminController(
+                                   AuditLogRepository auditLogRepository,
+                                   UserService userService,
                            BookingService bookingService,
                            ApplicationService applicationService,
                            ApplicationRepository applicationRepository,
                            UserRepository userRepository,
                            CaseRecordRepository caseRecordRepository) {
+
+        this.auditLogRepository = auditLogRepository;
         this.userService = userService;
         this.bookingService = bookingService;
         this.applicationService = applicationService;
@@ -61,19 +70,11 @@ public class AdminController {
         this.caseRecordRepository = caseRecordRepository;
     }
 
-    @GetMapping("/admin/logs")
-    public String logs(Model model) {
-        List<String> logs = List.of(
-                "User johndoe loggade in",
-                "Ny användare registrerad",
-                "Admin tog bort user #123"
-        );
 
-        model.addAttribute("logs", logs);
-        return "fragments/admin-logs :: content";
-    }
+
 
     @PostMapping("/admin/users")
+    @AuditAction(action = "DELETE_USER", entity = "USER")
     public String deleteUser(@RequestParam String id, Model model){
 
         userService.deleteUser(id);
@@ -111,19 +112,7 @@ public class AdminController {
         return "fragments/admin-applications :: content";
     }
 
-    @GetMapping("/admin/bookings")
-    public String adminBookings(Model model){
 
-        List<String> bookings = List.of(
-                "Bokning #1",
-                "Bokning #2",
-                "Bokning #3"
-        );
-
-        model.addAttribute("bookings", bookings);
-
-        return "fragments/admin-bookings :: content";
-    }
 
     @PostMapping("/admin/bookings")
     public ResponseEntity<Void> deleteBooking(@RequestParam Long id){
@@ -136,6 +125,7 @@ public class AdminController {
     }
 
     @GetMapping("/admin/users")
+    @AuditAction(action = "UPDATE_USER", entity = "USER")
     public String getUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "displayName") String sort,
@@ -171,13 +161,36 @@ public class AdminController {
         return "fragments/alert :: success";
     }
 
+
+
+    @GetMapping("/admin/logs")
+    public String viewLogs(Model model, @RequestHeader(value = "HX-Request", required = false) String htmx) {
+
+        var pageable = PageRequest.of(0, 50, Sort.by("timestamp").descending());
+
+        Page<AuditLog> logsPage = auditLogRepository.findAll(pageable);
+
+        model.addAttribute("logs", logsPage.getContent());
+
+        if (htmx != null) {
+            return "fragments/admin-logs :: content";
+        }
+        return "fragments/admin-logs";
+    }
+
+
+
     @GetMapping("/admin/cases")
     public String listCases(
             @RequestParam(defaultValue = "0") int page,
             Model model
     ) {
         Page<CaseRecord> cases = caseRecordRepository.findAll(PageRequest.of(page, 10));
-        List<UserEntity> officers = userRepository.findByRole(UserRole.CASE_OFFICER);
+
+        List<UserEntity> officers = userRepository.findByRole(UserRole.CASE_OFFICER, Pageable.unpaged()).getContent();
+
+
+
 
         model.addAttribute("cases", cases.getContent());
         model.addAttribute("officers", officers);
@@ -188,6 +201,7 @@ public class AdminController {
     }
 
     @PostMapping("/admin/cases/assign")
+    @AuditAction(action = "ASSIGN_CASE", entity = "CASE")
     public String assignCase(
             @RequestParam Long caseId,
             @RequestParam String officerId,
@@ -210,5 +224,22 @@ public class AdminController {
         return "fragments/alert :: success";
     }
 
+    @PostMapping("/users/{name}/role")
+    @AuditAction(action = "UPDATE_USER_ROLE", entity = "USER")
+    public String updateUserRole(
+            @PathVariable String name,
+            @RequestParam UserRole role,
+            Model model
+    ) {
+
+        userService.updateRole(name, role);
+
+        model.addAttribute("success",
+                "Rollen uppdaterades för " + name);
+
+        model.addAttribute("users", userService.findAll());
+
+        return "fragments/admin-users :: content";
+    }
 
 }

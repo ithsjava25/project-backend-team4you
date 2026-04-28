@@ -61,3 +61,33 @@ nav{
     cursor: pointer;
     transition: 0.2s;
 }
+
+.audit-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.audit-table th, .audit-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.audit-table th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    color: #475569;
+}
+
+.badge {
+    background: #e2e8f0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-family: monospace;
+}
+
