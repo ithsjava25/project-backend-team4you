@@ -1,6 +1,7 @@
 package backendlab.team4you.caserecord;
 
 
+import backendlab.team4you.audit.AuditAction;
 import backendlab.team4you.registryaccess.RegistryAccessService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,7 @@ public class CaseRecordController {
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")
+    @AuditAction(action = "CASE_CREATED", entity = "CASE_RECORD")
     public ResponseEntity<CaseRecordResponseDto> createCaseRecord(
             @Valid @RequestBody CaseRecordRequestDto requestDto,
             @AuthenticationPrincipal UserDetails user

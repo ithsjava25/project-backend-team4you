@@ -112,19 +112,7 @@ public class AdminController {
         return "fragments/admin-applications :: content";
     }
 
-    @GetMapping("/admin/bookings")
-    public String adminBookings(Model model){
 
-        List<String> bookings = List.of(
-                "Bokning #1",
-                "Bokning #2",
-                "Bokning #3"
-        );
-
-        model.addAttribute("bookings", bookings);
-
-        return "fragments/admin-bookings :: content";
-    }
 
     @PostMapping("/admin/bookings")
     public ResponseEntity<Void> deleteBooking(@RequestParam Long id){
@@ -137,7 +125,7 @@ public class AdminController {
     }
 
     @GetMapping("/admin/users")
-    @AuditAction(action = "DELETE_USER", entity = "USER")
+    @AuditAction(action = "UPDATE_USER", entity = "USER")
     public String getUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "displayName") String sort,
@@ -213,6 +201,7 @@ public class AdminController {
     }
 
     @PostMapping("/admin/cases/assign")
+    @AuditAction(action = "ASSIGN_CASE", entity = "CASE")
     public String assignCase(
             @RequestParam Long caseId,
             @RequestParam String officerId,
@@ -236,6 +225,7 @@ public class AdminController {
     }
 
     @PostMapping("/users/{name}/role")
+    @AuditAction(action = "UPDATE_USER_ROLE", entity = "USER")
     public String updateUserRole(
             @PathVariable String name,
             @RequestParam UserRole role,

@@ -1,5 +1,6 @@
 package backendlab.team4you.registry;
 
+import backendlab.team4you.audit.AuditAction;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,11 +16,14 @@ import java.net.URI;
 public class RegistryController {
     private final  RegistryService registryService;
 
+
+
     public RegistryController(RegistryService registryService) {
         this.registryService = registryService;
     }
 
     @PostMapping
+    @AuditAction(action = "CREATE", entity = "USER")
     public ResponseEntity<RegistryResponseDto> createRegistry(
             @Valid @RequestBody RegistryRequestDto requestDto
     ) {
@@ -32,5 +36,7 @@ public class RegistryController {
                 .toUri();
 
         return ResponseEntity.created(location).body(responseDto);
+
+
     }
 }

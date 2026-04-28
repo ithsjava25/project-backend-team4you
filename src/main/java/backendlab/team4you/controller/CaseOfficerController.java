@@ -1,7 +1,9 @@
 package backendlab.team4you.controller;
 
+import backendlab.team4you.audit.AuditAction;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
+import backendlab.team4you.caserecord.CaseRecordService;
 import backendlab.team4you.caserecord.CaseStatus;
 import backendlab.team4you.exceptions.CaseRecordNotFoundException;
 import backendlab.team4you.exceptions.UserNotFoundException;
@@ -38,6 +40,8 @@ public class CaseOfficerController {
     }
 
     @GetMapping("/case-officer/cases")
+    @ResponseBody
+    @AuditAction(action = "LIST_CASES", entity = "CASE")
     public String listCases(
             @RequestParam(defaultValue = "0") int page,
             Authentication auth,
@@ -58,15 +62,15 @@ public class CaseOfficerController {
 
     @PostMapping("/case-officer/cases/close")
     @ResponseBody
-    public String closeCase(@RequestParam Long id, Authentication auth) {
+    @AuditAction(action = "CLOSE_CASE", entity = "CASE")
+    public String closeCase(@RequestParam String id, Authentication auth) {
         UserEntity officer = userRepository.findByName(auth.getName())
                 .orElseThrow(() -> new UserNotFoundException("Case Officer not found"));
 
-        CaseRecord caseRecord = caseRecordRepository.findById(id)
+        CaseRecord caseRecord = caseRecordRepository.findById(Long.valueOf(id))
                 .orElseThrow(() -> new CaseRecordNotFoundException(id));
 
-        if (caseRecord.getAssignedUser() == null
-                || !caseRecord.getAssignedUser().getIdAsString().equals(officer.getIdAsString())) {
+        if (!caseRecord.getAssignedUser().getId().equals(officer.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not assigned to this officer");
         }
 

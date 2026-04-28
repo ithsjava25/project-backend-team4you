@@ -16,11 +16,9 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.webauthn.management.PublicKeyCredentialUserEntityRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -36,6 +34,8 @@ public class SignupController {
     }
 
     @GetMapping("/login/webauthn")
+    @ResponseBody
+    @AuditAction(action = "LOGIN", entity = "USER")
     public String webauthnCheck() {
         return "check";
     }
@@ -72,6 +72,12 @@ public class SignupController {
 
         SecurityContextRepository repo = new HttpSessionSecurityContextRepository();
         repo.saveContext(context, request, response);
+    }
+
+    @DeleteMapping("/settings/passkeys/{credentialId}")
+    @AuditAction(action = "PASSKEY_DELETE", entity = "SECURITY")
+    public String deletePasskey(@PathVariable String credentialId, Principal principal) {
+        return "redirect:/settings";
     }
 
     public static class SignupRequest {

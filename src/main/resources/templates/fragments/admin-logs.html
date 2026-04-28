@@ -50,6 +50,10 @@
             font-weight: bold;
             text-shadow: 0 0 5px rgba(245, 101, 101, 0.2);
         }
+        .entity-security {
+            color: #f6ad55;
+            font-weight: bold;
+        }
 
     </style>
     <button class="btn-secondary"
@@ -82,14 +86,16 @@
         <td><span class="method-tag" th:text="${log.httpMethod}"></span></td>
         <td><span class="badge" th:text="${log.action}"></span></td>
         <td th:text="${log.entityType}"></td>
-        <td th:text="${log.details}">
-            <span th:if="${log.details != null}" th:text="${log.details}"></span>
+        <td style="max-width: 250px; font-size: 13px; color: #e2e8f0;">
+            <span th:text="${log.details != null ? log.details : '—'}"></span>
         </td>
         <td th:text="${log.ipAddress}" ></td>
         <td>
                 <span th:class="${log.status == 'SUCCESS' ? 'status-ok' : 'status-fail'}"
                       th:text="${log.status}"></span>
         </td>
+        <td th:text="${log.entityType}"
+            th:class="${log.entityType == 'SECURITY' ? 'entity-security' : ''}"></td>
     </tr>
     </tbody>
 

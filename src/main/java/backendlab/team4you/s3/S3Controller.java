@@ -1,5 +1,6 @@
 package backendlab.team4you.s3;
 
+import backendlab.team4you.audit.AuditAction;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,8 @@ public class S3Controller {
     // POST /api/files/upload — upload a file
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @PostMapping("/upload")
+    @ResponseBody
+    @AuditAction(action = "UPLOAD", entity = "S3")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
         String key = file.getOriginalFilename();
         if (key == null || key.isBlank()) {
@@ -45,6 +48,8 @@ public class S3Controller {
     // GET /api/files/download/{key} — download a file
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/download/{key}")
+    @ResponseBody
+    @AuditAction(action = "DOWNLOAD", entity = "S3")
     public ResponseEntity<?> downloadFile(@PathVariable String key) throws IOException {
         try (InputStream stream = s3Service.downloadFile(key)) {
             byte[] bytes = stream.readAllBytes();
@@ -61,6 +66,8 @@ public class S3Controller {
     // DELETE /api/files/delete/{key} — delete a file
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{key}")
+    @ResponseBody
+    @AuditAction(action = "DELETE", entity = "S3")
     public ResponseEntity<String> deleteFile(@PathVariable String key) {
         try {
             s3Service.deleteFile(key);

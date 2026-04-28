@@ -1,5 +1,7 @@
 package backendlab.team4you.audit;
 
+import backendlab.team4you.caserecord.CaseRecordRequestDto;
+import backendlab.team4you.controller.SignupController;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -52,25 +54,67 @@ public class AuditAspect {
                 ip = attrs.getRequest().getRemoteAddr();
                 endpoint = attrs.getRequest().getRequestURI();
                 httpMethod = attrs.getRequest().getMethod();
+
             }
 
 
+
+
+            StringBuilder detailsBuilder = new StringBuilder();
             String methodName = joinPoint.getSignature().toShortString();
             String details = "Executed method: " + methodName;
+            String finalDetails = detailsBuilder.length() > 0
+                    ? detailsBuilder.toString()
+                    : details;
             int entityId = 0;
 
             Object[] args = joinPoint.getArgs();
             for (Object arg : args) {
-                if (arg instanceof Long) {
-                    entityId = ((Long) arg).intValue();
-                } else if (arg instanceof String && !((String) arg).contains("/")) {
-                    details = "File/Key: " + arg;
+                if (arg instanceof Long id) {
+                    entityId = id.intValue();
+                    detailsBuilder.append("| ID: ").append(id).append(" ");
                 }
+
+
+                 else {
+                    if (arg instanceof CaseRecordRequestDto dto) {
+                        detailsBuilder.append("Ärende: ").append(dto.title())
+                                .append(" (Register: ").append(dto.registryId()).append(")");
+                    }
+
+                    else if (arg instanceof String str && methodName.toLowerCase().contains("update")) {
+
+                        detailsBuilder.append("Tilldelad till: ").append(str).append(" ");
+                    }
+                    else if (arg instanceof String str && methodName.toLowerCase().contains("delete")) {
+                        detailsBuilder.append("Raderad av: ").append(str).append(" ");
+                    }
+                    else if (arg instanceof String str && methodName.toLowerCase().contains("create")) {
+                        detailsBuilder.append("Skapad av: ").append(str).append(" ");
+                    }
+                    else if (arg instanceof String str && methodName.toLowerCase().contains("assign")) {
+                        detailsBuilder.append("Tilldelad till: ").append(str).append(" ");
+                    }
+
+                    else if (arg instanceof SignupController.SignupRequest req) {
+                        detailsBuilder.append("Passkey registrerad för användare: ")
+                                .append(req.getUsername())
+                                .append(" (Display: ").append(req.getDisplayName()).append(")");
+                    }
+
+                    else {
+                        detailsBuilder.append(arg).append(" ");
+                    }
+
+                }
+
             }
+
+
 
             auditService.saveLog(
                     username,
-                    null,
+                    finalDetails,
                     auditAction.action(),
                     endpoint,
                     httpMethod,
@@ -78,11 +122,15 @@ public class AuditAspect {
                     status,
                     auditAction.entity(),
                     entityId
+
             );
 
         } catch (Exception e) {
             log.warn("Failed to persist audit log for {}: {}",
                     joinPoint.getSignature().toShortString(), e.getMessage(), e);
         }
+
+
     }
+
 }
