@@ -1,5 +1,6 @@
 package backendlab.team4you.caserecord;
 
+import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.exceptions.CaseRecordNotFoundException;
 import backendlab.team4you.exceptions.RegistryNotFoundException;
 import backendlab.team4you.exceptions.UserNotFoundException;
@@ -67,28 +68,7 @@ public class CaseRecordService {
     }
 
     private String allocateNextCaseNumber(Registry registry) {
-        int year = LocalDateTime.now().getYear();
-        int maxAttempts = 3;
-
-        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
-            try {
-                return tryAllocateNextCaseNumber(registry, year);
-            } catch (DataIntegrityViolationException exception) {
-                if (attempt == maxAttempts) {
-                    throw new IllegalStateException(
-                            "failed to allocate case number after " + maxAttempts +
-                                    " attempts for registry " + registry.getId() +
-                                    " and year " + year,
-                            exception
-                    );
-                }
-            }
-        }
-
-        throw new IllegalStateException(
-                "unreachable state while allocating case number for registry " +
-                        registry.getId() + " and year " + year
-        );
+        return allocateNextCaseNumber(registry, LocalDateTime.now().getYear());
     }
 
     private String tryAllocateNextCaseNumber(Registry registry, int year) {
@@ -164,6 +144,19 @@ public class CaseRecordService {
         return toResponseDto(savedCaseRecord);
     }
 
+    @Transactional
+    public CaseRecord findOrCreateAnnualProtocolCase(
+            Registry registry,
+            int year,
+            UserEntity currentUser
+    ) {
+        String title = "Protokoll för " + registry.getCode() + " år " + year;
+
+        return caseRecordRepository
+                .findByRegistryAndTitle(registry, title)
+                .orElseGet(() -> createAnnualProtocolCase(registry, year, title, currentUser));
+    }
+
     private String normalizeStatus(String status) {
         if (status == null || status.isBlank()) {
             throw new IllegalArgumentException("status is required");
@@ -177,5 +170,52 @@ public class CaseRecordService {
         }
 
         return normalizedStatus;
+    }
+
+    private CaseRecord createAnnualProtocolCase(
+            Registry registry,
+            int year,
+            String title,
+            UserEntity currentUser
+    ) {
+        CaseRecord caseRecord = new CaseRecord(
+                registry,
+                title,
+                "Årsärende för protokoll inom " + registry.getCode() + " år " + year,
+                CaseStatus.OPEN,
+                currentUser,
+                null,
+                ConfidentialityLevel.OPEN,
+                LocalDateTime.of(year, 1, 1, 0, 0)
+        );
+
+        String caseNumber = allocateNextCaseNumber(registry, year);
+        caseRecord.setCaseNumber(caseNumber);
+
+        return caseRecordRepository.save(caseRecord);
+    }
+
+    private String allocateNextCaseNumber(Registry registry, int year) {
+        int maxAttempts = 3;
+
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                return tryAllocateNextCaseNumber(registry, year);
+            } catch (DataIntegrityViolationException exception) {
+                if (attempt == maxAttempts) {
+                    throw new IllegalStateException(
+                            "failed to allocate case number after " + maxAttempts +
+                                    " attempts for registry " + registry.getId() +
+                                    " and year " + year,
+                            exception
+                    );
+                }
+            }
+        }
+
+        throw new IllegalStateException(
+                "unreachable state while allocating case number for registry " +
+                        registry.getId() + " and year " + year
+        );
     }
 }

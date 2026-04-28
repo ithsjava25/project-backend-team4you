@@ -4,6 +4,9 @@ import backendlab.team4you.meeting.Meeting;
 import backendlab.team4you.meeting.MeetingRepository;
 import backendlab.team4you.meeting.MeetingStatus;
 import backendlab.team4you.registry.Registry;
+import backendlab.team4you.user.UserEntity;
+import backendlab.team4you.user.UserRole;
+import backendlab.team4you.user.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.lang.reflect.Field;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,6 +40,12 @@ class ProtocolControllerTest {
 
     @MockitoBean
     private MeetingRepository meetingRepository;
+
+    @MockitoBean
+    private ProtocolViewService protocolViewService;
+
+    @MockitoBean
+    private UserService userService;
 
     @Test
     @WithMockUser(roles = "ADMIN")
@@ -63,6 +73,10 @@ class ProtocolControllerTest {
         Registry registry = registry(1L, "Kommunstyrelsen", "KS");
         Meeting meeting = meeting(10L, registry, "KS april");
         Protocol protocol = protocol(100L, meeting, registry);
+        UserEntity currentUser = adminUser();
+
+        when(userService.getCurrentUser(any())).thenReturn(currentUser);
+        when(protocolViewService.getParagraphsForViewer(100L, currentUser)).thenReturn(List.of());
 
         when(protocolService.createProtocolForCompletedMeeting(10L)).thenReturn(protocol);
         when(meetingRepository.findCompletedMeetingsWithoutProtocol()).thenReturn(List.of());
@@ -74,9 +88,11 @@ class ProtocolControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("fragments/admin-protocols :: content"))
                 .andExpect(model().attribute("successMessage", "Protokoll skapades."))
-                .andExpect(model().attribute("selectedProtocol", protocol));
+                .andExpect(model().attribute("selectedProtocol", protocol))
+                .andExpect(model().attributeExists("paragraphViews"));
 
         verify(protocolService).createProtocolForCompletedMeeting(10L);
+        verify(protocolViewService).getParagraphsForViewer(100L, currentUser);
     }
 
     @Test
@@ -86,6 +102,10 @@ class ProtocolControllerTest {
         Registry registry = registry(1L, "Kommunstyrelsen", "KS");
         Meeting meeting = meeting(10L, registry, "KS april");
         Protocol protocol = protocol(100L, meeting, registry);
+        UserEntity currentUser = adminUser();
+
+        when(userService.getCurrentUser(any())).thenReturn(currentUser);
+        when(protocolViewService.getParagraphsForViewer(100L, currentUser)).thenReturn(List.of());
 
         when(protocolService.getProtocol(100L)).thenReturn(protocol);
         when(meetingRepository.findCompletedMeetingsWithoutProtocol()).thenReturn(List.of());
@@ -95,7 +115,8 @@ class ProtocolControllerTest {
                         .header("HX-Request", "true"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("fragments/admin-protocols :: content"))
-                .andExpect(model().attribute("selectedProtocol", protocol));
+                .andExpect(model().attribute("selectedProtocol", protocol))
+                .andExpect(model().attributeExists("paragraphViews"));
     }
 
     @Test
@@ -105,6 +126,10 @@ class ProtocolControllerTest {
         Registry registry = registry(1L, "Kommunstyrelsen", "KS");
         Meeting meeting = meeting(10L, registry, "KS april");
         Protocol protocol = protocol(100L, meeting, registry);
+        UserEntity currentUser = adminUser();
+
+        when(userService.getCurrentUser(any())).thenReturn(currentUser);
+        when(protocolViewService.getParagraphsForViewer(100L, currentUser)).thenReturn(List.of());
 
         when(protocolService.updateParagraphDecision(
                 200L,
@@ -123,13 +148,15 @@ class ProtocolControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("fragments/admin-protocols :: content"))
                 .andExpect(model().attribute("successMessage", "Beslut sparades."))
-                .andExpect(model().attribute("selectedProtocol", protocol));
+                .andExpect(model().attribute("selectedProtocol", protocol))
+                .andExpect(model().attributeExists("paragraphViews"));
 
         verify(protocolService).updateParagraphDecision(
                 200L,
                 ProtocolDecisionType.REJECTED,
                 "Kommunstyrelsen beslutar att avslå ärendet."
         );
+        verify(protocolViewService).getParagraphsForViewer(100L, currentUser);
     }
 
     @Test
@@ -190,5 +217,12 @@ class ProtocolControllerTest {
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
+    }
+
+    private UserEntity adminUser() {
+        UserEntity user = new UserEntity();
+        user.setName("admin");
+        user.setRole(UserRole.ADMIN);
+        return user;
     }
 }

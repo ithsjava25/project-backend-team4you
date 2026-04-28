@@ -3,7 +3,7 @@ package backendlab.team4you;
 import backendlab.team4you.user.UserRepository;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserRole;
-import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -17,65 +17,82 @@ public class Team4youApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(Team4youApplication.class, args);
 	}
-
-	@Bean
 	@Profile("dev")
-	ApplicationRunner init(UserRepository repository, BCryptPasswordEncoder encoder) {
+	@Bean
+	CommandLineRunner commandLineRunner(UserRepository repository, BCryptPasswordEncoder encoder) {
 		return args -> {
-			if (repository.count() == 0) {
+			seedUser(
+					repository,
+					encoder,
+					"dev",
+					"123456",
+					"admin",
+					"devadmin@gmail.com",
+					UserRole.ADMIN,
+					"YWRtaW4="
+			);
 
-				UserEntity devAdmin = new UserEntity(
-						Bytes.fromBase64("YWRtaW4="),
-						"dev",
-						"admin"
-				);
+			seedUser(
+					repository,
+					encoder,
+					"user",
+					"1234",
+					"user",
+					"devuser@gmail.com",
+					UserRole.USER,
+					"dXNlcg=="
+			);
 
-				devAdmin.setPasswordHash(encoder.encode("123456"));
-				devAdmin.setRole(UserRole.ADMIN);
-				devAdmin.setEmail("devadmin@gmail.com");
+			seedUser(
+					repository,
+					encoder,
+					"officer1",
+					"officer1",
+					"caseofficer1",
+					"devcaseofficer@gmail.com",
+					UserRole.CASE_OFFICER,
+					"YLRtaW5="
+			);
 
-				repository.save(devAdmin);
-				System.out.println("✅ Admin created");
-
-				UserEntity devUser = new UserEntity(
-						Bytes.fromBase64("dXNlcg=="),
-						"user",
-						"user"
-				);
-
-				devUser.setPasswordHash(encoder.encode("1234"));
-				devUser.setRole(UserRole.USER);
-				devUser.setEmail("devuser@gmail.com");
-
-				repository.save(devUser);
-				System.out.println("✅ User created");
-
-				UserEntity officer1 = new UserEntity(
-						Bytes.fromBase64("YLRtaW5="),
-						"officer1",
-						"caseofficer1"
-				);
-
-				officer1.setPasswordHash(encoder.encode("officer1"));
-				officer1.setRole(UserRole.CASE_OFFICER);
-				officer1.setEmail("devcaseofficer@gmail.com");
-
-				repository.save(officer1);
-				System.out.println("✅ Case officer 1 created");
-
-				UserEntity officer2 = new UserEntity(
-						Bytes.fromBase64("YLRtaG6="),
-						"officer2",
-						"caseofficer2"
-				);
-
-				officer2.setPasswordHash(encoder.encode("officer2"));
-				officer2.setRole(UserRole.CASE_OFFICER);
-				officer2.setEmail("devcaseofficer2@gmail.com");
-
-				repository.save(officer2);
-				System.out.println("✅ Case officer 2 created");
-			}
+			seedUser(
+					repository,
+					encoder,
+					"officer2",
+					"officer2",
+					"caseofficer2",
+					"devcaseofficer2@gmail.com",
+					UserRole.CASE_OFFICER,
+					"YLRtaG6="
+			);
 		};
+	}
+
+	private void seedUser(
+			UserRepository repository,
+			BCryptPasswordEncoder encoder,
+			String username,
+			String password,
+			String displayName,
+			String email,
+			UserRole role,
+			String base64Id
+	) {
+		if (repository.existsByName(username)) {
+			return;
+		}
+
+		UserEntity user = new UserEntity(
+				Bytes.fromBase64(base64Id),
+				username,
+				displayName
+		);
+
+		user.setPasswordHash(encoder.encode(password));
+		user.setRole(role);
+		user.setEmail(email);
+
+		repository.save(user);
+
+		System.out.println("✅ User created: " + username + " (" + role + ")");
 	}
 }

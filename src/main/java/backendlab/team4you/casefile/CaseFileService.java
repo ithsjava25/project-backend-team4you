@@ -194,6 +194,74 @@ public class CaseFileService {
         }
     }
 
+    @Transactional
+    public CaseFile uploadGeneratedFile(
+            Long caseRecordId,
+            String originalFilename,
+            String contentType,
+            byte[] bytes,
+            ConfidentialityLevel confidentialityLevel,
+            UserEntity actor
+    ) {
+        ConfidentialityLevel effectiveConfidentialityLevel =
+                confidentialityLevel != null ? confidentialityLevel : ConfidentialityLevel.OPEN;
+
+        CaseRecord caseRecord = caseRecordRepository.findByIdWithLock(caseRecordId)
+                .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
+
+        if (!caseFileAccessService.canUploadFile(actor, caseRecord, effectiveConfidentialityLevel)) {
+            throw new AccessDeniedException("Du har inte behörighet att ladda upp denna fil.");
+        }
+
+        if (bytes == null) {
+            throw new IllegalArgumentException("Filinnehåll saknas.");
+            }
+        if (bytes.length > MAX_FILE_SIZE_BYTES) {
+            throw new FileTooLargeException(MAX_FILE_SIZE_BYTES);
+        }
+
+        if (originalFilename == null || originalFilename.isBlank()) {
+            throw new InvalidFileNameException("Filnamn måste anges.");
+        }
+
+        String normalizedContentType = normalizeContentType(contentType);
+
+        int nextDocumentNumber = allocateNextDocumentNumber(caseRecord.getId());
+        String documentReference = caseRecord.getCaseNumber() + "-" + nextDocumentNumber;
+        String s3Key = buildUniqueS3Key(caseRecord, originalFilename);
+
+        boolean uploadedToS3 = false;
+
+        try {
+            s3Service.uploadFileIfAbsent(s3Key, bytes, normalizedContentType);
+            uploadedToS3 = true;
+
+            CaseFile caseFile = new CaseFile();
+            caseFile.setCaseRecord(caseRecord);
+            caseFile.setOriginalFilename(originalFilename);
+            caseFile.setS3Key(s3Key);
+            caseFile.setContentType(normalizedContentType);
+            caseFile.setSize(bytes.length);
+            caseFile.setUploadedAt(LocalDateTime.now());
+            caseFile.setDocumentNumber(nextDocumentNumber);
+            caseFile.setDocumentReference(documentReference);
+            caseFile.setConfidentialityLevel(effectiveConfidentialityLevel);
+
+            return caseFileRepository.saveAndFlush(caseFile);
+
+        } catch (NoSuchBucketException exception) {
+            throw new FileStorageConfigurationException(
+                    "Filuppladdning är inte korrekt konfigurerad: S3-bucket saknas.",
+                    exception
+            );
+        } catch (RuntimeException exception) {
+            if (uploadedToS3) {
+                cleanupUploadedObjectIfPossible(s3Key, exception);
+            }
+            throw exception;
+        }
+    }
+
     private String normalizeContentType(String contentType) {
         if (contentType == null || contentType.isBlank()) {
             return MediaType.APPLICATION_OCTET_STREAM_VALUE;

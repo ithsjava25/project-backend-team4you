@@ -677,4 +677,121 @@ class CaseFileServiceTest {
         verify(caseFileRepository, never()).delete(any());
         verify(s3Service, never()).deleteFile(anyString());
     }
+
+    @Test
+    @DisplayName("uploadGeneratedFile should upload generated file and save metadata")
+    void uploadGeneratedFile_shouldUploadGeneratedFileAndSaveMetadata() {
+        byte[] bytes = "pdf-content".getBytes();
+
+        when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
+        when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        CaseFile result = caseFileService.uploadGeneratedFile(
+                1L,
+                "protokoll-ks-2026-1.pdf",
+                "application/pdf",
+                bytes,
+                ConfidentialityLevel.OPEN,
+                actor
+        );
+
+        assertThat(result.getCaseRecord()).isEqualTo(caseRecord);
+        assertThat(result.getOriginalFilename()).isEqualTo("protokoll-ks-2026-1.pdf");
+        assertThat(result.getContentType()).isEqualTo("application/pdf");
+        assertThat(result.getSize()).isEqualTo(bytes.length);
+        assertThat(result.getDocumentNumber()).isEqualTo(1);
+        assertThat(result.getDocumentReference()).isEqualTo("KS26-1-1");
+        assertThat(result.getUploadedAt()).isNotNull();
+        assertThat(result.getS3Key()).contains("cases/1/");
+        assertThat(result.getS3Key()).endsWith("-protokoll-ks-2026-1.pdf");
+
+        verify(s3Service).uploadFileIfAbsent(
+                startsWith("cases/1/"),
+                eq(bytes),
+                eq("application/pdf")
+        );
+    }
+
+    @Test
+    @DisplayName("uploadGeneratedFile should assign next document number")
+    void uploadGeneratedFile_shouldAssignNextDocumentNumber() {
+        byte[] bytes = "pdf-content".getBytes();
+
+        CaseFile existingFile = new CaseFile();
+        existingFile.setDocumentNumber(3);
+
+        when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L))
+                .thenReturn(Optional.of(existingFile));
+        when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        CaseFile result = caseFileService.uploadGeneratedFile(
+                1L,
+                "protokoll.pdf",
+                "application/pdf",
+                bytes,
+                ConfidentialityLevel.OPEN,
+                actor
+        );
+
+        assertThat(result.getDocumentNumber()).isEqualTo(4);
+        assertThat(result.getDocumentReference()).isEqualTo("KS26-1-4");
+    }
+
+    @Test
+    @DisplayName("uploadGeneratedFile should throw FileTooLargeException when generated file is too large")
+    void uploadGeneratedFile_shouldThrowFileTooLargeException_whenGeneratedFileTooLarge() {
+        byte[] bytes = new byte[6 * 1024 * 1024];
+
+        when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
+
+        assertThatThrownBy(() -> caseFileService.uploadGeneratedFile(
+                1L,
+                "big.pdf",
+                "application/pdf",
+                bytes,
+                ConfidentialityLevel.OPEN,
+                actor
+        ))
+                .isInstanceOf(FileTooLargeException.class)
+                .hasMessageContaining("Filen är för stor.");
+
+        verifyNoInteractions(caseFileRepository, s3Service);
+    }
+
+    @Test
+    @DisplayName("uploadGeneratedFile should delete uploaded object when repository save fails")
+    void uploadGeneratedFile_shouldDeleteUploadedObjectWhenRepositorySaveFails() {
+        byte[] bytes = "pdf-content".getBytes();
+
+        when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
+        when(caseFileRepository.saveAndFlush(any(CaseFile.class)))
+                .thenThrow(new DataIntegrityViolationException("database failure"));
+
+        assertThatThrownBy(() -> caseFileService.uploadGeneratedFile(
+                1L,
+                "protokoll.pdf",
+                "application/pdf",
+                bytes,
+                ConfidentialityLevel.OPEN,
+                actor
+        ))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("database failure");
+
+        ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(s3Service).uploadFileIfAbsent(
+                keyCaptor.capture(),
+                eq(bytes),
+                eq("application/pdf")
+        );
+        verify(s3Service).deleteFile(keyCaptor.getValue());
+    }
 }

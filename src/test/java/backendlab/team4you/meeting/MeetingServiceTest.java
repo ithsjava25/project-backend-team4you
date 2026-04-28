@@ -5,6 +5,7 @@ import backendlab.team4you.casefile.CaseFileRepository;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
 import backendlab.team4you.exceptions.*;
+import backendlab.team4you.protocol.ProtocolRepository;
 import backendlab.team4you.registry.Registry;
 import backendlab.team4you.registry.RegistryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +47,9 @@ class MeetingServiceTest {
 
     @Mock
     private CaseFileRepository caseFileRepository;
+
+    @Mock
+    private ProtocolRepository protocolRepository;
 
     @InjectMocks
     private MeetingService meetingService;
@@ -160,7 +164,8 @@ class MeetingServiceTest {
     @Test
     @DisplayName("updateMeeting should update existing meeting")
     void updateMeeting_shouldUpdateExistingMeeting() {
-        when(meetingRepository.findById(10L)).thenReturn(Optional.of(meeting));
+        when(meetingRepository.findByIdWithLock(10L)).thenReturn(Optional.of(meeting));
+when(protocolRepository.existsByMeetingId(10L)).thenReturn(false);
         when(meetingRepository.save(any(Meeting.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Meeting updated = meetingService.updateMeeting(
@@ -186,7 +191,8 @@ class MeetingServiceTest {
     void addCaseRecordToMeeting_shouldCreateAgendaItemWithNextOrder() {
         when(caseRecord.getRegistry()).thenReturn(registry);
 
-        when(meetingRepository.findById(10L)).thenReturn(Optional.of(meeting));
+        when(meetingRepository.findByIdWithLock(10L)).thenReturn(Optional.of(meeting));
+when(protocolRepository.existsByMeetingId(10L)).thenReturn(false);
         when(caseRecordRepository.findById(100L)).thenReturn(Optional.of(caseRecord));
         when(meetingAgendaItemRepository.existsByMeetingAndCaseRecord(meeting, caseRecord)).thenReturn(false);
         when(meetingAgendaItemRepository.countByMeeting(meeting)).thenReturn(2L);
@@ -205,7 +211,8 @@ class MeetingServiceTest {
     void addCaseRecordToMeeting_shouldThrowDuplicateMeetingAgendaItemException_whenCaseRecordAlreadyExists() {
         when(caseRecord.getRegistry()).thenReturn(registry);
 
-        when(meetingRepository.findById(10L)).thenReturn(Optional.of(meeting));
+        when(meetingRepository.findByIdWithLock(10L)).thenReturn(Optional.of(meeting));
+when(protocolRepository.existsByMeetingId(10L)).thenReturn(false);
         when(caseRecordRepository.findById(100L)).thenReturn(Optional.of(caseRecord));
         when(meetingAgendaItemRepository.existsByMeetingAndCaseRecord(meeting, caseRecord)).thenReturn(true);
 
@@ -219,7 +226,8 @@ class MeetingServiceTest {
     void addCaseRecordToMeeting_shouldThrowInvalidMeetingStateException_whenCaseRecordBelongsToDifferentRegistry() {
         when(otherRegistryCaseRecord.getRegistry()).thenReturn(otherRegistry);
 
-        when(meetingRepository.findById(10L)).thenReturn(Optional.of(meeting));
+        when(meetingRepository.findByIdWithLock(10L)).thenReturn(Optional.of(meeting));
+when(protocolRepository.existsByMeetingId(10L)).thenReturn(false);
         when(caseRecordRepository.findById(200L)).thenReturn(Optional.of(otherRegistryCaseRecord));
 
         assertThatThrownBy(() -> meetingService.addCaseRecordToMeeting(10L, 200L))
@@ -236,7 +244,8 @@ class MeetingServiceTest {
         when(caseFile.getCaseRecord()).thenReturn(caseRecord);
         when(caseRecord.getId()).thenReturn(100L);
 
-        when(meetingRepository.findById(10L)).thenReturn(Optional.of(meeting));
+        when(meetingRepository.findByIdWithLock(10L)).thenReturn(Optional.of(meeting));
+when(protocolRepository.existsByMeetingId(10L)).thenReturn(false);
         when(meetingAgendaItemRepository.findById(50L)).thenReturn(Optional.of(agendaItem));
         when(caseFileRepository.findByIdAndCaseRecordId(1000L, 100L))
                 .thenReturn(Optional.of(caseFile));
@@ -259,7 +268,8 @@ class MeetingServiceTest {
         when(caseFile.getCaseRecord()).thenReturn(caseRecord);
         when(caseRecord.getId()).thenReturn(100L);
 
-        when(meetingRepository.findById(10L)).thenReturn(Optional.of(meeting));
+        when(meetingRepository.findByIdWithLock(10L)).thenReturn(Optional.of(meeting));
+when(protocolRepository.existsByMeetingId(10L)).thenReturn(false);
         when(meetingAgendaItemRepository.findById(50L)).thenReturn(Optional.of(agendaItem));
         when(caseFileRepository.findByIdAndCaseRecordId(1000L, 100L))
                 .thenReturn(Optional.of(caseFile));
@@ -277,7 +287,8 @@ class MeetingServiceTest {
         setField(agendaItem, "id", 50L);
 
         when(caseRecord.getId()).thenReturn(100L);
-        when(meetingRepository.findById(10L)).thenReturn(Optional.of(meeting));
+        when(meetingRepository.findByIdWithLock(10L)).thenReturn(Optional.of(meeting));
+when(protocolRepository.existsByMeetingId(10L)).thenReturn(false);
         when(meetingAgendaItemRepository.findById(50L)).thenReturn(Optional.of(agendaItem));
 
         assertThatThrownBy(() -> meetingService.addDocumentToAgendaItem(10L, 50L, 2000L))
@@ -297,7 +308,8 @@ class MeetingServiceTest {
         MeetingAgendaItem item3 = new MeetingAgendaItem(meeting, caseRecord, 3, null);
         setField(item3, "id", 13L);
 
-        when(meetingRepository.findById(10L)).thenReturn(Optional.of(meeting));
+        when(meetingRepository.findByIdWithLock(10L)).thenReturn(Optional.of(meeting));
+when(protocolRepository.existsByMeetingId(10L)).thenReturn(false);
         when(meetingAgendaItemRepository.findById(12L)).thenReturn(Optional.of(item2));
         when(meetingAgendaItemRepository.findByMeetingOrderByAgendaOrderAsc(meeting))
                 .thenReturn(List.of(item1, item3));
@@ -318,7 +330,8 @@ class MeetingServiceTest {
         MeetingAgendaItem item2 = new MeetingAgendaItem(meeting, caseRecord, 2, null);
         setField(item2, "id", 12L);
 
-        when(meetingRepository.findById(10L)).thenReturn(Optional.of(meeting));
+        when(meetingRepository.findByIdWithLock(10L)).thenReturn(Optional.of(meeting));
+when(protocolRepository.existsByMeetingId(10L)).thenReturn(false);
         when(meetingAgendaItemRepository.findByIdAndMeeting(12L, meeting)).thenReturn(Optional.of(item2));
         when(meetingAgendaItemRepository.findByMeetingAndAgendaOrder(meeting, 1)).thenReturn(Optional.of(item1));
 
@@ -338,7 +351,8 @@ class MeetingServiceTest {
         MeetingAgendaItem item3 = new MeetingAgendaItem(meeting, caseRecord, 3, null);
         setField(item3, "id", 13L);
 
-        when(meetingRepository.findById(10L)).thenReturn(Optional.of(meeting));
+        when(meetingRepository.findByIdWithLock(10L)).thenReturn(Optional.of(meeting));
+when(protocolRepository.existsByMeetingId(10L)).thenReturn(false);
         when(meetingAgendaItemRepository.findByIdAndMeeting(12L, meeting)).thenReturn(Optional.of(item2));
         when(meetingAgendaItemRepository.findByMeetingAndAgendaOrder(meeting, 3)).thenReturn(Optional.of(item3));
 
@@ -357,5 +371,27 @@ class MeetingServiceTest {
         } catch (Exception exception) {
             throw new RuntimeException(exception);
         }
+    }
+
+    @Test
+    @DisplayName("updateMeeting should throw MeetingHasProtocolException when meeting has protocol")
+    void updateMeeting_shouldThrowMeetingHasProtocolException_whenMeetingHasProtocol() {
+        when(meetingRepository.findByIdWithLock(10L)).thenReturn(Optional.of(meeting));
+        when(protocolRepository.existsByMeetingId(10L)).thenReturn(true);
+
+        assertThatThrownBy(() -> meetingService.updateMeeting(
+                10L,
+                "Nytt mötesnamn",
+                LocalDateTime.of(2026, 5, 1, 9, 0),
+                LocalDateTime.of(2026, 5, 1, 11, 0),
+                "Nya salen",
+                "Nya anteckningar",
+                MeetingStatus.PREPARING
+        ))
+                .isInstanceOf(MeetingHasProtocolException.class);
+
+        verify(meetingRepository).findByIdWithLock(10L);
+        verify(protocolRepository).existsByMeetingId(10L);
+        verify(meetingRepository, never()).save(any());
     }
 }

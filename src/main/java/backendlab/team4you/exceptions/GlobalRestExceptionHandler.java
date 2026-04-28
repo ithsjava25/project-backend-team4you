@@ -64,7 +64,8 @@ public class GlobalRestExceptionHandler {
     @ExceptionHandler({
             InvalidFileNameException.class,
             IllegalArgumentException.class,
-            InvalidMeetingStateException.class
+            InvalidMeetingStateException.class,
+            ProtocolNotReadyForPdfException.class
     })
     public ResponseEntity<ErrorResponseDto> handleBadRequest(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -94,7 +95,9 @@ public class GlobalRestExceptionHandler {
             FileKeyConflictException.class,
             DuplicateMeetingAgendaItemException.class,
             DuplicateMeetingAgendaDocumentException.class,
-            ProtocolAlreadyExistsException.class
+            ProtocolAlreadyExistsException.class,
+            ProtocolAlreadyArchivedException.class,
+            MeetingHasProtocolException.class
     })
     public ResponseEntity<ErrorResponseDto> handleConflict(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)

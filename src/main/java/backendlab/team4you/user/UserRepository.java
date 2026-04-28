@@ -28,4 +28,6 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
     UserEntity findByDisplayName(String DisplayName);
 
     List<UserEntity> findByRole(UserRole role);
+
+    boolean existsByName(String name);
 }
