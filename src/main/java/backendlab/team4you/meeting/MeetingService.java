@@ -94,11 +94,6 @@ public class MeetingService {
             String notes,
             MeetingStatus status
     ) {
-        ensureMeetingHasNoProtocol(meetingId);
-
-        if (meetingId == null) {
-            throw new InvalidMeetingStateException("Meeting-id måste anges.");
-        }
 
         if (title == null || title.isBlank()) {
             throw new InvalidMeetingStateException("Titel måste anges.");
@@ -116,8 +111,7 @@ public class MeetingService {
             throw new InvalidMeetingStateException("Status måste anges.");
         }
 
-        Meeting meeting = meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new MeetingNotFoundException(meetingId));
+        Meeting meeting = getMeetingByIdWithLockAndEnsureNoProtocol(meetingId);
 
         meeting.setTitle(title.trim());
         meeting.setStartsAt(startsAt);
@@ -131,15 +125,7 @@ public class MeetingService {
 
     @Transactional
     public void deleteMeeting(Long meetingId) {
-        ensureMeetingHasNoProtocol(meetingId);
-
-        if (meetingId == null) {
-            throw new InvalidMeetingStateException("Meeting-id måste anges.");
-        }
-
-        Meeting meeting = meetingRepository.findById(meetingId)
-                .orElseThrow(() -> new MeetingNotFoundException(meetingId));
-
+        Meeting meeting = getMeetingByIdWithLockAndEnsureNoProtocol(meetingId);
         meetingRepository.delete(meeting);
     }
 
@@ -177,9 +163,7 @@ public class MeetingService {
             throw new InvalidMeetingStateException("Case record-id måste anges.");
         }
 
-        ensureMeetingHasNoProtocol(meetingId);
-
-        Meeting meeting = getMeetingById(meetingId);
+        Meeting meeting = getMeetingByIdWithLockAndEnsureNoProtocol(meetingId);
 
         CaseRecord caseRecord = caseRecordRepository.findById(caseRecordId)
                 .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
@@ -204,9 +188,7 @@ public class MeetingService {
 
     @Transactional
     public void moveAgendaItemUp(Long meetingId, Long agendaItemId) {
-        ensureMeetingHasNoProtocol(meetingId);
-
-        Meeting meeting = getMeetingById(meetingId);
+        Meeting meeting = getMeetingByIdWithLockAndEnsureNoProtocol(meetingId);
 
         MeetingAgendaItem currentItem = meetingAgendaItemRepository.findByIdAndMeeting(agendaItemId, meeting)
                 .orElseThrow(() -> new MeetingAgendaItemNotFoundException("Dagordningspunkten hittades inte."));
@@ -233,9 +215,7 @@ public class MeetingService {
 
     @Transactional
     public void moveAgendaItemDown(Long meetingId, Long agendaItemId) {
-        ensureMeetingHasNoProtocol(meetingId);
-
-        Meeting meeting = getMeetingById(meetingId);
+        Meeting meeting = getMeetingByIdWithLockAndEnsureNoProtocol(meetingId);
 
         MeetingAgendaItem currentItem = meetingAgendaItemRepository.findByIdAndMeeting(agendaItemId, meeting)
                 .orElseThrow(() -> new MeetingAgendaItemNotFoundException("Dagordningspunkten hittades inte."));
@@ -265,8 +245,7 @@ public class MeetingService {
     }
 
     public void removeAgendaItem(Long meetingId, Long agendaItemId) {
-        Meeting meeting = getMeetingById(meetingId);
-        ensureMeetingHasNoProtocol(meetingId);
+        Meeting meeting = getMeetingByIdWithLockAndEnsureNoProtocol(meetingId);
 
         MeetingAgendaItem agendaItem = meetingAgendaItemRepository.findById(agendaItemId)
                 .orElseThrow(() -> new MeetingAgendaItemNotFoundException("Dagordningspunkten hittades inte."));
@@ -296,8 +275,7 @@ public class MeetingService {
     }
 
     public MeetingAgendaDocument addDocumentToAgendaItem(Long meetingId, Long agendaItemId, Long caseFileId) {
-        Meeting meeting = getMeetingById(meetingId);
-        ensureMeetingHasNoProtocol(meetingId);
+        Meeting meeting = getMeetingByIdWithLockAndEnsureNoProtocol(meetingId);
 
         MeetingAgendaItem agendaItem = meetingAgendaItemRepository.findById(agendaItemId)
                 .orElseThrow(() -> new MeetingAgendaItemNotFoundException("Dagordningspunkten hittades inte."));
@@ -323,8 +301,7 @@ public class MeetingService {
     }
 
     public void removeDocumentFromAgendaItem(Long meetingId, Long agendaItemId, Long documentId) {
-        Meeting meeting = getMeetingById(meetingId);
-        ensureMeetingHasNoProtocol(meetingId);
+        Meeting meeting = getMeetingByIdWithLockAndEnsureNoProtocol(meetingId);
 
         MeetingAgendaItem agendaItem = meetingAgendaItemRepository.findById(agendaItemId)
                 .orElseThrow(() -> new MeetingAgendaItemNotFoundException("Dagordningspunkten hittades inte."));
@@ -348,9 +325,7 @@ public class MeetingService {
             throw new IllegalArgumentException("Status måste anges.");
         }
 
-        ensureMeetingHasNoProtocol(meetingId);
-
-        Meeting meeting = getMeetingById(meetingId);
+        Meeting meeting = getMeetingByIdWithLockAndEnsureNoProtocol(meetingId);
         meeting.setStatus(status);
 
         return meetingRepository.save(meeting);
@@ -393,12 +368,17 @@ public class MeetingService {
         return value.trim();
     }
 
-    private void ensureMeetingHasNoProtocol(Long meetingId) {
+    private Meeting getMeetingByIdWithLockAndEnsureNoProtocol(Long meetingId) {
         if (meetingId == null) {
             throw new InvalidMeetingStateException("Meeting-id måste anges.");
         }
+
+        Meeting meeting = meetingRepository.findByIdWithLock(meetingId)
+                .orElseThrow(() -> new MeetingNotFoundException(meetingId));
+
         if (protocolRepository.existsByMeetingId(meetingId)) {
             throw new MeetingHasProtocolException(meetingId);
         }
+        return meeting;
     }
 }

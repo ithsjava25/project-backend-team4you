@@ -25,22 +25,22 @@ public class Team4youApplication {
 					repository,
 					encoder,
 					"dev",
-					"dev",
-					"dev",
-					"dev@gmail.com",
-					UserRole.USER,
-					"ZGV2"
+					"123456",
+					"admin",
+					"devadmin@gmail.com",
+					UserRole.ADMIN,
+					"YWRtaW4="
 			);
 
 			seedUser(
 					repository,
 					encoder,
-					"admin",
-					"admin",
-					"admin",
-					"admin@gmail.com",
-					UserRole.ADMIN,
-					"YWRtaW4="
+					"user",
+					"1234",
+					"user",
+					"devuser@gmail.com",
+					UserRole.USER,
+					"dXNlcg=="
 			);
 
 			seedUser(

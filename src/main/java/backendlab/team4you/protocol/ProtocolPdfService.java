@@ -7,8 +7,8 @@ import backendlab.team4you.user.UserRole;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import java.io.InputStream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,40 +58,40 @@ public class ProtocolPdfService {
 
             try (PdfWriter writer = new PdfWriter(document)) {
 
-                writer.writeLine(protocol.getTitle(), Standard14Fonts.FontName.HELVETICA_BOLD, 16);
+                writer.writeLine(protocol.getTitle(), true, 16);
                 writer.addSpacing(12);
 
-                writer.writeLine("Diarium: " + registry.getName(), Standard14Fonts.FontName.HELVETICA, 12);
-                writer.writeLine("Sammanträde: " + meeting.getTitle(), Standard14Fonts.FontName.HELVETICA, 12);
-                writer.writeLine("Datum: " + meeting.getStartsAt().toLocalDate(), Standard14Fonts.FontName.HELVETICA, 12);
+                writer.writeLine("Diarium: " + registry.getName(), false, 12);
+                writer.writeLine("Sammanträde: " + meeting.getTitle(), false, 12);
+                writer.writeLine("Datum: " + meeting.getStartsAt().toLocalDate(), false, 12);
                 writer.writeLine("Plats: " + (meeting.getLocation() != null ? meeting.getLocation() : "Ej angiven"),
-                        Standard14Fonts.FontName.HELVETICA, 12);
+                        false, 12);
 
                 writer.addSpacing(16);
 
-                writer.writeLine("Paragrafer", Standard14Fonts.FontName.HELVETICA_BOLD, 14);
+                writer.writeLine("Paragrafer", true, 14);
                 writer.addSpacing(8);
 
                 for (ProtocolParagraphViewDto paragraph : paragraphViews) {
-                    writer.writeLine(paragraph.heading(), Standard14Fonts.FontName.HELVETICA_BOLD, 12);
+                    writer.writeLine(paragraph.heading(), true, 12);
 
                     writer.writeLine("Ärendenummer: " + paragraph.caseNumber(),
-                            Standard14Fonts.FontName.HELVETICA, 12);
+                            false, 12);
 
                     if (paragraph.decisionRestricted()) {
                         writer.writeLine("Beslut: Beslutet omfattas av sekretess.",
-                                Standard14Fonts.FontName.HELVETICA, 12);
+                                false, 12);
                     } else {
                         if (paragraph.decisionLabel() != null) {
                             writer.writeLine("Beslut: " + paragraph.decisionLabel(),
-                                    Standard14Fonts.FontName.HELVETICA, 12);
+                                    false, 12);
                         }
 
                         if (paragraph.decisionText() != null && !paragraph.decisionText().isBlank()) {
-                            writer.writeLine("Beslutstext:", Standard14Fonts.FontName.HELVETICA, 12);
+                            writer.writeLine("Beslutstext:", false, 12);
 
                             for (String line : splitText(paragraph.decisionText(), 85)) {
-                                writer.writeLine(line, Standard14Fonts.FontName.HELVETICA, 12);
+                                writer.writeLine(line, false, 12);
                             }
                         }
                     }
@@ -152,12 +152,29 @@ public class ProtocolPdfService {
     private static class PdfWriter implements AutoCloseable {
 
         private final PDDocument document;
+        private final PDType0Font regularFont;
+        private final PDType0Font boldFont;
+
         private PDPageContentStream content;
         private float currentY;
 
         PdfWriter(PDDocument document) throws IOException {
             this.document = document;
+            this.regularFont = loadFont(document, "/fonts/NotoSans-Regular.ttf");
+            this.boldFont = loadFont(document, "/fonts/NotoSans-Bold.ttf");
             addNewPage();
+        }
+
+        private static PDType0Font loadFont(PDDocument document, String path) throws IOException {
+            InputStream inputStream = ProtocolPdfService.class.getResourceAsStream(path);
+
+            if (inputStream == null) {
+                throw new IllegalStateException("Font file missing from classpath: " + path);
+            }
+
+            try (inputStream) {
+                return PDType0Font.load(document, inputStream);
+            }
         }
 
         void addNewPage() throws IOException {
@@ -175,12 +192,12 @@ public class ProtocolPdfService {
             currentY = START_Y;
         }
 
-        void writeLine(String text, Standard14Fonts.FontName fontName, float fontSize) throws IOException {
+        void writeLine(String text, boolean bold, float fontSize) throws IOException {
             if (currentY <= BOTTOM_MARGIN) {
                 addNewPage();
             }
 
-            content.setFont(new PDType1Font(fontName), fontSize);
+            content.setFont(bold ? boldFont : regularFont, fontSize);
             content.showText(text == null ? "" : text);
             content.newLineAtOffset(0, -(fontSize + 6));
             currentY -= (fontSize + 6);
