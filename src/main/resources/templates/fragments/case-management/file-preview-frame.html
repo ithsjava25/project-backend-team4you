@@ -1,0 +1,8 @@
+<div th:fragment="frame" class="file-preview-frame">
+    <iframe
+            th:src="@{/api/cases/{caseId}/files/{fileId}/preview(caseId=${caseId}, fileId=${fileId})}"
+            width="100%"
+            height="600px"
+            style="border: none;">
+    </iframe>
+</div>

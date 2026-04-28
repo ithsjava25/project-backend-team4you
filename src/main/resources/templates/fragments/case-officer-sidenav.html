@@ -1,0 +1,54 @@
+<aside th:fragment="aside" class="admin-aside"> <div class="admin-container">
+
+    <div class="admin-head">
+        <a th:href="@{/case-officer}">Case Officer Dashboard</a>
+    </div>
+
+    <ul class="sidebar-links">
+
+        <li>
+            <a th:href="@{/case-officer/cases}"
+               hx-get="/case-officer/cases"
+               hx-target="#content-area">
+                <i class="fa-solid fa-file-invoice"></i>
+                <span>Hantera ärenden</span>
+            </a>
+        </li>
+
+        <li>
+            <a th:href="@{/dashboard/protocols}"
+               hx-get="/dashboard/protocols"
+               hx-target="#content-area"
+               hx-swap="innerHTML">
+                <i class="fa-solid fa-file-signature"></i>
+                <span>Protokoll</span>
+            </a>
+        </li>
+
+        <li>
+            <a th:href="@{/dashboard}">
+                <i class="fa-solid fa-table-columns"></i>
+                <span>Till dashboard</span>
+            </a>
+        </li>
+
+        <li>
+            <a th:href="@{/webauthn/register}" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-key"></i>
+                <span>Add Passkeys</span>
+            </a>
+        </li>
+
+        <li>
+            <form th:action="@{/logout}" method="post">
+                <button class="submit" type="submit">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Logga ut</span>
+                </button>
+            </form>
+        </li>
+
+    </ul>
+
+</div>
+</aside>

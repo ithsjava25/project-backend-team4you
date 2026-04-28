@@ -1,0 +1,249 @@
+<div th:fragment="content" class="admin-protocols-page">
+
+    <h2>Protokoll</h2>
+
+    <p th:if="${successMessage}"
+       class="feedback-message success-message"
+       th:text="${successMessage}"></p>
+
+    <div class="admin-meetings-layout">
+
+        <section class="meeting-sidebar">
+            <h3>Skapa protokoll</h3>
+
+            <div th:if="${#lists.isEmpty(completedMeetingsWithoutProtocol)}">
+                <p>Det finns inga avslutade sammanträden utan protokoll.</p>
+            </div>
+
+            <ul class="meeting-list" th:if="${not #lists.isEmpty(completedMeetingsWithoutProtocol)}">
+                <li th:each="meeting : ${completedMeetingsWithoutProtocol}">
+                    <div class="agenda-item-card">
+                        <div class="agenda-item-main">
+                            <strong th:text="${meeting.title}">Sammanträde</strong>
+                            <span th:text="${meeting.registry.name}">Diarium</span>
+                            <span th:text="${#temporals.format(meeting.startsAt, 'yyyy-MM-dd HH:mm')}">
+                                2026-05-10 13:00
+                            </span>
+                        </div>
+
+                        <form th:attr="hx-post=@{/admin/protocols/meetings/{meetingId}(meetingId=${meeting.id})}"
+                              hx-target="#content-area"
+                              hx-swap="innerHTML">
+                            <input type="hidden"
+                                   th:if="${_csrf != null}"
+                                   th:name="${_csrf.parameterName}"
+                                   th:value="${_csrf.token}">
+
+                            <button type="submit" class="submit protocol-create-button">
+                                Skapa protokoll
+                            </button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+
+            <hr>
+
+            <h3>Skapade protokoll</h3>
+
+            <div th:if="${#lists.isEmpty(protocols)}">
+                <p>Inga protokoll har skapats ännu.</p>
+            </div>
+
+            <ul class="meeting-list" th:if="${not #lists.isEmpty(protocols)}">
+                <li th:each="protocol : ${protocols}">
+                    <a th:href="@{/admin/protocols/{protocolId}(protocolId=${protocol.id})}"
+                       th:attr="hx-get=@{/admin/protocols/{protocolId}(protocolId=${protocol.id})}"
+                       hx-target="#content-area"
+                       hx-swap="innerHTML"
+                       class="meeting-list-link">
+                        <strong th:text="${protocol.title}">Protokoll</strong>
+                        <span th:text="${protocol.registry.name}">Diarium</span>
+                        <span th:text="${protocol.year}">2026</span>
+                    </a>
+                </li>
+            </ul>
+        </section>
+
+        <section class="meeting-detail">
+
+            <div th:if="${selectedProtocol == null}">
+                <h3>Välj ett protokoll</h3>
+                <p>Skapa ett nytt protokoll eller välj ett befintligt i listan.</p>
+            </div>
+
+            <div th:if="${selectedProtocol != null}">
+                <h3 th:text="${selectedProtocol.title}">Protokoll</h3>
+
+                <p>
+                    <strong>Diarium:</strong>
+                    <span th:text="${selectedProtocol.registry.name}">Kommunstyrelsen</span>
+                </p>
+
+                <p>
+                    <strong>Sammanträde:</strong>
+                    <span th:text="${selectedProtocol.meeting.title}">Sammanträde</span>
+                </p>
+
+                <p>
+                    <strong>Datum:</strong>
+                    <span th:text="${#temporals.format(selectedProtocol.meeting.startsAt, 'yyyy-MM-dd HH:mm')}">
+                        2026-05-10 13:00
+                    </span>
+                </p>
+
+                <p>
+                    <strong>Plats:</strong>
+                    <span th:text="${selectedProtocol.meeting.location ?: 'Ej angiven'}">Sessionssalen</span>
+                </p>
+
+                <div class="protocol-actions">
+
+                    <div th:if="${selectedProtocol.readyForPdf}">
+                        <a th:href="@{/admin/protocols/{protocolId}/pdf(protocolId=${selectedProtocol.id})}"
+                           target="_blank"
+                           class="submit protocol-create-button">
+                            Visa PDF
+                        </a>
+
+                        <p th:if="${selectedProtocol.archivedPdfFile != null}"
+                           class="feedback-message success-message">
+                            PDF redan sparad i årsärende. Protokollet är låst för ändringar.
+                        </p>
+
+                        <form th:if="${selectedProtocol.archivedPdfFile == null}"
+                              th:attr="hx-post=@{/admin/protocols/{protocolId}/archive-pdf(protocolId=${selectedProtocol.id})}"
+                              hx-target="#content-area"
+                              hx-swap="innerHTML">
+                            <input type="hidden"
+                                   th:if="${_csrf != null}"
+                                   th:name="${_csrf.parameterName}"
+                                   th:value="${_csrf.token}">
+
+                            <button type="submit" class="submit protocol-create-button">
+                                Spara PDF i årsärende
+                            </button>
+                        </form>
+                    </div>
+
+                    <p th:if="${!selectedProtocol.readyForPdf}"
+                       class="feedback-message error-message">
+                        Alla paragrafer måste ha beslut och beslutstext innan PDF kan skapas.
+                    </p>
+
+                </div>
+
+                <hr>
+
+                <h4>Paragrafer</h4>
+
+                <div th:if="${#lists.isEmpty(selectedProtocol.paragraphs)}">
+                    <p>Protokollet saknar paragrafer.</p>
+                </div>
+
+                <div th:each="paragraph : ${paragraphViews}"
+                     class="agenda-item-card protocol-paragraph">
+
+                    <div class="agenda-item-main">
+                        <strong th:text="${paragraph.heading}">§ 1 Ärendenamn</strong>
+
+                        <span>
+                            Ärendenummer:
+                        <span th:text="${paragraph.caseNumber}">KS26-1</span>
+                        </span>
+
+                        <div class="protocol-decision-display">
+                            <strong>Beslut:</strong>
+
+                            <span th:if="${paragraph.decisionRestricted}"
+                                  class="case-file-restricted-text">
+                                Beslutet omfattas av sekretess.
+                            </span>
+
+                            <span th:if="${!paragraph.decisionRestricted}"
+                                  th:text="${paragraph.decisionLabel ?: 'Ej valt'}">
+                                Bifall
+                            </span>
+
+                            <p th:if="${!paragraph.decisionRestricted and paragraph.decisionText != null}"
+                               th:text="${paragraph.decisionText}">
+                                Beslutstext
+                            </p>
+                        </div>
+
+                        <form th:if="${selectedProtocol.archivedPdfFile == null}"
+                              th:attr="hx-post=@{/admin/protocols/paragraphs/{paragraphId}/decision(paragraphId=${paragraph.id})}"
+                              hx-target="#content-area"
+                              hx-swap="innerHTML"
+                              class="meeting-form protocol-decision-form">
+
+                            <input type="hidden"
+                                   th:if="${_csrf != null}"
+                                   th:name="${_csrf.parameterName}"
+                                   th:value="${_csrf.token}">
+
+                            <div class="form-group">
+                                <label th:for="${'decisionType-' + paragraph.id}">Beslut</label>
+
+                                <select th:id="${'decisionType-' + paragraph.id}"
+                                        name="decisionType"
+                                        required
+                                        th:attr="hx-get=@{/admin/protocols/paragraphs/{paragraphId}/decision-text(paragraphId=${paragraph.id})}"
+                                        hx-target="next .decision-text-wrapper"
+                                        hx-swap="outerHTML">
+                                    <option value="">Välj beslut</option>
+                                    <option th:each="decisionType : ${T(backendlab.team4you.protocol.ProtocolDecisionType).values()}"
+                                            th:value="${decisionType}"
+                                            th:text="${decisionType.label}"
+                                            th:selected="${decisionType == paragraph.decisionType}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group decision-text-wrapper"
+                                 th:id="${'decision-text-wrapper-' + paragraph.id}">
+                                <label th:for="${'decisionText-' + paragraph.id}">Beslutstext</label>
+
+                                <textarea th:id="${'decisionText-' + paragraph.id}"
+                                          name="decisionText"
+                                          rows="3"
+                                          required
+                                          th:text="${paragraph.decisionText != null
+                                                  ? paragraph.decisionText
+                                                  : selectedProtocol.registry.name + ' beslutar att bifalla ärendet.'}">
+                                </textarea>
+                            </div>
+
+                            <button type="submit" class="submit protocol-create-button">
+                                Spara beslut
+                            </button>
+                        </form>
+
+                        <p th:if="${selectedProtocol.archivedPdfFile != null}"
+                           class="feedback-message success-message">
+                            Protokollet är arkiverat och besluten kan inte längre ändras.
+                        </p>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+</div>
+
+<div th:fragment="decisionTextField(paragraphId, decisionText)"
+     class="form-group decision-text-wrapper"
+     th:id="${'decision-text-wrapper-' + paragraphId}">
+
+    <label th:for="${'decisionText-' + paragraphId}">Beslutstext</label>
+
+    <textarea th:id="${'decisionText-' + paragraphId}"
+              name="decisionText"
+              rows="3"
+              required
+              th:text="${decisionText}">
+    </textarea>
+</div>

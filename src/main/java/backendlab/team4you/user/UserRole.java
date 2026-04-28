@@ -4,5 +4,5 @@ public enum UserRole {
 
     USER,
     ADMIN,
-
+    CASE_OFFICER
 }

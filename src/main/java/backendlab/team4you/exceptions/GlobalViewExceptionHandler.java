@@ -9,7 +9,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ControllerAdvice(basePackages = "backendlab.team4you.casefile.ui")
+@ControllerAdvice(basePackages = {
+        "backendlab.team4you.casefile.ui",
+        "backendlab.team4you.meeting",
+        "backendlab.team4you.protocol"
+})
 public class GlobalViewExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalViewExceptionHandler.class);
@@ -31,7 +35,11 @@ public class GlobalViewExceptionHandler {
     @ExceptionHandler({
             CaseRecordNotFoundException.class,
             RegistryNotFoundException.class,
-            CaseFileNotFoundException.class
+            CaseFileNotFoundException.class,
+            MeetingNotFoundException.class,
+            MeetingAgendaDocumentNotFoundException.class,
+            ProtocolNotFoundException.class,
+            ProtocolParagraphNotFoundException.class,
     })
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleNotFound(RuntimeException ex, Model model) {
@@ -59,6 +67,34 @@ public class GlobalViewExceptionHandler {
     public String handleUnexpected(Exception ex, Model model) {
         log.error("Unexpected view error", ex);
         model.addAttribute("errorMessage", "Något gick fel. Försök igen.");
+        return "error";
+    }
+
+    @ExceptionHandler(ProtocolAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleProtocolAlreadyExists(ProtocolAlreadyExistsException ex, Model model) {
+        model.addAttribute("errorMessage", "Ett protokoll finns redan för det här sammanträdet.");
+        return "error";
+    }
+
+    @ExceptionHandler(ProtocolAlreadyArchivedException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleProtocolAlreadyArchived(ProtocolAlreadyArchivedException ex, Model model) {
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "error";
+    }
+
+    @ExceptionHandler(ProtocolNotReadyForPdfException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleProtocolNotReady(ProtocolNotReadyForPdfException ex, Model model) {
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "error";
+    }
+
+    @ExceptionHandler(MeetingHasProtocolException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleMeetingHasProtocol(MeetingHasProtocolException ex, Model model) {
+        model.addAttribute("errorMessage", ex.getMessage());
         return "error";
     }
 }

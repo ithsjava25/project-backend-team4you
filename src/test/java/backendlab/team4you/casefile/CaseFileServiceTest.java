@@ -5,6 +5,7 @@ import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
 import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.exceptions.*;
+import backendlab.team4you.meeting.MeetingAgendaDocumentRepository;
 import backendlab.team4you.s3.S3Service;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserRole;
@@ -46,6 +47,9 @@ class CaseFileServiceTest {
     @Mock
     private CaseFileAccessService caseFileAccessService;
 
+    @Mock
+    private MeetingAgendaDocumentRepository meetingAgendaDocumentRepository;
+
     @InjectMocks
     private CaseFileService caseFileService;
 
@@ -78,7 +82,7 @@ class CaseFileServiceTest {
                 "hello world".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -115,13 +119,16 @@ class CaseFileServiceTest {
                 "hello".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(false);
+        when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
+
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(false);
 
         assertThatThrownBy(() -> caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN, actor))
                 .isInstanceOf(AccessDeniedException.class)
                 .hasMessage("Du har inte behörighet att ladda upp denna fil.");
 
-        verifyNoInteractions(caseRecordRepository, caseFileRepository, s3Service);
+        verify(caseRecordRepository).findByIdWithLock(1L);
+        verifyNoInteractions(caseFileRepository, s3Service);
     }
 
     @Test
@@ -134,7 +141,6 @@ class CaseFileServiceTest {
                 "hello world".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 99L, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> caseFileService.uploadFile(99L, file, ConfidentialityLevel.OPEN, actor))
@@ -150,7 +156,7 @@ class CaseFileServiceTest {
     void uploadFile_shouldThrowInvalidFileNameException_whenFilenameIsBlank() {
         MultipartFile file = mock(MultipartFile.class);
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(file.getSize()).thenReturn(10L);
         when(file.getOriginalFilename()).thenReturn(" ");
@@ -173,7 +179,7 @@ class CaseFileServiceTest {
                 "abc".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -318,6 +324,7 @@ class CaseFileServiceTest {
         when(caseFileRepository.findByIdAndCaseRecordId(100L, 1L))
                 .thenReturn(Optional.of(caseFile));
         when(caseFileAccessService.canDeleteFile(actor, caseFile)).thenReturn(true);
+        when(meetingAgendaDocumentRepository.existsByCaseFileId(100L)).thenReturn(false);
 
         caseFileService.deleteFile(1L, 100L, actor);
 
@@ -355,7 +362,7 @@ class CaseFileServiceTest {
                 "hello".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -380,7 +387,7 @@ class CaseFileServiceTest {
                 "hello".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
         doNothing().when(s3Service).uploadFileIfAbsent(anyString(), any(byte[].class), eq("application/pdf"));
@@ -412,7 +419,7 @@ class CaseFileServiceTest {
                 "hello".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
         doNothing().when(s3Service).uploadFileIfAbsent(anyString(), any(byte[].class), eq("application/pdf"));
@@ -444,7 +451,7 @@ class CaseFileServiceTest {
                 "hello".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
 
@@ -461,8 +468,8 @@ class CaseFileServiceTest {
     }
 
     @Test
-    @DisplayName("deleteFile should delete metadata before attempting s3 delete")
-    void deleteFile_shouldDeleteMetadataBeforeAttemptingS3Delete() {
+    @DisplayName("deleteFile should not throw when s3 delete fails after metadata deletion")
+    void deleteFile_shouldNotThrowWhenS3DeleteFailsAfterMetadataDeletion() {
         CaseFile caseFile = new CaseFile();
         caseFile.setId(100L);
         caseFile.setCaseRecord(caseRecord);
@@ -471,14 +478,15 @@ class CaseFileServiceTest {
         when(caseFileRepository.findByIdAndCaseRecordId(100L, 1L))
                 .thenReturn(Optional.of(caseFile));
         when(caseFileAccessService.canDeleteFile(actor, caseFile)).thenReturn(true);
+        when(meetingAgendaDocumentRepository.existsByCaseFileId(100L))
+                .thenReturn(false);
 
         doThrow(new RuntimeException("s3 delete failed"))
                 .when(s3Service)
                 .deleteFile("cases/1/uuid-test.pdf");
 
-        assertThatThrownBy(() -> caseFileService.deleteFile(1L, 100L, actor))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("s3 delete failed");
+        assertThatCode(() -> caseFileService.deleteFile(1L, 100L, actor))
+                .doesNotThrowAnyException();
 
         verify(caseFileRepository).delete(caseFile);
         verify(s3Service).deleteFile("cases/1/uuid-test.pdf");
@@ -494,7 +502,9 @@ class CaseFileServiceTest {
                 new byte[6 * 1024 * 1024]
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
+
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
 
         assertThatThrownBy(() -> caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN, actor))
                 .isInstanceOf(FileTooLargeException.class)
@@ -511,13 +521,16 @@ class CaseFileServiceTest {
                 new byte[6 * 1024 * 1024]
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
+
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
 
         assertThatThrownBy(() -> caseFileService.uploadFile(1L, file, ConfidentialityLevel.OPEN, actor))
                 .isInstanceOf(FileTooLargeException.class)
                 .hasMessageContaining("Filen är för stor.");
 
-        verifyNoInteractions(caseRecordRepository, caseFileRepository, s3Service);
+        verify(caseRecordRepository).findByIdWithLock(1L);
+        verifyNoInteractions(caseFileRepository, s3Service);
     }
 
     @Test
@@ -530,7 +543,7 @@ class CaseFileServiceTest {
                 "hello".getBytes()
         );
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
         when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -554,7 +567,7 @@ class CaseFileServiceTest {
         CaseFile existingFile = new CaseFile();
         existingFile.setDocumentNumber(1);
 
-        when(caseFileAccessService.canUploadFile(actor, 1L, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
         when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
         when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L))
                 .thenReturn(Optional.of(existingFile));
@@ -640,5 +653,145 @@ class CaseFileServiceTest {
         assertThat(result.get(0).displayName()).isEqualTo("offentlig.pdf");
         assertThat(result.get(0).canDownload()).isTrue();
         assertThat(result.get(0).confidential()).isFalse();
+    }
+
+    @Test
+    @DisplayName("delete file should throw FileInUseException when file is in use by a meeting")
+    void deleteFile_shouldThrowFileInUseException_whenFileIsUsedByMeetingAgendaDocument() {
+        CaseFile caseFile = new CaseFile();
+        caseFile.setId(100L);
+        caseFile.setCaseRecord(caseRecord);
+        caseFile.setS3Key("cases/1/uuid-test.pdf");
+
+        when(caseFileRepository.findByIdAndCaseRecordId(100L, 1L))
+                .thenReturn(Optional.of(caseFile));
+        when(caseFileAccessService.canDeleteFile(actor, caseFile))
+                .thenReturn(true);
+        when(meetingAgendaDocumentRepository.existsByCaseFileId(100L))
+                .thenReturn(true);
+
+        assertThatThrownBy(() -> caseFileService.deleteFile(1L, 100L, actor))
+                .isInstanceOf(FileInUseException.class)
+                .hasMessageContaining("mötesunderlag");
+
+        verify(caseFileRepository, never()).delete(any());
+        verify(s3Service, never()).deleteFile(anyString());
+    }
+
+    @Test
+    @DisplayName("uploadGeneratedFile should upload generated file and save metadata")
+    void uploadGeneratedFile_shouldUploadGeneratedFileAndSaveMetadata() {
+        byte[] bytes = "pdf-content".getBytes();
+
+        when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
+        when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        CaseFile result = caseFileService.uploadGeneratedFile(
+                1L,
+                "protokoll-ks-2026-1.pdf",
+                "application/pdf",
+                bytes,
+                ConfidentialityLevel.OPEN,
+                actor
+        );
+
+        assertThat(result.getCaseRecord()).isEqualTo(caseRecord);
+        assertThat(result.getOriginalFilename()).isEqualTo("protokoll-ks-2026-1.pdf");
+        assertThat(result.getContentType()).isEqualTo("application/pdf");
+        assertThat(result.getSize()).isEqualTo(bytes.length);
+        assertThat(result.getDocumentNumber()).isEqualTo(1);
+        assertThat(result.getDocumentReference()).isEqualTo("KS26-1-1");
+        assertThat(result.getUploadedAt()).isNotNull();
+        assertThat(result.getS3Key()).contains("cases/1/");
+        assertThat(result.getS3Key()).endsWith("-protokoll-ks-2026-1.pdf");
+
+        verify(s3Service).uploadFileIfAbsent(
+                startsWith("cases/1/"),
+                eq(bytes),
+                eq("application/pdf")
+        );
+    }
+
+    @Test
+    @DisplayName("uploadGeneratedFile should assign next document number")
+    void uploadGeneratedFile_shouldAssignNextDocumentNumber() {
+        byte[] bytes = "pdf-content".getBytes();
+
+        CaseFile existingFile = new CaseFile();
+        existingFile.setDocumentNumber(3);
+
+        when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L))
+                .thenReturn(Optional.of(existingFile));
+        when(caseFileRepository.saveAndFlush(any(CaseFile.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        CaseFile result = caseFileService.uploadGeneratedFile(
+                1L,
+                "protokoll.pdf",
+                "application/pdf",
+                bytes,
+                ConfidentialityLevel.OPEN,
+                actor
+        );
+
+        assertThat(result.getDocumentNumber()).isEqualTo(4);
+        assertThat(result.getDocumentReference()).isEqualTo("KS26-1-4");
+    }
+
+    @Test
+    @DisplayName("uploadGeneratedFile should throw FileTooLargeException when generated file is too large")
+    void uploadGeneratedFile_shouldThrowFileTooLargeException_whenGeneratedFileTooLarge() {
+        byte[] bytes = new byte[6 * 1024 * 1024];
+
+        when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
+
+        assertThatThrownBy(() -> caseFileService.uploadGeneratedFile(
+                1L,
+                "big.pdf",
+                "application/pdf",
+                bytes,
+                ConfidentialityLevel.OPEN,
+                actor
+        ))
+                .isInstanceOf(FileTooLargeException.class)
+                .hasMessageContaining("Filen är för stor.");
+
+        verifyNoInteractions(caseFileRepository, s3Service);
+    }
+
+    @Test
+    @DisplayName("uploadGeneratedFile should delete uploaded object when repository save fails")
+    void uploadGeneratedFile_shouldDeleteUploadedObjectWhenRepositorySaveFails() {
+        byte[] bytes = "pdf-content".getBytes();
+
+        when(caseRecordRepository.findByIdWithLock(1L)).thenReturn(Optional.of(caseRecord));
+        when(caseFileAccessService.canUploadFile(actor, caseRecord, ConfidentialityLevel.OPEN)).thenReturn(true);
+        when(caseFileRepository.findTopByCaseRecordIdOrderByDocumentNumberDesc(1L)).thenReturn(Optional.empty());
+        when(caseFileRepository.saveAndFlush(any(CaseFile.class)))
+                .thenThrow(new DataIntegrityViolationException("database failure"));
+
+        assertThatThrownBy(() -> caseFileService.uploadGeneratedFile(
+                1L,
+                "protokoll.pdf",
+                "application/pdf",
+                bytes,
+                ConfidentialityLevel.OPEN,
+                actor
+        ))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("database failure");
+
+        ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
+
+        verify(s3Service).uploadFileIfAbsent(
+                keyCaptor.capture(),
+                eq(bytes),
+                eq("application/pdf")
+        );
+        verify(s3Service).deleteFile(keyCaptor.getValue());
     }
 }

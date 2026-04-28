@@ -1,0 +1,381 @@
+<div th:fragment="content" class="admin-meetings-page">
+
+    <h2>Sammanträden</h2>
+
+    <p th:if="${successMessage}" class="feedback-message success-message" th:text="${successMessage}"></p>
+    <p th:if="${errorMessage}" class="feedback-message error-message" th:text="${errorMessage}"></p>
+
+    <div class="admin-meetings-layout">
+
+        <section class="meeting-sidebar">
+            <h3>Skapa sammanträde</h3>
+
+            <form
+                    hx-post="/admin/meetings"
+                    hx-target="#content-area"
+                    hx-swap="innerHTML"
+                    class="meeting-form"
+            >
+                <input type="hidden"
+                       th:if="${_csrf != null}"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+                <div class="form-group">
+                    <label for="registryId">Diarium</label>
+                    <select id="registryId" name="registryId" required>
+                        <option value="">Välj diarium</option>
+                        <option
+                                th:each="registry : ${registries}"
+                                th:value="${registry.id}"
+                                th:text="${registry.name}"
+                                th:selected="${registry.id == selectedRegistryId}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="title">Titel</label>
+                    <input id="title" name="title" type="text" placeholder="T.ex. Kommunstyrelsen april" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="startsAt">Start</label>
+                    <input id="startsAt" name="startsAt" type="datetime-local" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="endsAt">Slut</label>
+                    <input id="endsAt" name="endsAt" type="datetime-local">
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Plats</label>
+                    <input id="location" name="location" type="text" placeholder="Sessionssalen">
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Anteckning</label>
+                    <textarea id="notes" name="notes" rows="3"></textarea>
+                </div>
+
+                <button class="submit" type="submit">Skapa sammanträde</button>
+            </form>
+
+            <hr>
+
+            <h3>Befintliga sammanträden</h3>
+
+            <div th:if="${#lists.isEmpty(meetings)}">
+                <p>Inga sammanträden att visa.</p>
+            </div>
+
+            <ul class="meeting-list" th:if="${not #lists.isEmpty(meetings)}">
+                <li th:each="meeting : ${meetings}">
+
+                    <a
+                    th:href="@{/admin/meetings/{meetingId}(meetingId=${meeting.id})}"
+                    th:attr="hx-get=@{/admin/meetings/{meetingId}(meetingId=${meeting.id})}"
+                    hx-target="#content-area"
+                    hx-swap="innerHTML"
+                    class="meeting-list-link"
+                    >
+                    <strong th:text="${meeting.title}">Kommunstyrelsen april</strong>
+                    <span th:text="${#temporals.format(meeting.startsAt, 'yyyy-MM-dd HH:mm')}">2026-05-10 13:00</span>
+                    </a>
+                </li>
+            </ul>
+        </section>
+
+        <section class="meeting-detail">
+            <div th:if="${selectedMeeting == null}">
+                <h3>Välj ett sammanträde</h3>
+                <p>Skapa ett nytt sammanträde eller välj ett befintligt i listan.</p>
+            </div>
+
+            <div th:if="${selectedMeeting != null}">
+                <h3 th:text="${selectedMeeting.title}">Sammanträde</h3>
+
+                <p>
+                    <strong>Diarium:</strong>
+                    <span th:text="${selectedMeeting.registry.name}">Kommunstyrelsen</span>
+                </p>
+
+                <p>
+                    <strong>Start:</strong>
+                    <span th:text="${#temporals.format(selectedMeeting.startsAt, 'yyyy-MM-dd HH:mm')}">2026-05-10 13:00</span>
+                </p>
+
+                <p th:if="${selectedMeeting.endsAt != null}">
+                    <strong>Slut:</strong>
+                    <span th:text="${#temporals.format(selectedMeeting.endsAt, 'yyyy-MM-dd HH:mm')}">2026-05-10 15:00</span>
+                </p>
+
+                <p th:if="${selectedMeeting.location != null}">
+                    <strong>Plats:</strong>
+                    <span th:text="${selectedMeeting.location}">Sessionssalen</span>
+                </p>
+
+                <p>
+                    <strong>Status:</strong>
+                    <span th:text="${selectedMeeting.status.label}">Planerad</span>
+                </p>
+
+                <p th:if="${selectedMeeting.notes != null}">
+                    <strong>Anteckningar:</strong>
+                    <span th:text="${selectedMeeting.notes}">Anteckning</span>
+                </p>
+
+                <hr>
+
+                <h4>Redigera sammanträde</h4>
+
+                <form
+                        th:attr="hx-post=@{/admin/meetings/{meetingId}/update(meetingId=${selectedMeeting.id})}"
+                        hx-target="#content-area"
+                        hx-swap="innerHTML"
+                        class="meeting-form"
+                >
+                    <input type="hidden"
+                           th:if="${_csrf != null}"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+                    <div class="form-group">
+                        <label for="edit-title">Titel</label>
+                        <input id="edit-title" name="title" type="text" th:value="${selectedMeeting.title}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-startsAt">Start</label>
+                        <input id="edit-startsAt"
+                               name="startsAt"
+                               type="datetime-local"
+                               th:value="${#temporals.format(selectedMeeting.startsAt, 'yyyy-MM-dd''T''HH:mm')}"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-endsAt">Slut</label>
+                        <input id="edit-endsAt"
+                               name="endsAt"
+                               type="datetime-local"
+                               th:value="${selectedMeeting.endsAt != null ? #temporals.format(selectedMeeting.endsAt, 'yyyy-MM-dd''T''HH:mm') : ''}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-location">Plats</label>
+                        <input id="edit-location" name="location" type="text" th:value="${selectedMeeting.location}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-status">Status</label>
+                        <select id="edit-status" name="status" required>
+                            <option
+                                    th:each="meetingStatus : ${T(backendlab.team4you.meeting.MeetingStatus).values()}"
+                                    th:value="${meetingStatus}"
+                                    th:selected="${meetingStatus == selectedMeeting.status}"
+                                    th:text="${meetingStatus.label}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-notes">Anteckning</label>
+                        <textarea id="edit-notes" name="notes" rows="3" th:text="${selectedMeeting.notes}"></textarea>
+                    </div>
+
+                    <button class="submit" type="submit">Spara ändringar</button>
+                </form>
+
+                <form
+                        th:attr="hx-post=@{/admin/meetings/{meetingId}/delete(meetingId=${selectedMeeting.id})}"
+                        hx-target="#content-area"
+                        hx-swap="innerHTML"
+                        class="delete-meeting-form"
+                >
+                    <input type="hidden"
+                           th:if="${_csrf != null}"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+                    <button type="submit" class="danger-button">Ta bort sammanträde</button>
+                </form>
+
+                <hr>
+
+                <h4>Lägg till ärende</h4>
+
+                <form
+                        th:attr="hx-post=@{/admin/meetings/{meetingId}/agenda-items(meetingId=${selectedMeeting.id})}"
+                        hx-target="#content-area"
+                        hx-swap="innerHTML"
+                        class="meeting-form"
+                >
+                    <input type="hidden"
+                           th:if="${_csrf != null}"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+                    <div class="form-group">
+                        <label for="caseRecordId">Ärende</label>
+                        <select id="caseRecordId" name="caseRecordId" required>
+                            <option value="">Välj ärende</option>
+                            <option
+                                    th:each="caseRecord : ${availableCaseRecords}"
+                                    th:value="${caseRecord.id}"
+                                    th:text="${caseRecord.caseNumber + ' - ' + caseRecord.title}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <button class="submit" type="submit">Lägg till ärende</button>
+                </form>
+
+                <hr>
+
+                <h4>Dagordning</h4>
+
+                <div th:if="${#lists.isEmpty(agendaItems)}">
+                    <p>Inga ärenden tillagda ännu.</p>
+                </div>
+
+                <ol class="meeting-agenda-list" th:if="${not #lists.isEmpty(agendaItems)}">
+                    <li th:each="agendaItem : ${agendaItems}">
+                        <div class="agenda-item-card">
+                            <div class="agenda-item-main">
+                                <strong th:text="${agendaItem.agendaOrder + '. ' + agendaItem.caseRecord.caseNumber}">1. KS26-1</strong>
+                                <span th:text="${agendaItem.caseRecord.title}">Ärendetitel</span>
+                            </div>
+
+                            <div class="agenda-item-actions">
+                                <form
+                                        th:attr="hx-post=@{/admin/meetings/{meetingId}/agenda-items/{agendaItemId}/move-up(meetingId=${selectedMeeting.id}, agendaItemId=${agendaItem.id})}"
+                                        hx-target="#content-area"
+                                        hx-swap="innerHTML"
+                                >
+                                    <input type="hidden"
+                                           th:if="${_csrf != null}"
+                                           th:name="${_csrf.parameterName}"
+                                           th:value="${_csrf.token}">
+                                    <button type="submit" class="secondary-button">Upp</button>
+                                </form>
+
+                                <form
+                                        th:attr="hx-post=@{/admin/meetings/{meetingId}/agenda-items/{agendaItemId}/move-down(meetingId=${selectedMeeting.id}, agendaItemId=${agendaItem.id})}"
+                                        hx-target="#content-area"
+                                        hx-swap="innerHTML"
+                                >
+                                    <input type="hidden"
+                                           th:if="${_csrf != null}"
+                                           th:name="${_csrf.parameterName}"
+                                           th:value="${_csrf.token}">
+                                    <button type="submit" class="secondary-button">Ner</button>
+                                </form>
+
+                                <form
+                                        th:attr="hx-delete=@{/admin/meetings/{meetingId}/agenda-items/{agendaItemId}(meetingId=${selectedMeeting.id}, agendaItemId=${agendaItem.id})}"
+                                        hx-target="#content-area"
+                                        hx-swap="innerHTML"
+                                >
+                                    <input type="hidden"
+                                           th:if="${_csrf != null}"
+                                           th:name="${_csrf.parameterName}"
+                                           th:value="${_csrf.token}">
+                                    <button type="submit" class="danger-button">Ta bort ärende</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="agenda-documents-section">
+                            <h5>Valda beslutsunderlag</h5>
+
+                            <div th:if="${#lists.isEmpty(documentsByAgendaItemId[agendaItem.id])}">
+                                <p>Inga handlingar valda ännu.</p>
+                            </div>
+
+                            <ul class="agenda-document-list" th:if="${not #lists.isEmpty(documentsByAgendaItemId[agendaItem.id])}">
+                                <li th:each="document : ${documentsByAgendaItemId[agendaItem.id]}">
+                                    <div class="agenda-document-row">
+                                        <span th:text="${document.caseFile.originalFilename}">tjansteskrivelse.pdf</span>
+
+                                        <button type="button"
+                                                th:data-preview-url="@{/dashboard/case-management/case-records/{caseId}/files/{fileId}/preview-frame(caseId=${agendaItem.caseRecord.id}, fileId=${document.caseFile.id})}"
+                                                title="Öppna fil"
+                                                onclick="togglePreview(this)">👁</button>
+
+                                        <form
+                                                th:attr="hx-post=@{/admin/meetings/{meetingId}/agenda-items/{agendaItemId}/documents/{documentId}/remove(meetingId=${selectedMeeting.id}, agendaItemId=${agendaItem.id}, documentId=${document.id})}"
+                                                hx-target="#content-area"
+                                                hx-swap="innerHTML"
+                                        >
+                                            <input type="hidden"
+                                                   th:if="${_csrf != null}"
+                                                   th:name="${_csrf.parameterName}"
+                                                   th:value="${_csrf.token}">
+                                            <button type="submit" class="danger-button">Ta bort</button>
+                                        </form>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <h5>Tillgängliga handlingar</h5>
+
+                            <div th:if="${#lists.isEmpty(availableFilesByAgendaItemId[agendaItem.id])}">
+                                <p>Det finns inga handlingar kopplade till ärendet.</p>
+                            </div>
+
+                            <ul class="agenda-document-list" th:if="${not #lists.isEmpty(availableFilesByAgendaItemId[agendaItem.id])}">
+                                <li th:each="caseFile : ${availableFilesByAgendaItemId[agendaItem.id]}">
+                                    <div class="agenda-document-row">
+                                        <span th:text="${caseFile.originalFilename}">budgetunderlag.pdf</span>
+
+                                        <button type="button"
+                                                th:data-preview-url="@{/dashboard/case-management/case-records/{caseId}/files/{fileId}/preview-frame(caseId=${agendaItem.caseRecord.id}, fileId=${caseFile.id})}"
+                                                title="Öppna fil"
+                                                onclick="togglePreview(this)">👁</button>
+
+                                        <form
+                                                th:attr="hx-post=@{/admin/meetings/{meetingId}/agenda-items/{agendaItemId}/documents(meetingId=${selectedMeeting.id}, agendaItemId=${agendaItem.id})}"
+                                                hx-target="#content-area"
+                                                hx-swap="innerHTML"
+                                        >
+                                            <input type="hidden"
+                                                   th:if="${_csrf != null}"
+                                                   th:name="${_csrf.parameterName}"
+                                                   th:value="${_csrf.token}">
+
+                                            <input type="hidden" name="caseFileId" th:value="${caseFile.id}">
+                                            <button type="submit" class="submit">Lägg till</button>
+                                        </form>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        function togglePreview(btn) {
+            const item = btn.closest('.agenda-document-row');
+            const existing = item.querySelector('.file-preview-frame');
+            if (existing) {
+                existing.remove();
+                return;
+            }
+            const url = btn.getAttribute('data-preview-url');
+            fetch(url)
+                .then(res => {
+                    if (!res.ok) throw new Error('Preview failed');
+                    return res.text();
+                })
+                .then(html => {
+                    item.insertAdjacentHTML('beforeend', html);
+                })
+                .catch(err => {
+                    console.error('Failed to load preview:', err);
+                });
+        }
+    </script>
+
+</div>

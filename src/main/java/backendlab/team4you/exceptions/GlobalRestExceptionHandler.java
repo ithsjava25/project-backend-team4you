@@ -22,7 +22,8 @@ import java.time.LocalDateTime;
         "backendlab.team4you.caserecord",
         "backendlab.team4you.registry",
         "backendlab.team4you.user",
-        "backendlab.team4you.controller"
+        "backendlab.team4you.controller",
+        "backendlab.team4you.protocol"
 })
 public class GlobalRestExceptionHandler {
 
@@ -43,7 +44,12 @@ public class GlobalRestExceptionHandler {
             CaseFileNotFoundException.class,
             CaseRecordNotFoundException.class,
             RegistryNotFoundException.class,
-            UserNotFoundException.class
+            UserNotFoundException.class,
+            MeetingNotFoundException.class,
+            MeetingAgendaItemNotFoundException.class,
+            MeetingAgendaDocumentNotFoundException.class,
+            ProtocolNotFoundException.class,
+            ProtocolParagraphNotFoundException.class
     })
     public ResponseEntity<ErrorResponseDto> handleNotFound(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -58,7 +64,8 @@ public class GlobalRestExceptionHandler {
     @ExceptionHandler({
             InvalidFileNameException.class,
             IllegalArgumentException.class,
-            IllegalStateException.class
+            InvalidMeetingStateException.class,
+            ProtocolNotReadyForPdfException.class
     })
     public ResponseEntity<ErrorResponseDto> handleBadRequest(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -85,7 +92,12 @@ public class GlobalRestExceptionHandler {
             DuplicateRegistryNameException.class,
             DuplicateRegistryCodeException.class,
             DuplicateEmailException.class,
-            FileKeyConflictException.class
+            FileKeyConflictException.class,
+            DuplicateMeetingAgendaItemException.class,
+            DuplicateMeetingAgendaDocumentException.class,
+            ProtocolAlreadyExistsException.class,
+            ProtocolAlreadyArchivedException.class,
+            MeetingHasProtocolException.class
     })
     public ResponseEntity<ErrorResponseDto> handleConflict(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -196,6 +208,17 @@ public class GlobalRestExceptionHandler {
                         HttpStatus.INTERNAL_SERVER_ERROR.value(),
                         "internal server error",
                         "Ett oväntat fel uppstod.",
+                        LocalDateTime.now()
+                ));
+    }
+
+    @ExceptionHandler(FileInUseException.class)
+    public ResponseEntity<ErrorResponseDto> handleFileInUse(FileInUseException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponseDto(
+                        HttpStatus.CONFLICT.value(),
+                        "conflict",
+                        ex.getMessage(),
                         LocalDateTime.now()
                 ));
     }

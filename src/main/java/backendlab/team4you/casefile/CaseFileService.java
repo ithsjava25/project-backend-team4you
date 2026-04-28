@@ -4,11 +4,8 @@ import backendlab.team4you.casefile.access.CaseFileAccessService;
 import backendlab.team4you.caserecord.CaseRecord;
 import backendlab.team4you.caserecord.CaseRecordRepository;
 import backendlab.team4you.common.ConfidentialityLevel;
-import backendlab.team4you.exceptions.CaseFileNotFoundException;
-import backendlab.team4you.exceptions.CaseRecordNotFoundException;
-import backendlab.team4you.exceptions.FileStorageConfigurationException;
-import backendlab.team4you.exceptions.FileTooLargeException;
-import backendlab.team4you.exceptions.InvalidFileNameException;
+import backendlab.team4you.exceptions.*;
+import backendlab.team4you.meeting.MeetingAgendaDocumentRepository;
 import backendlab.team4you.s3.S3Service;
 import backendlab.team4you.user.UserEntity;
 import org.slf4j.Logger;
@@ -38,17 +35,20 @@ public class CaseFileService {
     private final CaseFileRepository caseFileRepository;
     private final CaseFileAccessService caseFileAccessService;
     private final S3Service s3Service;
+    private final MeetingAgendaDocumentRepository meetingAgendaDocumentRepository;
 
     public CaseFileService(
             CaseRecordRepository caseRecordRepository,
             CaseFileRepository caseFileRepository,
             CaseFileAccessService caseFileAccessService,
-            S3Service s3Service
+            S3Service s3Service,
+            MeetingAgendaDocumentRepository meetingAgendaDocumentRepository
     ) {
         this.caseRecordRepository = caseRecordRepository;
         this.caseFileRepository = caseFileRepository;
         this.caseFileAccessService = caseFileAccessService;
         this.s3Service = s3Service;
+        this.meetingAgendaDocumentRepository = meetingAgendaDocumentRepository;
     }
 
     @Transactional
@@ -62,16 +62,16 @@ public class CaseFileService {
         ConfidentialityLevel effectiveConfidentialityLevel =
                 confidentialityLevel != null ? confidentialityLevel : ConfidentialityLevel.OPEN;
 
-        if (!caseFileAccessService.canUploadFile(actor, caseRecordId, effectiveConfidentialityLevel)) {
+        CaseRecord caseRecord = caseRecordRepository.findByIdWithLock(caseRecordId)
+                .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
+
+        if (!caseFileAccessService.canUploadFile(actor, caseRecord, effectiveConfidentialityLevel)) {
             throw new AccessDeniedException("Du har inte behörighet att ladda upp denna fil.");
         }
 
         if (file.getSize() > MAX_FILE_SIZE_BYTES) {
             throw new FileTooLargeException(MAX_FILE_SIZE_BYTES);
         }
-
-        CaseRecord caseRecord = caseRecordRepository.findByIdWithLock(caseRecordId)
-                .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
 
         int nextDocumentNumber = allocateNextDocumentNumber(caseRecord.getId());
         String documentReference = caseRecord.getCaseNumber() + "-" + nextDocumentNumber;
@@ -180,12 +180,85 @@ public class CaseFileService {
         }
 
         String s3Key = caseFile.getS3Key();
+
+        if (meetingAgendaDocumentRepository.existsByCaseFileId(fileId)) {
+            throw new FileInUseException("Filen kan inte tas bort eftersom den används som mötesunderlag.");
+        }
+
         caseFileRepository.delete(caseFile);
+
         try {
             s3Service.deleteFile(s3Key);
-        } catch (Exception e) {
-            log.error("Failed to delete S3 object after DB deletion: {}", s3Key, e);
-            throw e;
+        } catch (Exception exception) {
+            log.error("Failed to delete S3 object after DB deletion: {}", s3Key, exception);
+        }
+    }
+
+    @Transactional
+    public CaseFile uploadGeneratedFile(
+            Long caseRecordId,
+            String originalFilename,
+            String contentType,
+            byte[] bytes,
+            ConfidentialityLevel confidentialityLevel,
+            UserEntity actor
+    ) {
+        ConfidentialityLevel effectiveConfidentialityLevel =
+                confidentialityLevel != null ? confidentialityLevel : ConfidentialityLevel.OPEN;
+
+        CaseRecord caseRecord = caseRecordRepository.findByIdWithLock(caseRecordId)
+                .orElseThrow(() -> new CaseRecordNotFoundException(caseRecordId));
+
+        if (!caseFileAccessService.canUploadFile(actor, caseRecord, effectiveConfidentialityLevel)) {
+            throw new AccessDeniedException("Du har inte behörighet att ladda upp denna fil.");
+        }
+
+        if (bytes == null) {
+            throw new IllegalArgumentException("Filinnehåll saknas.");
+            }
+        if (bytes.length > MAX_FILE_SIZE_BYTES) {
+            throw new FileTooLargeException(MAX_FILE_SIZE_BYTES);
+        }
+
+        if (originalFilename == null || originalFilename.isBlank()) {
+            throw new InvalidFileNameException("Filnamn måste anges.");
+        }
+
+        String normalizedContentType = normalizeContentType(contentType);
+
+        int nextDocumentNumber = allocateNextDocumentNumber(caseRecord.getId());
+        String documentReference = caseRecord.getCaseNumber() + "-" + nextDocumentNumber;
+        String s3Key = buildUniqueS3Key(caseRecord, originalFilename);
+
+        boolean uploadedToS3 = false;
+
+        try {
+            s3Service.uploadFileIfAbsent(s3Key, bytes, normalizedContentType);
+            uploadedToS3 = true;
+
+            CaseFile caseFile = new CaseFile();
+            caseFile.setCaseRecord(caseRecord);
+            caseFile.setOriginalFilename(originalFilename);
+            caseFile.setS3Key(s3Key);
+            caseFile.setContentType(normalizedContentType);
+            caseFile.setSize(bytes.length);
+            caseFile.setUploadedAt(LocalDateTime.now());
+            caseFile.setDocumentNumber(nextDocumentNumber);
+            caseFile.setDocumentReference(documentReference);
+            caseFile.setConfidentialityLevel(effectiveConfidentialityLevel);
+
+            return caseFileRepository.saveAndFlush(caseFile);
+
+        } catch (NoSuchBucketException exception) {
+            throw new FileStorageConfigurationException(
+                    "Filuppladdning är inte korrekt konfigurerad: S3-bucket saknas.",
+                    exception
+            );
+        } catch (RuntimeException exception) {
+            if (uploadedToS3) {
+                cleanupUploadedObjectIfPossible(s3Key, exception);
+            }
+            throw exception;
         }
     }
 
