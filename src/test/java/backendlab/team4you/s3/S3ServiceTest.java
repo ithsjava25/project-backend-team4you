@@ -11,6 +11,8 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.test.util.ReflectionTestUtils;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -54,6 +56,7 @@ class S3ServiceTest {
         // Assert — verify that deleteObject was called once
         verify(s3Client, times(1)).deleteObject(any(DeleteObjectRequest.class));
     }
+
     @Test
     void downloadFile_shouldCallGetObject() {
         // Arrange
@@ -66,5 +69,38 @@ class S3ServiceTest {
 
         // Assert — verify that getObject was called once
         verify(s3Client, times(1)).getObject(any(GetObjectRequest.class));
+    }
+
+    @Test
+    void uploadFile_shouldThrowFileStorageConfigurationException_whenS3Fails() {
+        // Arrange
+        when(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
+                .thenThrow(S3Exception.builder().message("S3 error").build());
+
+        // Act & Assert
+        assertThrows(backendlab.team4you.exceptions.FileStorageConfigurationException.class,
+                () -> s3Service.uploadFile("test.txt", "Hello".getBytes(), "text/plain"));
+    }
+
+    @Test
+    void downloadFile_shouldThrowFileStorageConfigurationException_whenS3Fails() {
+        // Arrange
+        when(s3Client.getObject(any(GetObjectRequest.class)))
+                .thenThrow(S3Exception.builder().message("S3 error").build());
+
+        // Act & Assert
+        assertThrows(backendlab.team4you.exceptions.FileStorageConfigurationException.class,
+                () -> s3Service.downloadFile("test.txt"));
+    }
+
+    @Test
+    void deleteFile_shouldThrowFileStorageConfigurationException_whenS3Fails() {
+        // Arrange
+        when(s3Client.deleteObject(any(DeleteObjectRequest.class)))
+                .thenThrow(S3Exception.builder().message("S3 error").build());
+
+        // Act & Assert
+        assertThrows(backendlab.team4you.exceptions.FileStorageConfigurationException.class,
+                () -> s3Service.deleteFile("test.txt"));
     }
 }

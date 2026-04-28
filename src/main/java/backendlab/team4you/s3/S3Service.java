@@ -10,6 +10,8 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import software.amazon.awssdk.services.s3.model.S3Exception;
+import backendlab.team4you.exceptions.FileStorageConfigurationException;
+
 
 
 import java.io.InputStream;
@@ -29,34 +31,46 @@ public class S3Service {
 
     // Upload a file to S3
     public void uploadFile(String key, byte[] data, String contentType) {
-        s3Client.putObject(
-                PutObjectRequest.builder()
-                        .bucket(bucketName)
-                        .key(key)
-                        .contentType(contentType)
-                        .build(),
-                RequestBody.fromBytes(data)
-        );
+        try {
+            s3Client.putObject(
+                    PutObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(key)
+                            .contentType(contentType)
+                            .build(),
+                    RequestBody.fromBytes(data)
+            );
+        } catch (S3Exception e) {
+            throw new FileStorageConfigurationException("Kunde inte ladda upp filen: " + key, e);
+        }
     }
 
     // Download a file from S3
     public InputStream downloadFile(String key) {
-        return s3Client.getObject(
-                GetObjectRequest.builder()
-                        .bucket(bucketName)
-                        .key(key)
-                        .build()
-        );
+        try {
+            return s3Client.getObject(
+                    GetObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(key)
+                            .build()
+            );
+        } catch (S3Exception e) {
+            throw new FileStorageConfigurationException("Kunde inte ladda ner filen: " + key, e);
+        }
     }
 
     // Delete a file from S3
     public void deleteFile(String key) {
-        s3Client.deleteObject(
-                DeleteObjectRequest.builder()
-                        .bucket(bucketName)
-                        .key(key)
-                        .build()
-        );
+        try {
+            s3Client.deleteObject(
+                    DeleteObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(key)
+                            .build()
+            );
+        } catch (S3Exception e) {
+            throw new FileStorageConfigurationException("Kunde inte radera filen: " + key, e);
+        }
     }
 
     public void uploadFileIfAbsent(String key, byte[] data, String contentType) {
