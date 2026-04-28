@@ -16,6 +16,23 @@
         </li>
 
         <li>
+            <a th:href="@{/dashboard/protocols}"
+               hx-get="/dashboard/protocols"
+               hx-target="#content-area"
+               hx-swap="innerHTML">
+                <i class="fa-solid fa-file-signature"></i>
+                <span>Protokoll</span>
+            </a>
+        </li>
+
+        <li>
+            <a th:href="@{/dashboard}">
+                <i class="fa-solid fa-table-columns"></i>
+                <span>Till dashboard</span>
+            </a>
+        </li>
+
+        <li>
             <a th:href="@{/webauthn/register}" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
                 <i class="fa-solid fa-key"></i>
                 <span>Add Passkeys</span>

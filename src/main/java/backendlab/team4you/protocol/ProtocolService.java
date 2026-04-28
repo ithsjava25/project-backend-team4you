@@ -102,14 +102,20 @@ public class ProtocolService {
             String decisionText
     ) {
         Objects.requireNonNull(paragraphId, "paragraphId is required");
-        Objects.requireNonNull(decisionType, "decisionType is required");
 
         ProtocolParagraph paragraph = paragraphRepository.findById(paragraphId)
                 .orElseThrow(() -> new ProtocolParagraphNotFoundException(paragraphId));
 
+        Protocol protocol = protocolRepository.findWithLockById(paragraph.getProtocol().getId())
+                .orElseThrow(() -> new ProtocolNotFoundException(paragraph.getProtocol().getId()));
+
+        if (protocol.getArchivedPdfFile() != null) {
+            throw new ProtocolAlreadyArchivedException(protocol.getId());
+        }
+
         paragraph.updateDecision(decisionType, decisionText);
 
-        return paragraph.getProtocol();
+        return protocol;
     }
 
     @Transactional(readOnly = true)

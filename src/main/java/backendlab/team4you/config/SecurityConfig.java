@@ -46,6 +46,7 @@ public class SecurityConfig {
 
                                 .requestMatchers("/webauthn/**").hasAnyRole("USER", ADMIN, CASE_OFFICER)
                                 .requestMatchers("/admin/**").hasRole(ADMIN)
+                                .requestMatchers("/case-officer").hasRole(CASE_OFFICER)
                                 .requestMatchers("/case-officer/**").hasRole(CASE_OFFICER)
                                 .requestMatchers("/home", "/profile/**").hasAnyRole("USER", ADMIN, CASE_OFFICER)
                                 .requestMatchers("/add-passkey", "/webauthn/register/**").hasAnyRole("USER", ADMIN, CASE_OFFICER)
