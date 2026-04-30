@@ -38,7 +38,7 @@ public class ProtocolController {
     }
 
     @GetMapping
-    @ResponseBody
+
     @AuditAction(action = "VIEW_PROTOCOLS", entity = "PROTOCOL")
     public String listProtocols(Model model) {
         model.addAttribute(
@@ -51,7 +51,7 @@ public class ProtocolController {
     }
 
     @PostMapping("/meetings/{meetingId}")
-    @ResponseBody
+
     @AuditAction(action = "CREATE_PROTOCOL", entity = "PROTOCOL")
     public String createProtocol(
             @PathVariable Long meetingId,
@@ -78,7 +78,7 @@ public class ProtocolController {
     }
 
     @GetMapping("/{protocolId}")
-    @ResponseBody
+
     @AuditAction(action = "VIEW_PROTOCOL", entity = "PROTOCOL")
     public String viewProtocol(
             @PathVariable Long protocolId,
@@ -100,7 +100,7 @@ public class ProtocolController {
     }
 
     @PostMapping("/paragraphs/{paragraphId}/decision")
-    @ResponseBody
+
     @AuditAction(action = "UPDATE_PROTOCOL_DECISION", entity = "PROTOCOL_DECISION")
     public String updateParagraphDecision(
             @PathVariable Long paragraphId,
@@ -133,7 +133,6 @@ public class ProtocolController {
     }
 
     @GetMapping("/paragraphs/{paragraphId}/decision-text")
-    @ResponseBody
     @AuditAction(action = "VIEW_PROTOCOL_DECISION_TEXT", entity = "PROTOCOL_DECISION")
     public String getDefaultDecisionText(
             @PathVariable Long paragraphId,

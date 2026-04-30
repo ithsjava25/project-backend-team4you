@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 @Service
@@ -35,7 +36,7 @@ public class AuditService {
         log.setAction(action);
         log.setEndpoint(endpoint);
         log.setIpAddress(ipAddress);
-        log.setTimestamp(ZonedDateTime.now(ZoneId.of("Europe/Stockholm")));
+        log.setTimestamp(ZonedDateTime.now(ZoneOffset.UTC));
         log.setStatus(status);
         log.setHttpMethod(httpMethod);
                 log.setEntityType(entityType);
