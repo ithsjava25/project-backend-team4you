@@ -46,7 +46,6 @@ public class CaseFileController {
     }
 
     @GetMapping
-    @ResponseBody
     @AuditAction(action = "FILE_LIST_VIEWED", entity = "CASE_FILE")
     public ResponseEntity<List<CaseFileListItemDto>> listFiles(
             @PathVariable Long caseRecordId,
@@ -61,7 +60,6 @@ public class CaseFileController {
     }
 
     @GetMapping("/{fileId}")
-    @ResponseBody
     @AuditAction(action = "FILE_DOWNLOADED", entity = "CASE_FILE")
     public ResponseEntity<StreamingResponseBody> downloadFile(
             @PathVariable Long caseRecordId,

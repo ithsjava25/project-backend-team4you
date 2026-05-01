@@ -41,7 +41,6 @@ public class CaseRecordViewController {
     }
 
     @GetMapping("/registries/{registryId}/case-records")
-    @ResponseBody
     @AuditAction(action = "CASE_RECORD_LIST", entity = "CASE_RECORD")
     public String caseRecords(@PathVariable Long registryId, Model model, Principal principal) {
         UserEntity currentUser = userService.getCurrentUser(principal);
@@ -49,7 +48,7 @@ public class CaseRecordViewController {
     }
 
     @PostMapping("/registries/{registryId}/case-records")
-    @ResponseBody
+
     @AuditAction(action = "CASE_RECORD_CREATE", entity = "CASE_RECORD")
     public String createCaseRecord(
             @PathVariable Long registryId,
@@ -91,7 +90,7 @@ public class CaseRecordViewController {
     }
 
     @GetMapping("/case-records/{caseId}")
-    @ResponseBody
+
     @AuditAction(action = "CASE_RECORD_DETAIL", entity = "CASE_RECORD")
     public String caseRecordDetail(@PathVariable Long caseId, Model model) {
         try {
@@ -109,7 +108,6 @@ public class CaseRecordViewController {
     }
 
     @PostMapping("/case-records/{caseId}/update")
-    @ResponseBody
     @AuditAction(action = "CASE_RECORD_UPDATE", entity = "CASE_RECORD")
     public String updateCaseRecord(
             @PathVariable Long caseId,
