@@ -1,5 +1,6 @@
 package backendlab.team4you.controller;
 
+import backendlab.team4you.audit.AuditAction;
 import backendlab.team4you.user.UserEntity;
 import backendlab.team4you.user.UserService;
 
@@ -15,11 +16,9 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.webauthn.management.PublicKeyCredentialUserEntityRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -35,11 +34,15 @@ public class SignupController {
     }
 
     @GetMapping("/login/webauthn")
+    @ResponseBody
+    @AuditAction(action = "LOGIN", entity = "USER")
     public String webauthnCheck() {
         return "check";
     }
 
     @GetMapping("/signup")
+    @ResponseBody
+    @AuditAction(action = "SIGNUP", entity = "USER")
     String signup(org.springframework.security.web.csrf.CsrfToken token, Model model) {
         model.addAttribute("csrfToken", token.getToken());
         return "signup";
@@ -47,6 +50,7 @@ public class SignupController {
 
     @PostMapping("/signup")
     @ResponseBody
+    @AuditAction(action = "SIGNUP", entity = "USER")
     public void signup(@RequestBody SignupRequest req, HttpServletRequest request, HttpServletResponse response) {
 
         UserEntity userEntity = userService.registerWebAuthnUser(
@@ -68,6 +72,12 @@ public class SignupController {
 
         SecurityContextRepository repo = new HttpSessionSecurityContextRepository();
         repo.saveContext(context, request, response);
+    }
+
+    @DeleteMapping("/settings/passkeys/{credentialId}")
+    @AuditAction(action = "PASSKEY_DELETE", entity = "SECURITY")
+    public String deletePasskey(@PathVariable String credentialId, Principal principal) {
+        return "redirect:/settings";
     }
 
     public static class SignupRequest {

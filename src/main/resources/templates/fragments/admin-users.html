@@ -1,28 +1,89 @@
 <div th:fragment="content">
 
-    <h2>Användare</h2>
+<style>
+    .admin-users{
+    background-color:
+    #161a2d;
+
+    border-collapse: collapse;
+    color:white;
+    }
+
+    .admin-users-select{
+
+    padding: 10px;
+    border-radius:20px;
+    border: 1px solid purple;
+    margin-bottom: 20px;
+    font-family: sans-serif;
+    font-weight: 100;
+    background: white;
+    cursor: pointer;
+    color:purple;
+
+    }
+
+    .btn-admin-users{
+    padding: 10px;
+    border-radius:20px;
+    border: 1px solid purple;
+    margin-bottom: 20px;
+    font-family: sans-serif;
+    font-weight: 100;
+    background: white;
+    cursor: pointer;
+    color:green;
+
+    }
+
+    .admin-users-ul{
+    font-size:20px;
+    list-style-type: none;
+
+    }
+
+    h2{
+    font-size:30px;
+    font-weight: 200;
+    }
+    </style>
+
+    <div class="admin-users">
+    <h2 class="admin-users-h2">Användare</h2>
 
     <div id="alert-area"></div>
 
-    <ul>
-        <li th:each="user : ${users}">
+    <ul class="admin-users-ul">
+        <li class="admin-users-li" th:each="user : ${users}">
 
-            <span th:text="${user.displayName}"></span>
-            <span th:text="${user.email}"></span>
-             <span th:text="${user.role}"></span>
+            <strong th:text="${user.displayName}"></strong>
 
-            <button
-                    th:attr="hx-post=@{/admin/users/delete(id=${user.id})}"
-                    hx-target="closest li"
-                    hx-swap="outerHTML"
-                    hx-confirm="Är du säker?"
+            <span class="admin-users-span" th:text="${user.email}"></span>
+
+            <form class="admin-users-form"
+                    th:action="@{/admin/users/{name}/role(name=${user.name})}"
+                    th:attr="hx-post=@{/admin/users/{name}/role(name=${user.name})}"
+                    hx-target="#content-area"
+                    hx-swap="innerHTML"
             >
-                Ta bort
-            </button>
+
+                <select class="admin-users-select" name="role">
+                    <option value="USER">USER</option>
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="CASE_OFFICER">CASE OFFICER</option>
+                </select>
+
+                <button type="submit" class="btn-admin-users">
+                    Uppdatera roll
+                </button>
+
+            </form>
 
         </li>
     </ul>
 
-    <div th:replace="fragments/pagination :: pagination('/admin/users')"></div>
+    <div th:replace="fragments/pagination :: pagination('/admin/users')">
+    </div>
 
+</div>
 </div>

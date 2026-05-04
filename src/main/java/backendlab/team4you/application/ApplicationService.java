@@ -19,9 +19,9 @@ public class ApplicationService {
 
     }
 
-    public void save(ApplicationEntity applicationEntity) {
-        applicationRepository.save(applicationEntity);
-    }
+    public ApplicationEntity save(ApplicationEntity applicationEntity) {
+            return applicationRepository.save(applicationEntity);
+        }
 
     public ApplicationEntity findById(Long id) {
         return applicationRepository.findById(id).orElse(null);

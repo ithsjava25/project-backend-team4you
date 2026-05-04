@@ -1,5 +1,7 @@
 package backendlab.team4you.casefile.ui;
 
+import backendlab.team4you.audit.AuditAction;
+import backendlab.team4you.audit.AuditService;
 import backendlab.team4you.casefile.CaseFileService;
 import backendlab.team4you.common.ConfidentialityLevel;
 import backendlab.team4you.exceptions.*;
@@ -22,10 +24,12 @@ public class CaseFileViewController {
 
     private final CaseFileService caseFileService;
     private final UserService userService;
+    private final AuditService auditService;
 
-    public CaseFileViewController(CaseFileService caseFileService, UserService userService) {
+    public CaseFileViewController(CaseFileService caseFileService, UserService userService, AuditService auditService) {
         this.caseFileService = caseFileService;
         this.userService = userService;
+        this.auditService = auditService;
     }
 
     @GetMapping("/case-records/{caseId}/files")
@@ -49,6 +53,7 @@ public class CaseFileViewController {
     }
 
     @PostMapping("/case-records/{caseId}/files")
+    @AuditAction(action = "FILE_UPLOAD_UI", entity = "CASE_FILE")
     public String uploadCaseFile(
             @PathVariable Long caseId,
             @RequestParam("file") MultipartFile file,
@@ -57,6 +62,7 @@ public class CaseFileViewController {
             Principal principal
     ) {
         UserEntity currentUser = userService.getCurrentUser(principal);
+        auditService.log("TEST_USER", "MANUAL_LOG", "CASE", caseId, "Testar loggning", "SUCCESS");
 
         try {
             caseFileService.uploadFile(caseId, file, confidentialityLevel, currentUser);
@@ -79,6 +85,7 @@ public class CaseFileViewController {
     }
 
     @DeleteMapping("/case-records/{caseId}/files/{fileId}")
+    @AuditAction(action = "FILE_DELETE_UI", entity = "CASE_FILE")
     public String deleteCaseFile(
             @PathVariable Long caseId,
             @PathVariable Long fileId,

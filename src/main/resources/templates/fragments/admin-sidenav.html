@@ -69,6 +69,17 @@
                     <span>Add Passkeys</span>
                 </a>
             </li>
+            <li>
+                <a th:href="@{/admin/registry-access}"
+                   hx-get="/admin/registry-access"
+                   hx-target="#content-area"
+                   hx-swap="innerHTML">
+
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Registry Permissions</span>
+
+                </a>
+            </li>
 
             <li>
                 <form th:action="@{/logout}" method="post">
@@ -79,24 +90,9 @@
                 </form>
             </li>
 
+
         </ul>
-        <div class="sorting">
 
-            <button
-                    th:attr="hx-get=@{/admin/users(page=0, sort='displayName', direction=${direction == 'asc' ? 'desc' : 'asc'})}"
-                    hx-target="#content-area"
-                    hx-swap="innerHTML">
-                Sortera namn
-            </button>
-
-            <button
-                    th:attr="hx-get=@{/admin/users(page=0, sort='email', direction=${direction == 'asc' ? 'desc' : 'asc'})}"
-                    hx-target="#content-area"
-                    hx-swap="innerHTML">
-                Sortera email
-            </button>
-
-        </div>
 
     </div>
 

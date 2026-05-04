@@ -1,0 +1,41 @@
+<div th:fragment="content">
+    <style>
+
+        .admin-registry-access{
+
+
+        }
+    </style>
+
+    <div class="admin-registry-access">
+        <h2>Registry Permissions</h2>
+
+        <p>Välj en användare för att hantera registry access.</p>
+
+        <div id="alert-area"></div>
+
+        <ul>
+            <li th:each="user : ${users}">
+
+                <a
+                        th:href="@{/admin/registry-access/user/{name}(name=${user.name})}"
+                        th:attr="hx-get=@{/admin/registry-access/user/{name}(name=${user.name})}"
+                        hx-target="#permission-area"
+                        hx-swap="innerHTML"
+                >
+
+
+                <strong th:text="${user.displayName}"></strong>
+                    -
+                    <span th:text="${user.email}"></span>
+
+                </a>
+
+            </li>
+        </ul>
+    </div>
+    <div id="permission-area">
+        <p>Välj en användare för att se permissions.</p>
+    </div>
+
+</div>

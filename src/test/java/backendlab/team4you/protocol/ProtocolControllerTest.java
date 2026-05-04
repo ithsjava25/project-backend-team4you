@@ -47,6 +47,8 @@ class ProtocolControllerTest {
     @MockitoBean
     private UserService userService;
 
+
+
     @Test
     @WithMockUser(roles = "ADMIN")
     @DisplayName("GET /admin/protocols should return protocols fragment")

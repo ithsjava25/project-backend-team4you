@@ -1,5 +1,6 @@
 package backendlab.team4you.controller;
 
+import backendlab.team4you.audit.AuditAction;
 import backendlab.team4you.dto.UserRegistrationDTO;
 import backendlab.team4you.exceptions.DuplicateEmailException;
 import backendlab.team4you.user.UserEntity;
@@ -23,6 +24,7 @@ public class RegistrationController {
     }
 
     @GetMapping("/register")
+    @AuditAction(action = "REGISTER", entity = "USER")
     public String showRegistrationForm(Model model) {
 
         model.addAttribute("user", new UserRegistrationDTO("","", "", "", "", "", ""));
@@ -30,6 +32,7 @@ public class RegistrationController {
     }
 
     @PostMapping("/register")
+    @AuditAction(action = "REGISTER", entity = "USER")
     public String registerUser(@ModelAttribute("user") UserRegistrationDTO registrationDto, Model model) {
 
 
@@ -52,6 +55,7 @@ public class RegistrationController {
     }
 
     @GetMapping("/login")
+    @AuditAction(action = "LOGIN", entity = "USER")
     public String loginPage(@RequestParam(value = "registered", required = false) String registered,
                             @RequestParam(value = "logout", required = false) String logout,
                             Model model) {
